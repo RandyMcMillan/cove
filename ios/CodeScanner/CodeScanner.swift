@@ -97,6 +97,10 @@
         public var videoCaptureDevice: AVCaptureDevice?
         public var completion: (Result<ScanResult, ScanError>) -> Void
 
+        // anayzis
+        private var lastAnalysisTime: Date = .distantPast
+        private let analysisCooldown: TimeInterval = 0.4 // 400ms
+
         public init(
             codeTypes: [AVMetadataObject.ObjectType],
             scanMode: ScanMode = .once,
