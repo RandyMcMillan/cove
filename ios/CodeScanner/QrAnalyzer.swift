@@ -37,12 +37,12 @@ class QrAnalyzer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private func analyzeImage(_ image: UIImage) {
         Task {
             do {
-                let potentialQRCodes = try await detectPotentialQRCodes(in: image)
+//                let potentialQRCodes = try await detectPotentialQRCodes(in: image)
                 try await detectPotentialQRCodes2(in: image)
-                if !potentialQRCodes.isEmpty {
+//                if !potentialQRCodes.isEmpty {
 //                    checkImageBlurriness(in: image, potentialQRCodes: potentialQRCodes)
 //                    checkPotentialQrCodeSizes(rectangles: potentialQRCodes, in: image)
-                }
+//                }
             } catch {
                 print("Failed to detect potential QR codes: \(error)")
             }
