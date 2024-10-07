@@ -5,7 +5,7 @@ use message_info::MessageInfo;
 use parser::{parse_message_info, stream::StreamExt};
 use record::NdefRecord;
 
-pub mod ffi;
+// pub mod ffi;
 pub mod header;
 pub mod message_info;
 pub mod ndef_type;

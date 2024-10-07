@@ -18,6 +18,7 @@ pub mod keychain;
 pub mod keys;
 pub mod mnemonic;
 pub mod network;
+pub mod nfc;
 pub mod node;
 pub mod node_connect;
 pub mod pending_wallet;
@@ -34,3 +35,4 @@ pub mod word_validator;
 pub mod xpub;
 
 uniffi::setup_scaffolding!();
+cove_nfc::uniffi_reexport_scaffolding!();
