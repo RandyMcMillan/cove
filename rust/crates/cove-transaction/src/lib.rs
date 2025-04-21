@@ -1,8 +1,13 @@
-use bdk_wallet::bitcoin::Amount as BdkAmount;
+pub mod sent_and_received;
+pub mod unit;
+
+uniffi::setup_scaffolding!();
+
 use numfmt::{Formatter, Precision};
 use serde::{Deserialize, Serialize};
 
-use super::Unit;
+use crate::unit::Unit;
+
 #[derive(
     Debug,
     Clone,
@@ -22,27 +27,7 @@ use super::Unit;
     derive_more::Into,
     derive_more::Deref,
 )]
-pub struct Amount(pub BdkAmount);
-
-impl AsRef<f64> for Amount {
-    fn as_ref(&self) -> &f64 {
-        // This is a bit of a hack, but it works for our use case
-        // We need to return a reference to a f64 value
-        // Since as_btc() returns a copy, we need to store it somewhere
-        // Using a thread_local for this
-        thread_local! {
-            static TEMP_F64: std::cell::Cell<f64> = std::cell::Cell::new(0.0);
-        }
-
-        TEMP_F64.with(|cell| {
-            cell.set(self.as_btc());
-            // This is unsafe but works for our specific use case
-            // We're converting the Cell reference to a raw reference
-            // because AsRef needs to return a reference
-            unsafe { &*(cell as *const _ as *const f64) }
-        })
-    }
-}
+pub struct Amount(pub bitcoin::Amount);
 
 // rust only
 impl Amount {
@@ -97,7 +82,7 @@ impl Amount {
             .unwrap()
             .precision(Precision::Decimals(0));
 
-        f.fmt(self.as_sats() as f64).to_string()
+        f.fmt2(self.as_sats() as f64).to_string()
     }
 
     pub fn sats_string_with_unit(&self) -> String {

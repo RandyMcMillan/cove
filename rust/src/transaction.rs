@@ -1,7 +1,3 @@
-mod amount;
-mod sent_and_received;
-mod unit;
-
 pub mod fees;
 pub mod ffi;
 pub mod transaction_details;
@@ -25,9 +21,9 @@ use crate::{
 // Import types from cove-types
 pub use cove_types::{OutPoint, TxId, WalletId};
 
-pub type Amount = amount::Amount;
-pub type SentAndReceived = sent_and_received::SentAndReceived;
-pub type Unit = unit::Unit;
+pub type Amount = cove_types::Amount;
+pub type SentAndReceived = cove_types::SentAndReceived;
+pub type Unit = cove_types::Unit;
 pub type TransactionDetails = transaction_details::TransactionDetails;
 
 pub type FeeRate = fees::FeeRate;

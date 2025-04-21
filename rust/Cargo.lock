@@ -711,7 +711,7 @@ dependencies = [
  "memchr",
  "nid",
  "num-bigint",
- "numfmt",
+ "numfmt 1.1.1 (git+https://github.com/bitcoinppl/numfmt)",
  "once_cell",
  "parking_lot",
  "paste",
@@ -743,10 +743,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "cove-database"
+version = "0.1.0"
+dependencies = [
+ "arc-swap",
+ "bitcoin",
+ "cove-types",
+ "derive_more",
+ "eyre",
+ "jiff",
+ "macros",
+ "once_cell",
+ "reqwest 0.12.15",
+ "serde",
+ "serde_json",
+ "strum",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tryhard",
+ "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "util",
+]
+
+[[package]]
 name = "cove-fiat"
 version = "0.1.0"
 dependencies = [
  "arc-swap",
+ "bitcoin",
+ "cove-transaction",
  "cove-types",
  "derive_more",
  "eyre",
@@ -824,15 +850,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "cove-transaction"
+version = "0.1.0"
+dependencies = [
+ "bitcoin",
+ "derive_more",
+ "eyre",
+ "hex",
+ "jiff",
+ "macros",
+ "nid",
+ "numfmt 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.9.1",
+ "redb",
+ "serde",
+ "strum",
+ "thiserror 2.0.12",
+ "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+]
+
+[[package]]
 name = "cove-types"
 version = "0.1.0"
 dependencies = [
  "bitcoin",
  "derive_more",
+ "eyre",
  "hex",
  "jiff",
  "macros",
  "nid",
+ "numfmt 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.9.1",
  "redb",
  "serde",
@@ -2074,6 +2122,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "numfmt"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db7467e47de9fb6ea5b3f47dc34c1cf0b86359f072a46f6278119544cdbd0021"
+dependencies = [
+ "dtoa",
+ "itoa",
 ]
 
 [[package]]

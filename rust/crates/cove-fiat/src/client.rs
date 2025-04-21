@@ -1,18 +1,19 @@
 use std::{
-    sync::{Arc, LazyLock, Mutex},
+    sync::{Arc, LazyLock},
     time::Duration,
 };
 
 use arc_swap::ArcSwap;
-use eyre::Result;
+use cove_transaction::Amount;
+use eyre::{Context as _, Result};
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-use crate::currency::FiatCurrency;
-use macros::impl_default_for;
+use crate::FiatCurrency;
 
 use super::historical::HistoricalPricesResponse;
+use macros::impl_default_for;
 
 const CURRENCY_URL: &str = "https://mempool.space/api/v1/prices";
 const HISTORICAL_PRICES_URL: &str = "https://mempool.space/api/v1/historical-price";
@@ -24,11 +25,6 @@ pub static FIAT_CLIENT: LazyLock<FiatClient> = LazyLock::new(FiatClient::new);
 
 pub static PRICES: LazyLock<ArcSwap<Option<PriceResponse>>> =
     LazyLock::new(|| ArcSwap::from_pointee(None));
-
-// Simple global cache for database access
-// In a real implementation, we would use proper dependency injection
-// This is just to break the circular dependency for extraction
-static GLOBAL_CACHE: LazyLock<Mutex<Option<PriceResponse>>> = LazyLock::new(|| Mutex::new(None));
 
 #[derive(Debug, Clone, uniffi::Object)]
 pub struct FiatClient {
@@ -56,9 +52,12 @@ pub struct PriceResponse {
 #[uniffi::export]
 impl PriceResponse {
     pub fn get(&self) -> u64 {
-        // In the real implementation, this would use Database::global()
-        // For now, we'll default to USD to break the circular dependency
-        self.get_for_currency(FiatCurrency::Usd)
+        let currency = Database::global()
+            .global_config
+            .fiat_currency()
+            .unwrap_or_default();
+
+        self.get_for_currency(currency)
     }
 
     pub fn get_for_currency(&self, currency: FiatCurrency) -> u64 {
@@ -121,10 +120,11 @@ impl FiatClient {
     /// Convert the BTC amount to the requested currency using a historical price
     pub async fn historical_value_in_currency(
         &self,
-        btc_amount: f64,
+        amount: Amount,
         currency: FiatCurrency,
         timestamp: u64,
     ) -> Result<Option<f64>, reqwest::Error> {
+        let btc = amount.as_btc();
         let price = self
             .historical_price_for_currency(timestamp, currency)
             .await?;
@@ -133,7 +133,7 @@ impl FiatClient {
             return Ok(None);
         }
 
-        let value_in_currency = btc_amount * price.expect("price is some") as f64;
+        let value_in_currency = btc * price.expect("price is some") as f64;
         Ok(Some(value_in_currency))
     }
 
@@ -175,17 +175,14 @@ impl FiatClient {
     }
 
     /// Convert the BTC amount to the requested currency using the current price
-    pub async fn current_value_in_currency<T>(
+    pub async fn current_value_in_currency(
         &self,
-        amount: T,
+        amount: Amount,
         currency: FiatCurrency,
-    ) -> Result<f64, reqwest::Error>
-    where
-        T: AsRef<f64>,
-    {
-        let btc_amount = *amount.as_ref();
+    ) -> Result<f64, reqwest::Error> {
+        let btc = amount.as_btc();
         let price = self.price_for(currency).await?;
-        let value_in_currency = btc_amount * price as f64;
+        let value_in_currency = btc * price as f64;
 
         Ok(value_in_currency)
     }
@@ -205,17 +202,17 @@ pub async fn init_prices() -> Result<()> {
         Ok(prices) => {
             PRICES.swap(Arc::new(Some(prices)));
 
-            // Also store in our simple cache
-            let mut cache = GLOBAL_CACHE.lock().unwrap();
-            *cache = Some(prices);
+            let db = Database::global();
+            db.global_cache
+                .set_prices(prices)
+                .context("unable to set prices")?;
         }
 
         Err(error) => {
             warn!("Unable to get prices: {error:?}, using last known prices");
+            let db = Database::global();
 
-            // Check if we have prices in our simple cache
-            let cache = GLOBAL_CACHE.lock().unwrap();
-            if let Some(prices) = *cache {
+            if let Some(prices) = db.global_cache.get_prices()? {
                 PRICES.swap(Arc::new(Some(prices)));
             }
         }
@@ -228,9 +225,10 @@ pub async fn init_prices() -> Result<()> {
 fn update_prices(prices: PriceResponse) -> Result<()> {
     PRICES.swap(Arc::new(Some(prices)));
 
-    // Update our simple cache
-    let mut cache = GLOBAL_CACHE.lock().unwrap();
-    *cache = Some(prices);
+    let db = Database::global();
+    db.global_cache
+        .set_prices(prices)
+        .context("unable to save prices to the database")?;
 
     Ok(())
 }
@@ -260,10 +258,117 @@ mod ffi {
     use tracing::error;
 
     #[uniffi::export]
-    pub async fn update_prices_if_needed() {
-        if let Err(error) = super::update_prices_if_needed().await {
+    async fn update_prices_if_needed() {
+        if let Err(error) = crate::fiat::client::update_prices_if_needed().await {
             error!("unable to update prices: {error:?}");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::transaction::Amount;
+
+    #[tokio::test]
+    async fn run_all_tests() {
+        test_get_prices().await;
+        test_get_price_for().await;
+        test_get_value_in_usd().await;
+        test_get_value_in_usd_with_currency().await;
+        test_get_historical_prices().await;
+        test_historical_price_at_time().await;
+    }
+
+    async fn test_get_prices() {
+        crate::database::delete_database();
+        let fiat_client = &FIAT_CLIENT;
+        let fiat = fiat_client.prices().await.unwrap();
+        assert!(fiat.usd > 0);
+    }
+
+    async fn test_get_price_for() {
+        crate::database::delete_database();
+        let fiat_client = &FIAT_CLIENT;
+        let fiat = fiat_client.price_for(FiatCurrency::Usd).await.unwrap();
+        assert!(fiat > 0);
+    }
+
+    async fn test_get_value_in_usd() {
+        crate::database::delete_database();
+        let fiat_client = &FIAT_CLIENT;
+        let fiat = fiat_client.prices().await.unwrap();
+        let value_in_usd = fiat_client
+            .current_value_in_currency(Amount::one_btc(), FiatCurrency::Usd)
+            .await
+            .unwrap();
+
+        assert_eq!(value_in_usd, fiat.usd as f64);
+    }
+
+    async fn test_get_value_in_usd_with_currency() {
+        crate::database::delete_database();
+        let fiat_client = &FIAT_CLIENT;
+        let fiat = fiat_client.prices().await.unwrap();
+
+        let half_a_btc = Amount::from_sat(50_000_000);
+        let value_in_usd = fiat_client
+            .current_value_in_currency(half_a_btc, FiatCurrency::Usd)
+            .await
+            .unwrap();
+
+        assert_eq!(value_in_usd, (fiat.usd as f64) / 2.0);
+    }
+
+    async fn test_get_historical_prices() {
+        let fiat_client = &FIAT_CLIENT;
+
+        // Get historical prices for current timestamp
+        let now = Timestamp::now().as_second() as u64;
+
+        let historical_prices = fiat_client.historical_prices(now).await.unwrap();
+
+        // Verify we got some price data
+        assert!(!historical_prices.prices.is_empty());
+
+        // Verify the prices have a valid timestamp
+        for price in &historical_prices.prices {
+            assert!(price.time > 0);
+            assert!(price.usd > 0.0);
+            assert!(price.eur > 0.0);
+            assert!(price.gbp > 0.0);
+            assert!(price.cad > 0.0);
+            assert!(price.chf > 0.0);
+            assert!(price.aud > 0.0);
+            assert!(price.jpy > 0.0);
+        }
+    }
+
+    async fn test_historical_price_at_time() {
+        let fiat_client = &FIAT_CLIENT;
+
+        // Use a known timestamp (now - 12 hours)
+        let timestamp = Timestamp::now().as_second() as u64 - (12 * 60 * 60);
+
+        // Test for USD
+        let price_usd = fiat_client
+            .historical_price_for_currency(timestamp, FiatCurrency::Usd)
+            .await
+            .unwrap();
+
+        assert!(price_usd.is_some());
+        let price_usd = price_usd.unwrap();
+        assert!(price_usd > 0.0);
+
+        // Test for EUR
+        let price_eur = fiat_client
+            .historical_price_for_currency(timestamp, FiatCurrency::Eur)
+            .await
+            .unwrap();
+
+        assert!(price_eur.is_some());
+        let price_eur = price_eur.unwrap();
+        assert!(price_eur > 0.0);
     }
 }
 
@@ -271,4 +376,3 @@ mod ffi {
 fn prices_are_equal(lhs: Arc<PriceResponse>, rhs: Arc<PriceResponse>) -> bool {
     lhs == rhs
 }
-

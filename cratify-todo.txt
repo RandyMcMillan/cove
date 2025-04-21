@@ -10,41 +10,8 @@
 - In a new lib.rs if it has uniffi annotations, add the lib.rs add `uniffi::setup_scafolding!` directive
 - DO NOT CREATE build.rs with `uniffi::generate_scaffolding("src/lib.rs").unwrap();`
 
-⏺ Based on the analysis of the codebase, I can identify several modules that could be extracted into separate crates while avoiding circular dependencies. Let me outline them in a logical order, starting with the most
-  foundational ones:
 
-  2. fiat crate:
-    - Defines currency types and conversion
-    - Minimal dependencies on other modules
-    - Contains functionality for exchange rates and formatting
+#### TODO
+- [ ] finish extraction all transaction and transaction_details into cove-transaction
+- [ ] extract cove-database out of main cove crate
 
-  4. node crate:
-    - Depends on network module
-    - Handles Bitcoin node client implementations
-    - Can be extracted after resolving network dependency
-
-  Here's my recommendation for extraction order and addressing potential circular dependencies:
-
-  1. First, extract the network module into a small crate to serve as a foundation for other crates.
-  2. Then extract  fiat crate as they are relatively self-contained.
-  5. Extract the node crate with dependencies on network and potentially common.
-
-#### CURRENT APPROACH FOR EXTRACTING CRATES
-
-We've taken a more thorough approach to extracting the `cove-types` crate. Key elements of our approach include:
-
-1. **Keeping UniFfi Annotations**: 
-   - We've kept all UniFfi annotations (`uniffi::Object`, `uniffi::Record`, etc.) in the extracted types
-   - Added a proper `uniffi::setup_scafolding!` directive to the crate's lib.rs
-   - Added the necessary build.rs to generate the scaffolding
-   - DO NOT USE `uniffi_macros` crate, use `uniffi` crate directly
-   - DO NOT create a UDL file, we use only proc macros
-
-2. **Export Strategy**:
-   - The main crate now re-exports the types from cove-types: `pub use cove_types::{TxId, WalletId, etc.}`
-   - This allows existing code to keep the same import paths via re-exports
-   - Gradually, we can update imports to use cove-types directly where appropriate
-
-3. **Dependencies**:
-   - Added explicit dependencies for everything the types need (thiserror, serde, etc.)
-   - Included uniffi and uniffi_macros as dependencies in the extracted crate

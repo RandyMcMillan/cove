@@ -9,17 +9,24 @@ pub struct FiatAmount {
 }
 
 impl FiatAmount {
-    /// Tries to create a new FiatAmount from a BTC amount and currency
-    /// 
-    /// This is the main implementation method used by external code
-    pub fn try_new<T>(amount: &T, currency: FiatCurrency) -> Result<Self> 
-    where 
-        T: AsRef<f64>,
-    {
-        let btc_amount = *amount.as_ref();
-        Self::try_new_from_btc(btc_amount, currency)
+    pub fn try_new(sent_and_received: &SentAndReceived, currency: FiatCurrency) -> Result<Self> {
+        let prices = PRICES.load().as_ref().ok_or_else(|| {
+            crate::task::spawn(async {
+                let _ = crate::fiat::client::update_prices_if_needed().await;
+            });
+
+            FiatAmountError::PricesUnavailable("prices not available".to_string())
+        })?;
+
+        let amount = sent_and_received.amount();
+        let fiat = amount.as_btc() * prices.get_for_currency(currency) as f64;
+
+        Ok(Self {
+            amount: fiat,
+            currency,
+        })
     }
-    
+
     /// Tries to create a new FiatAmount from a BTC amount and currency
     pub fn try_new_from_btc(btc_amount: f64, currency: FiatCurrency) -> Result<Self> {
         let prices = PRICES.load().as_ref().ok_or_else(|| {
@@ -58,3 +65,4 @@ impl PartialEq for FiatAmount {
         self.amount.ceil() == other.amount.ceil() && self.currency == other.currency
     }
 }
+
