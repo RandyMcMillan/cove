@@ -1138,6 +1138,119 @@ public func FfiConverterTypeNfcMessage_lower(_ value: NfcMessage) -> UnsafeMutab
 
 
 
+
+
+public protocol UnusedObjectProtocol: AnyObject, Sendable {
+    
+}
+open class UnusedObject: UnusedObjectProtocol, @unchecked Sendable {
+    fileprivate let pointer: UnsafeMutableRawPointer!
+
+    /// Used to instantiate a [FFIObject] without an actual pointer, for fakes in tests, mostly.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public struct NoPointer {
+        public init() {}
+    }
+
+    // TODO: We'd like this to be `private` but for Swifty reasons,
+    // we can't implement `FfiConverter` without making this `required` and we can't
+    // make it `required` without making it `public`.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    required public init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
+        self.pointer = pointer
+    }
+
+    // This constructor can be used to instantiate a fake object.
+    // - Parameter noPointer: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
+    //
+    // - Warning:
+    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing [Pointer] the FFI lower functions will crash.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public init(noPointer: NoPointer) {
+        self.pointer = nil
+    }
+
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public func uniffiClonePointer() -> UnsafeMutableRawPointer {
+        return try! rustCall { uniffi_cove_nfc_fn_clone_unusedobject(self.pointer, $0) }
+    }
+    // No primary constructor declared for this class.
+
+    deinit {
+        guard let pointer = pointer else {
+            return
+        }
+
+        try! rustCall { uniffi_cove_nfc_fn_free_unusedobject(pointer, $0) }
+    }
+
+    
+
+    
+
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeUnusedObject: FfiConverter {
+
+    typealias FfiType = UnsafeMutableRawPointer
+    typealias SwiftType = UnusedObject
+
+    public static func lift(_ pointer: UnsafeMutableRawPointer) throws -> UnusedObject {
+        return UnusedObject(unsafeFromRawPointer: pointer)
+    }
+
+    public static func lower(_ value: UnusedObject) -> UnsafeMutableRawPointer {
+        return value.uniffiClonePointer()
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UnusedObject {
+        let v: UInt64 = try readInt(&buf)
+        // The Rust code won't compile if a pointer won't fit in a UInt64.
+        // We have to go via `UInt` because that's the thing that's the size of a pointer.
+        let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
+        if (ptr == nil) {
+            throw UniffiInternalError.unexpectedNullPointer
+        }
+        return try lift(ptr!)
+    }
+
+    public static func write(_ value: UnusedObject, into buf: inout [UInt8]) {
+        // This fiddling is because `Int` is the thing that's the same size as a pointer.
+        // The Rust code won't compile if a pointer won't fit in a `UInt64`.
+        writeInt(&buf, UInt64(bitPattern: Int64(Int(bitPattern: lower(value)))))
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUnusedObject_lift(_ pointer: UnsafeMutableRawPointer) throws -> UnusedObject {
+    return try FfiConverterTypeUnusedObject.lift(pointer)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUnusedObject_lower(_ value: UnusedObject) -> UnsafeMutableRawPointer {
+    return FfiConverterTypeUnusedObject.lower(value)
+}
+
+
+
+
 public struct MessageInfo {
     /**
      * The payload length of the message, including the header info
@@ -1657,6 +1770,68 @@ public func FfiConverterTypeTextPayload_lift(_ buf: RustBuffer) throws -> TextPa
 #endif
 public func FfiConverterTypeTextPayload_lower(_ value: TextPayload) -> RustBuffer {
     return FfiConverterTypeTextPayload.lower(value)
+}
+
+
+public struct UnusedRecord {
+    public var data: Data
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(data: Data) {
+        self.data = data
+    }
+}
+
+#if compiler(>=6)
+extension UnusedRecord: Sendable {}
+#endif
+
+
+extension UnusedRecord: Equatable, Hashable {
+    public static func ==(lhs: UnusedRecord, rhs: UnusedRecord) -> Bool {
+        if lhs.data != rhs.data {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(data)
+    }
+}
+
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeUnusedRecord: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UnusedRecord {
+        return
+            try UnusedRecord(
+                data: FfiConverterData.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: UnusedRecord, into buf: inout [UInt8]) {
+        FfiConverterData.write(value.data, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUnusedRecord_lift(_ buf: RustBuffer) throws -> UnusedRecord {
+    return try FfiConverterTypeUnusedRecord.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUnusedRecord_lower(_ value: UnusedRecord) -> RustBuffer {
+    return FfiConverterTypeUnusedRecord.lower(value)
 }
 
 // Note that we don't yet support `indirect` for enums.

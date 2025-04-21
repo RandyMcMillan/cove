@@ -18,6 +18,16 @@ pub mod payload;
 pub mod record;
 pub mod resume;
 
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct UnusedRecord {
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Object)]
+pub struct UnusedObject {
+    pub data: Vec<u8>,
+}
+
 /// Number of blocks read at a time from the NFC chip
 pub const NUMBER_OF_BLOCKS_PER_CHUNK: u16 = 32;
 
@@ -283,3 +293,4 @@ mod tests {
         assert_eq!(chunks_processed, 30);
     }
 }
+
