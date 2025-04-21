@@ -361,7 +361,6 @@ dependencies = [
  "bitcoin_hashes 0.13.0",
  "serde",
  "unicode-normalization",
- "zeroize",
 ]
 
 [[package]]
@@ -576,33 +575,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ciborium"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42e69ffd6f0917f5c029256a24d0161db17cea3997d185db0d35926308770f0e"
-dependencies = [
- "ciborium-io",
- "ciborium-ll",
- "serde",
-]
-
-[[package]]
-name = "ciborium-io"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05afea1e0a06c9be33d539b876f1ce3692f4afea2cb41f740e7743225ed1c757"
-
-[[package]]
-name = "ciborium-ll"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57663b653d948a338bfb3eeba9bb2fd5fcfaecb9e199e87e1eda4d9e8b240fd9"
-dependencies = [
- "ciborium-io",
- "half",
-]
-
-[[package]]
 name = "cipher"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -680,22 +652,15 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "bbqr",
- "bdk_chain",
- "bdk_core",
- "bdk_electrum",
- "bdk_esplora",
- "bdk_file_store",
- "bdk_wallet",
- "bip329",
- "bip39",
- "bitcoin",
  "bitvec",
  "cbor4ii",
  "chacha20poly1305",
+ "cove-database",
  "cove-fiat",
  "cove-nfc",
  "cove-node",
  "cove-tap-card",
+ "cove-transaction",
  "cove-types",
  "crossbeam",
  "data-encoding",
@@ -716,11 +681,9 @@ dependencies = [
  "parking_lot",
  "paste",
  "pretty_assertions",
- "pubport",
  "rand 0.9.1",
  "redb",
  "reqwest 0.12.15",
- "rust-cktap",
  "serde",
  "serde_json",
  "serde_urlencoded",
@@ -734,7 +697,7 @@ dependencies = [
  "tracing-log",
  "tracing-subscriber",
  "tryhard",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
  "url",
  "util",
  "winnow",
@@ -762,7 +725,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tryhard",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
  "util",
 ]
 
@@ -772,7 +735,6 @@ version = "0.1.0"
 dependencies = [
  "arc-swap",
  "bitcoin",
- "cove-transaction",
  "cove-types",
  "derive_more",
  "eyre",
@@ -787,7 +749,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tryhard",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
  "util",
 ]
 
@@ -803,7 +765,7 @@ dependencies = [
  "sha2",
  "thiserror 2.0.12",
  "tracing",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
  "util",
  "winnow",
 ]
@@ -829,7 +791,7 @@ dependencies = [
  "thiserror 2.0.12",
  "tokio",
  "tracing",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
  "url",
  "util",
 ]
@@ -846,14 +808,21 @@ dependencies = [
  "serde_urlencoded",
  "thiserror 2.0.12",
  "tracing",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
 ]
 
 [[package]]
 name = "cove-transaction"
 version = "0.1.0"
 dependencies = [
+ "arc-swap",
+ "bdk_chain",
+ "bdk_wallet",
+ "bip329",
  "bitcoin",
+ "cove-fiat",
+ "cove-nfc",
+ "cove-types",
  "derive_more",
  "eyre",
  "hex",
@@ -861,12 +830,17 @@ dependencies = [
  "macros",
  "nid",
  "numfmt 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "once_cell",
  "rand 0.9.1",
  "redb",
+ "reqwest 0.12.15",
  "serde",
+ "serde_json",
  "strum",
  "thiserror 2.0.12",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "tracing",
+ "tryhard",
+ "uniffi",
 ]
 
 [[package]]
@@ -886,7 +860,7 @@ dependencies = [
  "serde",
  "strum",
  "thiserror 2.0.12",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
 ]
 
 [[package]]
@@ -962,12 +936,6 @@ name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
-
-[[package]]
-name = "crunchy"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 
 [[package]]
 name = "crypto-common"
@@ -1396,16 +1364,6 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
-]
-
-[[package]]
-name = "half"
-version = "2.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "459196ed295495a68f7d7fe1d84f6c4b7ff0e21fe3017b2f283c6fac3ad803c9"
-dependencies = [
- "cfg-if",
- "crunchy",
 ]
 
 [[package]]
@@ -1988,16 +1946,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
-name = "mime_guess"
-version = "2.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7c44f8e672c00fe5308fa235f821cb4198414e1c77935c1ab6948d3fd78550e"
-dependencies = [
- "mime",
- "unicase",
-]
-
-[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2358,21 +2306,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pubport"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25e4e9d35105877dd8d3747024a524d2e134ae2f2aa978885c0f2136db1d0c06"
-dependencies = [
- "bitcoin",
- "derive_more",
- "log",
- "miniscript",
- "serde",
- "serde_json",
- "thiserror 2.0.12",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2631,45 +2564,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rinja"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3dc4940d00595430b3d7d5a01f6222b5e5b51395d1120bdb28d854bb8abb17a5"
-dependencies = [
- "itoa",
- "rinja_derive",
-]
-
-[[package]]
-name = "rinja_derive"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08d9ed0146aef6e2825f1b1515f074510549efba38d71f4554eec32eb36ba18b"
-dependencies = [
- "basic-toml",
- "memchr",
- "mime",
- "mime_guess",
- "proc-macro2",
- "quote",
- "rinja_parser",
- "rustc-hash",
- "serde",
- "syn",
-]
-
-[[package]]
-name = "rinja_parser"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93f9a866e2e00a7a1fb27e46e9e324a6f7c0e7edc4543cae1d38f4e4a100c610"
-dependencies = [
- "memchr",
- "nom",
- "serde",
-]
-
-[[package]]
 name = "rusqlite"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2681,21 +2575,6 @@ dependencies = [
  "hashlink",
  "libsqlite3-sys",
  "smallvec",
-]
-
-[[package]]
-name = "rust-cktap"
-version = "0.1.0"
-source = "git+https://github.com/bitcoinppl/rust-cktap#3d7c1ec986a0409773f9c73e0032e8c67c98852f"
-dependencies = [
- "bitcoin",
- "ciborium",
- "log",
- "serde",
- "serde_bytes",
- "thiserror 2.0.12",
- "tokio",
- "uniffi 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2912,15 +2791,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6"
 dependencies = [
  "serde_derive",
-]
-
-[[package]]
-name = "serde_bytes"
-version = "0.11.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8437fd221bde2d4ca316d61b90e337e9e702b3820b87d63caa9ba6c02bd06d96"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -3452,12 +3322,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
 
 [[package]]
-name = "unicase"
-version = "2.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75b844d17643ee918803943289730bec8aac480150456169e647ed0b576ba539"
-
-[[package]]
 name = "unicode-ident"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3481,55 +3345,16 @@ checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
 [[package]]
 name = "uniffi"
 version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe34585ac0275accf6c284d0080cc2840f3898c551cda869ec291b5a4218712c"
-dependencies = [
- "anyhow",
- "camino",
- "cargo_metadata",
- "clap",
- "uniffi_bindgen 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "uniffi_build 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "uniffi_core 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "uniffi_macros 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "uniffi"
-version = "0.29.1"
 source = "git+https://github.com/mozilla/uniffi-rs#92a2add9cd9b49795ab424f880b1c5eee6344f69"
 dependencies = [
  "anyhow",
  "camino",
  "cargo_metadata",
  "clap",
- "uniffi_bindgen 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
- "uniffi_build 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
- "uniffi_core 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
- "uniffi_macros 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
-]
-
-[[package]]
-name = "uniffi_bindgen"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a792af1424cc8b3c43b44c1a6cb7935ed1fbe5584a74f70e8bab9799740266d"
-dependencies = [
- "anyhow",
- "camino",
- "cargo_metadata",
- "fs-err",
- "glob",
- "goblin",
- "heck",
- "once_cell",
- "paste",
- "rinja",
- "serde",
- "textwrap",
- "toml",
- "uniffi_meta 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "uniffi_udl 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uniffi_bindgen",
+ "uniffi_build",
+ "uniffi_core",
+ "uniffi_macros",
 ]
 
 [[package]]
@@ -3549,20 +3374,9 @@ dependencies = [
  "serde",
  "textwrap",
  "toml",
- "uniffi_meta 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi_meta",
  "uniffi_testing",
- "uniffi_udl 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
-]
-
-[[package]]
-name = "uniffi_build"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "00c4138211f2ae951018fcce6a978e1fcd1a47c3fd0bc0d5472a520520060db1"
-dependencies = [
- "anyhow",
- "camino",
- "uniffi_bindgen 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uniffi_udl",
 ]
 
 [[package]]
@@ -3572,19 +3386,7 @@ source = "git+https://github.com/mozilla/uniffi-rs#92a2add9cd9b49795ab424f880b1c
 dependencies = [
  "anyhow",
  "camino",
- "uniffi_bindgen 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
-]
-
-[[package]]
-name = "uniffi_core"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c18baace68a52666d33d12d73ca335ecf27a302202cefb53b1f974512bb72417"
-dependencies = [
- "anyhow",
- "bytes",
- "once_cell",
- "static_assertions",
+ "uniffi_bindgen",
 ]
 
 [[package]]
@@ -3602,37 +3404,10 @@ dependencies = [
 [[package]]
 name = "uniffi_internal_macros"
 version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9902d4ed16c65e6c0222241024dd0bfeed07ea3deb7c470eb175e5f5ef406cd"
-dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
-name = "uniffi_internal_macros"
-version = "0.29.1"
 source = "git+https://github.com/mozilla/uniffi-rs#92a2add9cd9b49795ab424f880b1c5eee6344f69"
 dependencies = [
  "quote",
  "syn",
-]
-
-[[package]]
-name = "uniffi_macros"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d82c82ef945c51082d8763635334b994e63e77650f09d0fae6d28dd08b1de83"
-dependencies = [
- "camino",
- "fs-err",
- "once_cell",
- "proc-macro2",
- "quote",
- "serde",
- "syn",
- "toml",
- "uniffi_meta 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3648,18 +3423,7 @@ dependencies = [
  "serde",
  "syn",
  "toml",
- "uniffi_meta 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
-]
-
-[[package]]
-name = "uniffi_meta"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d6027b971c2aa86350dd180aee9819729c7b99bacd381534511ff29d2c09cea"
-dependencies = [
- "anyhow",
- "siphasher",
- "uniffi_internal_macros 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uniffi_meta",
 ]
 
 [[package]]
@@ -3669,7 +3433,7 @@ source = "git+https://github.com/mozilla/uniffi-rs#92a2add9cd9b49795ab424f880b1c
 dependencies = [
  "anyhow",
  "siphasher",
- "uniffi_internal_macros 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi_internal_macros",
 ]
 
 [[package]]
@@ -3687,24 +3451,12 @@ dependencies = [
 [[package]]
 name = "uniffi_udl"
 version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52300b7a4ab02dc159a038a13d5bfe27aefbad300d91b0b501b3dda094c1e0a2"
-dependencies = [
- "anyhow",
- "textwrap",
- "uniffi_meta 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "weedle2 5.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "uniffi_udl"
-version = "0.29.1"
 source = "git+https://github.com/mozilla/uniffi-rs#92a2add9cd9b49795ab424f880b1c5eee6344f69"
 dependencies = [
  "anyhow",
  "textwrap",
- "uniffi_meta 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
- "weedle2 5.0.0 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi_meta",
+ "weedle2",
 ]
 
 [[package]]
@@ -3753,7 +3505,7 @@ dependencies = [
  "bitcoin",
  "hex",
  "rand 0.9.1",
- "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "uniffi",
 ]
 
 [[package]]
@@ -3884,15 +3636,6 @@ name = "webpki-roots"
 version = "0.25.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f20c57d8d7db6d3b86154206ae5d8fba62dd39573114de97c2cb0578251f8e1"
-
-[[package]]
-name = "weedle2"
-version = "5.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "998d2c24ec099a87daf9467808859f9d82b61f1d9c9701251aea037f514eae0e"
-dependencies = [
- "nom",
-]
 
 [[package]]
 name = "weedle2"
@@ -4316,20 +4059,6 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
-dependencies = [
- "zeroize_derive",
-]
-
-[[package]]
-name = "zeroize_derive"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
 
 [[package]]
 name = "zerovec"

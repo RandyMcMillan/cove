@@ -1,0 +1,12 @@
+[bindings.kotlin]
+package_name = "org.bitcoinppl.cove.database"
+cdylib_name = "cove_database"
+omit_argument_names = false
+
+[bindings.swift]
+cdylib_name = "cove_database"
+omit_argument_names = false
+
+[bindings.python]
+cdylib_name = "cove_database"
+omit_argument_names = false

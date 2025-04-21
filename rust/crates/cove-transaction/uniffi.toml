@@ -1,7 +1,12 @@
-[bindings.swift]
-generate_module_maps = true
-cdylib_name = "cove_transaction_ffi"
-
 [bindings.kotlin]
-package_name = "org.bitcoinppl.cove_transaction"
-cdylib_name = "cove_transaction_ffi"
+package_name = "org.bitcoinppl.cove.transaction"
+cdylib_name = "cove_transaction"
+omit_argument_names = false
+
+[bindings.swift]
+cdylib_name = "cove_transaction"
+omit_argument_names = false
+
+[bindings.python]
+cdylib_name = "cove_transaction"
+omit_argument_names = false

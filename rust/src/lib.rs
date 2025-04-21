@@ -45,6 +45,8 @@ mod xpub;
 // re-export types from crates
 pub use cove_fiat as fiat;
 pub use cove_node as node;
+pub use cove_transaction as transaction;
+pub use cove_database as database;
 
 ::cove_tap_card::uniffi_reexport_scaffolding!();
 ::util::uniffi_reexport_scaffolding!();
@@ -53,5 +55,7 @@ pub use cove_node as node;
 ::cove_types::uniffi_reexport_scaffolding!();
 ::cove_fiat::uniffi_reexport_scaffolding!();
 ::cove_node::uniffi_reexport_scaffolding!();
+::cove_transaction::uniffi_reexport_scaffolding!();
+::cove_database::uniffi_reexport_scaffolding!();
 
 uniffi::setup_scaffolding!();

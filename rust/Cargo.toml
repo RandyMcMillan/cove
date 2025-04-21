@@ -22,12 +22,35 @@ members = ["crates/*"]
 # bindings
 uniffi = { git = "https://github.com/mozilla/uniffi-rs", features = ["tokio"] }
 
+# bdk / bitcoin
+bitcoin = { version = "0.32", features = ["serde"] }
+bdk_core = "0.4"
+bdk_wallet = { version = "1.1", features = ["keys-bip39", "file_store", "rusqlite"] }
+bip39 = { version = "2.0.0", features = ["zeroize"] }
+
+# bitcoin nodes
+bdk_esplora = { version = "0.20", features = ["async-https", "tokio"] }
+bdk_electrum = { version = "0.21", features = ["use-rustls-ring"], default-features = false }
+# bdk_bitcoind_rpc = { version = "0.12", features = [] }
+
+# store bdk wallet data
+bdk_file_store = { version = "0.18.0" }
+bdk_chain = { version = "0.21.0" }
+
+# import / export hardware wallet public keys
+pubport = { version = "0.3.1", features = [] }
+
+# bip329 labels
+bip329 = { version = "0.4.0" }
+
+# tapsigner / satscard
+rust-cktap = { git = "https://github.com/bitcoinppl/rust-cktap" }
+
 # sync
 parking_lot = { version = "0.12.3" }
 
 # primitives
 sha2 = "0.10.8"
-bitcoin = { version = "0.32" }
 rand = "0.9"
 hex = "0.4.3"
 
@@ -62,32 +85,9 @@ cove-tap-card = { path = "./crates/cove-tap-card" }
 cove-types = { path = "./crates/cove-types" }
 cove-fiat = { path = "./crates/cove-fiat" }
 cove-node = { path = "./crates/cove-node" }
+cove-transaction = { path = "./crates/cove-transaction" }
+cove-database = { path = "./crates/cove-database" }
 
-# bdk / bitcoin
-bdk_core = "0.4"
-bdk_wallet = { version = "1.1", features = ["keys-bip39", "file_store", "rusqlite"] }
-bip39 = { version = "2.0.0", features = ["zeroize"] }
-
-# bitcoin nodes
-bdk_esplora = { version = "0.20", features = ["async-https", "tokio"] }
-bdk_electrum = { version = "0.21", features = ["use-rustls-ring"], default-features = false }
-# bdk_bitcoind_rpc = { version = "0.12", features = [] }
-
-# store bdk wallet data
-bdk_file_store = { version = "0.18.0" }
-bdk_chain = { version = "0.21.0" }
-
-# import / export hardware wallet public keys
-pubport = { version = "0.3.1", features = [] }
-
-# bip329 labels
-bip329 = { version = "0.4.0" }
-
-# bitcoin
-bitcoin = { version = "0.32", features = ["serde"] }
-
-# tapsigner / satscard
-rust-cktap = { git = "https://github.com/bitcoinppl/rust-cktap" }
 
 # actors
 act-zero = { version = "0.4.0", features = ["default-tokio"] }
