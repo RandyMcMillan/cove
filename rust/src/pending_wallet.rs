@@ -1,6 +1,7 @@
 use bip39::Mnemonic;
 
-use crate::{database::Database, mnemonic::NumberOfBip39Words, network::Network};
+use crate::{database::Database, mnemonic::NumberOfBip39Words};
+use cove_types::Network;
 
 #[derive(Debug, uniffi::Object)]
 pub struct PendingWallet {

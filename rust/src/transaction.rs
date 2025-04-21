@@ -109,7 +109,8 @@ impl Transaction {
             .fiat_currency()
             .unwrap_or_default();
 
-        let fiat = FiatAmount::try_new(&sent_and_received, fiat_currency).ok();
+        let amount = sent_and_received.amount().as_btc();
+        let fiat = FiatAmount::try_new_from_btc(amount, fiat_currency).ok();
 
         let label_db = WalletDataDb::new_or_existing(wallet_id.clone());
         let labels = label_db

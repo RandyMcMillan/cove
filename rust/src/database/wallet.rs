@@ -5,13 +5,12 @@ use tracing::debug;
 
 use crate::{
     app::reconcile::{AppStateReconcileMessage, Update, Updater},
-    network::Network,
     redb::Json,
     wallet::metadata::{HardwareWalletMetadata, WalletMetadata, WalletMode},
 };
 
 use super::{Database, Error};
-use cove_types::WalletId;
+use cove_types::{Network, WalletId};
 
 const TABLE: TableDefinition<&'static str, Json<Vec<WalletMetadata>>> =
     TableDefinition::new("wallets.json");

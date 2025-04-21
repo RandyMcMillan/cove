@@ -15,7 +15,6 @@ mod consts;
 mod converter;
 mod device;
 mod encryption;
-mod fiat;
 mod file_handler;
 mod format;
 mod hardware_export;
@@ -26,8 +25,6 @@ mod manager;
 mod mnemonic;
 mod multi_format;
 mod multi_qr;
-mod network;
-mod node;
 mod node_connect;
 mod pending_wallet;
 mod psbt;
@@ -45,10 +42,16 @@ mod wallet_scanner;
 mod word_validator;
 mod xpub;
 
+// re-export types from crates
+pub use cove_fiat as fiat;
+pub use cove_node as node;
+
 ::cove_tap_card::uniffi_reexport_scaffolding!();
 ::util::uniffi_reexport_scaffolding!();
 ::rust_cktap::uniffi_reexport_scaffolding!();
 ::cove_nfc::uniffi_reexport_scaffolding!();
 ::cove_types::uniffi_reexport_scaffolding!();
+::cove_fiat::uniffi_reexport_scaffolding!();
+::cove_node::uniffi_reexport_scaffolding!();
 
 uniffi::setup_scaffolding!();

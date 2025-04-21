@@ -1,7 +1,8 @@
 use tracing::error;
 use url::Url;
 
-use crate::{database::Database, network::Network, node::Node};
+use crate::{database::Database, node::Node};
+use cove_types::Network;
 use eyre::{Context, eyre};
 use macros::impl_default_for;
 
@@ -281,7 +282,10 @@ fn parse_node_url(url: &str) -> eyre::Result<Url> {
 
 #[uniffi::export]
 fn node_selection_to_node(node: NodeSelection) -> Node {
-    node.into()
+    match node {
+        NodeSelection::Preset(n) => n,
+        NodeSelection::Custom(n) => n,
+    }
 }
 
 #[uniffi::export]

@@ -6,5 +6,6 @@
 - DO NOT create a UDL file, we use only proc macros
 - Don't be afraid to add dependencies to the newly extracted crates
 - Always omit_argument_names = false in the uniffi.toml
-- In a new lib.rs if it has uniffi annotations, add the lib.rs add `uniffi::setup_scafolding!` directive, DO NOT ADD `uniffi::generate_scaffolding("src/lib.rs").unwrap();`
+- In a new lib.rs if it has uniffi annotations, add the lib.rs add `uniffi::setup_scafolding!` directive
+- DO NOT CREATE build.rs with `uniffi::generate_scaffolding("src/lib.rs").unwrap();`
 - Never create a build.rs file, we use only proc macros

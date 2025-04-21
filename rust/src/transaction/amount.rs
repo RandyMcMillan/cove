@@ -24,6 +24,26 @@ use super::Unit;
 )]
 pub struct Amount(pub BdkAmount);
 
+impl AsRef<f64> for Amount {
+    fn as_ref(&self) -> &f64 {
+        // This is a bit of a hack, but it works for our use case
+        // We need to return a reference to a f64 value
+        // Since as_btc() returns a copy, we need to store it somewhere
+        // Using a thread_local for this
+        thread_local! {
+            static TEMP_F64: std::cell::Cell<f64> = std::cell::Cell::new(0.0);
+        }
+
+        TEMP_F64.with(|cell| {
+            cell.set(self.as_btc());
+            // This is unsafe but works for our specific use case
+            // We're converting the Cell reference to a raw reference
+            // because AsRef needs to return a reference
+            unsafe { &*(cell as *const _ as *const f64) }
+        })
+    }
+}
+
 // rust only
 impl Amount {
     pub fn from_btc(btc: f64) -> Result<Self, eyre::Report> {

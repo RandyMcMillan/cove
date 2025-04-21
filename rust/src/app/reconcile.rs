@@ -8,12 +8,13 @@ use once_cell::sync::OnceCell;
 use crate::{
     color_scheme::ColorSchemeSelection,
     fiat::{FiatCurrency, client::PriceResponse},
-    network::Network,
     node::Node,
     router::Route,
     transaction::fees::client::FeeResponse,
     wallet::metadata::WalletMode,
 };
+
+use cove_types::Network;
 
 #[derive(uniffi::Enum)]
 #[allow(clippy::enum_variant_names)]

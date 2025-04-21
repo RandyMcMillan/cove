@@ -15,7 +15,6 @@ use crate::{
     keys::{Descriptor, Descriptors},
     mnemonic::MnemonicExt as _,
     multi_format::MultiFormatError,
-    network::Network,
     tap_card::tap_signer_reader::DeriveInfo,
     xpub::{self, XpubError},
 };
@@ -23,6 +22,7 @@ use balance::Balance;
 use bdk_chain::rusqlite::Connection;
 use bdk_wallet::{KeychainKind, descriptor::ExtendedDescriptor, keys::DescriptorPublicKey};
 use bip39::Mnemonic;
+use cove_types::Network;
 use eyre::Context as _;
 use fingerprint::Fingerprint;
 use metadata::{DiscoveryState, HardwareWalletMetadata, WalletId, WalletMetadata, WalletType};

@@ -1,0 +1,9 @@
+[bindings.swift]
+generate_module_maps = true
+cdylib_name = "cove_fiat_ffi"
+omit_argument_names = false
+
+[bindings.kotlin]
+package_name = "org.bitcoinppl.cove_fiat"
+cdylib_name = "cove_fiat_ffi"
+omit_argument_names = false

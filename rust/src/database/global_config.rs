@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use cove_types::Network;
 use redb::TableDefinition;
 use tap::TapFallible as _;
 use tracing::{error, warn};
@@ -9,7 +10,6 @@ use crate::{
     auth::AuthType,
     color_scheme::ColorSchemeSelection,
     fiat::FiatCurrency,
-    network::Network,
     node::Node,
     wallet::metadata::{WalletId, WalletMode},
 };
@@ -392,7 +392,7 @@ impl GlobalConfigTable {
 
 #[cfg(test)]
 mod tests {
-    use crate::network::Network;
+    use cove_types::Network;
 
     #[test]
     fn test_selected_node_key() {

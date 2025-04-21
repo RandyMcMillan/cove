@@ -48,5 +48,8 @@ rand = { workspace = true, features = ["std_rng"] }
 # encoding
 hex = { workspace = true }
 
+# enum utilities
+strum = { version = "0.27", features = ["derive"] }
+
 [build-dependencies]
 uniffi = { workspace = true, features = ["build"] }

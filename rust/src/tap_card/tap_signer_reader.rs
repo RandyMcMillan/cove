@@ -14,7 +14,8 @@ use rust_cktap::{
 use tokio::sync::Mutex;
 use tracing::debug;
 
-use crate::{database::Database, network::Network, psbt::Psbt};
+use crate::{database::Database, psbt::Psbt};
+use cove_types::Network;
 
 use super::{CkTapError, TapcardTransport, TapcardTransportProtocol, TransportError};
 

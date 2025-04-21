@@ -692,7 +692,9 @@ dependencies = [
  "bitvec",
  "cbor4ii",
  "chacha20poly1305",
+ "cove-fiat",
  "cove-nfc",
+ "cove-node",
  "cove-tap-card",
  "cove-types",
  "crossbeam",
@@ -741,6 +743,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "cove-fiat"
+version = "0.1.0"
+dependencies = [
+ "arc-swap",
+ "cove-types",
+ "derive_more",
+ "eyre",
+ "jiff",
+ "macros",
+ "once_cell",
+ "reqwest 0.12.15",
+ "serde",
+ "serde_json",
+ "strum",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tryhard",
+ "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "util",
+]
+
+[[package]]
 name = "cove-nfc"
 version = "0.1.0"
 dependencies = [
@@ -755,6 +780,32 @@ dependencies = [
  "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
  "util",
  "winnow",
+]
+
+[[package]]
+name = "cove-node"
+version = "0.1.0"
+dependencies = [
+ "bdk_chain",
+ "bdk_core",
+ "bdk_electrum",
+ "bdk_esplora",
+ "bdk_wallet",
+ "bitcoin",
+ "cove-types",
+ "derive_more",
+ "eyre",
+ "macros",
+ "serde",
+ "serde_json",
+ "strum",
+ "tap",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
+ "url",
+ "util",
 ]
 
 [[package]]
@@ -785,6 +836,7 @@ dependencies = [
  "rand 0.9.1",
  "redb",
  "serde",
+ "strum",
  "thiserror 2.0.12",
  "uniffi 0.29.1 (git+https://github.com/mozilla/uniffi-rs)",
 ]

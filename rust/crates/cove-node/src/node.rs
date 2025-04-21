@@ -1,9 +1,27 @@
-pub mod client;
-pub mod client_builder;
-
-use crate::node_connect::{BITCOIN_ELECTRUM, NodeSelection, SIGNET_ESPLORA, TESTNET_ESPLORA};
-use client::NodeClient;
 use cove_types::Network;
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    client::NodeClient,
+    constants::{BITCOIN_ELECTRUM, SIGNET_ESPLORA, TESTNET_ESPLORA},
+    error::Error,
+};
+
+// Node selection type - needed for conversions
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NodeSelection {
+    Preset(Node),
+    Custom(Node),
+}
+
+impl From<NodeSelection> for Node {
+    fn from(node: NodeSelection) -> Self {
+        match node {
+            NodeSelection::Preset(node) => node,
+            NodeSelection::Custom(node) => node,
+        }
+    }
+}
 
 #[derive(
     Debug,
@@ -15,8 +33,8 @@ use cove_types::Network;
     derive_more::Display,
     strum::EnumIter,
     uniffi::Enum,
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
 )]
 pub enum ApiType {
     Esplora,
@@ -25,19 +43,13 @@ pub enum ApiType {
 }
 
 #[derive(
-    Debug, Clone, Hash, Eq, PartialEq, uniffi::Record, serde::Serialize, serde::Deserialize,
+    Debug, Clone, Hash, Eq, PartialEq, uniffi::Record, Serialize, Deserialize,
 )]
 pub struct Node {
     pub name: String,
     pub network: Network,
     pub api_type: ApiType,
     pub url: String,
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error("failed to check node url: {0}")]
-    CheckUrlError(#[from] client::Error),
 }
 
 impl Node {
@@ -98,14 +110,5 @@ impl Node {
         client.check_url().await?;
 
         Ok(())
-    }
-}
-
-impl From<NodeSelection> for Node {
-    fn from(node: NodeSelection) -> Self {
-        match node {
-            NodeSelection::Preset(node) => node,
-            NodeSelection::Custom(node) => node,
-        }
     }
 }

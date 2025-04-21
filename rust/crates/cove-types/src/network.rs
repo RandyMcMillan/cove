@@ -1,6 +1,4 @@
-use bdk_chain::bitcoin::params::Params;
-use bdk_wallet::bitcoin;
-use bitcoin::NetworkKind;
+use bitcoin::{params::Params, NetworkKind, Network as BitcoinNetwork};
 use serde::{Deserialize, Serialize};
 
 #[derive(
@@ -25,12 +23,12 @@ pub enum Network {
 use strum::IntoEnumIterator;
 
 #[uniffi::export]
-fn network_to_string(network: Network) -> String {
+pub fn network_to_string(network: Network) -> String {
     network.to_string()
 }
 
 #[uniffi::export]
-fn all_networks() -> Vec<Network> {
+pub fn all_networks() -> Vec<Network> {
     Network::iter().collect()
 }
 
@@ -48,22 +46,22 @@ impl TryFrom<&str> for Network {
     }
 }
 
-impl From<Network> for bitcoin::Network {
+impl From<Network> for BitcoinNetwork {
     fn from(network: Network) -> Self {
         match network {
-            Network::Bitcoin => bitcoin::Network::Bitcoin,
-            Network::Testnet => bitcoin::Network::Testnet,
-            Network::Signet => bitcoin::Network::Signet,
+            Network::Bitcoin => BitcoinNetwork::Bitcoin,
+            Network::Testnet => BitcoinNetwork::Testnet,
+            Network::Signet => BitcoinNetwork::Signet,
         }
     }
 }
 
-impl From<bitcoin::Network> for Network {
-    fn from(network: bitcoin::Network) -> Self {
+impl From<BitcoinNetwork> for Network {
+    fn from(network: BitcoinNetwork) -> Self {
         match network {
-            bitcoin::Network::Bitcoin => Network::Bitcoin,
-            bitcoin::Network::Testnet => Network::Testnet,
-            bitcoin::Network::Signet => Network::Signet,
+            BitcoinNetwork::Bitcoin => Network::Bitcoin,
+            BitcoinNetwork::Testnet => Network::Testnet,
+            BitcoinNetwork::Signet => Network::Signet,
             network => panic!("unsupported network: {network:?}"),
         }
     }
@@ -72,7 +70,7 @@ impl From<bitcoin::Network> for Network {
 impl From<Network> for Params {
     fn from(network: Network) -> Self {
         match network {
-            Network::Bitcoin => Params::MAINNET,
+            Network::Bitcoin => Params::BITCOIN,
             Network::Testnet => Params::TESTNET3,
             Network::Signet => Params::SIGNET,
         }

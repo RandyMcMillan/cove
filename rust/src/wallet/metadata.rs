@@ -8,9 +8,10 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
 use super::{AddressInfo, WalletAddressType, fingerprint::Fingerprint};
+use crate::database::Database;
 use crate::transaction::Unit;
-use crate::{database::Database, network::Network};
 use cove_tap_card::TapSigner;
+use cove_types::Network;
 
 pub use cove_types::{BlockSizeLast, WalletId};
 

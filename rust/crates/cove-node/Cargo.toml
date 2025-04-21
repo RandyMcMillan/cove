@@ -1,0 +1,56 @@
+[package]
+name = "cove-node"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# internal crates
+cove-types = { path = "../cove-types" }
+macros = { path = "../macros" }
+util = { path = "../util" }
+
+# bitcoin
+bitcoin = { workspace = true, features = ["serde"] }
+bdk_chain = { version = "0.21.0" }
+bdk_wallet = { version = "1.1", features = ["keys-bip39", "file_store", "rusqlite"] }
+bdk_esplora = { version = "0.20", features = ["async-https", "tokio"] }
+bdk_electrum = { version = "0.21", features = ["use-rustls-ring"], default-features = false }
+bdk_core = "0.4"
+
+# error handling
+thiserror = { workspace = true }
+eyre = "0.6"
+
+# serialization
+serde = { workspace = true }
+serde_json = "1.0"
+
+# utilities
+tap = "1.0.1"
+url = "2.5"
+
+# async
+tokio = { version = "1.38", features = ["rt"] }
+
+# derive utilities
+derive_more = { workspace = true, features = [
+    "display",
+    "add",
+    "mul",
+    "from",
+    "into",
+    "as_ref",
+    "from_str",
+    "deref",
+    "deref_mut",
+] }
+strum = { version = "0.27", features = ["derive"] }
+
+# logging
+tracing = "0.1"
+
+# bindings
+uniffi = { workspace = true, features = ["tokio"] }
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }

@@ -60,6 +60,8 @@ util = { path = "./crates/util" }
 cove-nfc = { path = "./crates/cove-nfc" }
 cove-tap-card = { path = "./crates/cove-tap-card" }
 cove-types = { path = "./crates/cove-types" }
+cove-fiat = { path = "./crates/cove-fiat" }
+cove-node = { path = "./crates/cove-node" }
 
 # bdk / bitcoin
 bdk_core = "0.4"

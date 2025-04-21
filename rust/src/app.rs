@@ -13,12 +13,13 @@ use crate::{
         client::{FIAT_CLIENT, PriceResponse},
     },
     keychain::Keychain,
-    network::Network,
     node::Node,
     router::{Route, RouteFactory, Router},
     transaction::fees::client::{FEE_CLIENT, FeeResponse},
     wallet::metadata::{WalletId, WalletMetadata, WalletType},
 };
+
+use cove_types::Network;
 use crossbeam::channel::{Receiver, Sender};
 use macros::impl_default_for;
 use once_cell::sync::OnceCell;
@@ -288,7 +289,11 @@ impl FfiApp {
 
     /// Save the backup for the tap signer in the keychain
     #[uniffi::method]
-    pub fn save_tap_signer_backup(&self, tap_signer: &cove_tap_card::TapSigner, backup: &[u8]) -> bool {
+    pub fn save_tap_signer_backup(
+        &self,
+        tap_signer: &cove_tap_card::TapSigner,
+        backup: &[u8],
+    ) -> bool {
         let run = || {
             let metadata = self.find_tap_signer_wallet(tap_signer).tap_none(|| {
                 debug!(
