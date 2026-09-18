@@ -855,7 +855,7 @@ mod tests {
     }
 
     fn next_reconcile_message(manager: &super::RustSendFlowManager) -> super::Message {
-        let message = manager.reconciler.receiver().try_recv().expect("message is reconciled");
+        let message = manager.reconciler.receiver.try_recv().expect("message is reconciled");
         let SingleOrMany::Single(message) = message else {
             panic!("expected a single reconcile message");
         };
@@ -865,7 +865,7 @@ mod tests {
 
     fn drain_reconcile_messages(manager: &super::RustSendFlowManager) -> Vec<super::Message> {
         let mut messages = Vec::new();
-        let receiver = manager.reconciler.receiver();
+        let receiver = manager.reconciler.receiver.clone();
 
         while let Ok(message) = receiver.try_recv() {
             match message {
@@ -1427,7 +1427,7 @@ mod tests {
         set_selected_fee_total(&manager, 156);
 
         assert!(manager.validate_amount(true));
-        assert!(manager.reconciler.receiver().try_recv().is_err());
+        assert!(manager.reconciler.receiver.try_recv().is_err());
     }
 
     #[test]

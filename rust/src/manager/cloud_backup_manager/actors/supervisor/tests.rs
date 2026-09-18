@@ -284,7 +284,7 @@ fn test_pending_completion(
 }
 
 fn emitted_enable_completed(manager: &RustCloudBackupManager) -> bool {
-    manager.reconciler.receiver().try_iter().any(|messages| match messages {
+    manager.reconciler.receiver.try_iter().any(|messages| match messages {
         SingleOrMany::Single(message) => {
             matches!(message, CloudBackupReconcileMessage::EnableCompleted(_))
         }
@@ -505,7 +505,7 @@ async fn drive_account_switch_restart_preserves_failed_reinitialization_for_retr
         .unwrap();
 
     assert_eq!(action, DriveAccountSwitchReconcileAction::None);
-    assert!(!manager.reconciler.receiver().try_iter().any(|messages| match messages {
+    assert!(!manager.reconciler.receiver.try_iter().any(|messages| match messages {
         SingleOrMany::Single(message) => matches!(
             message,
             CloudBackupReconcileMessage::DriveAccountSwitchCommitRequired(7)
@@ -590,7 +590,7 @@ async fn stale_drive_account_switch_completion_cannot_finish_live_operation() {
     );
     let commit_requests = manager
         .reconciler
-        .receiver()
+        .receiver
         .try_iter()
         .map(|messages| match messages {
             SingleOrMany::Single(message) => usize::from(matches!(
@@ -644,7 +644,7 @@ async fn failed_drive_account_reinitialization_does_not_request_account_commit()
     );
     assert_eq!(supervisor.active_operation, None);
     assert_eq!(manager.projected_exclusive_operation(), None);
-    assert!(!manager.reconciler.receiver().try_iter().any(|messages| match messages {
+    assert!(!manager.reconciler.receiver.try_iter().any(|messages| match messages {
         SingleOrMany::Single(message) => matches!(
             message,
             CloudBackupReconcileMessage::DriveAccountSwitchCommitRequired(7)
@@ -738,7 +738,7 @@ async fn drive_account_switch_restart_keeps_fence_for_mismatched_platform_transi
         supervisor.active_operation.claim().and_then(CloudBackupExclusiveOperationClaim::drive_account_switch_id),
         None
     );
-    assert!(manager.reconciler.receiver().try_iter().any(|messages| match messages {
+    assert!(manager.reconciler.receiver.try_iter().any(|messages| match messages {
         SingleOrMany::Single(message) => matches!(
             message,
             CloudBackupReconcileMessage::DriveAccountSwitchRecoveryRequired {

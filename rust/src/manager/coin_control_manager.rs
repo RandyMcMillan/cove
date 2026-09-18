@@ -594,7 +594,7 @@ mod tests {
         let (wallet_db, _tmp) = new_test_wallet_data_db(wallet_id);
 
         manager.clone().notify_search_changed(search);
-        while manager.reconciler.receiver().try_recv().is_ok() {}
+        while manager.reconciler.receiver.try_recv().is_ok() {}
 
         wallet_db
             .labels
@@ -606,7 +606,7 @@ mod tests {
 
         manager.reload_labels().await.expect("labels reload");
 
-        let message = manager.reconciler.receiver().recv_async().await.expect("reconcile message");
+        let message = manager.reconciler.receiver.recv_async().await.expect("reconcile message");
         let crate::manager::deferred_sender::SingleOrMany::Single(Message::UpdateUtxos(utxos)) =
             message
         else {

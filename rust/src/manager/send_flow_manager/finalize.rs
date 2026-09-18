@@ -418,7 +418,7 @@ mod tests {
             Some(total_fee),
         );
 
-        let message = manager.reconciler.receiver().try_recv().expect("warning is reconciled");
+        let message = manager.reconciler.receiver.try_recv().expect("warning is reconciled");
         let SingleOrMany::Single(message) = message else {
             panic!("expected a single reconcile message");
         };

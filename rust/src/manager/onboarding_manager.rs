@@ -2742,7 +2742,7 @@ mod tests {
 
     fn assert_no_reconcile_messages(manager: &RustOnboardingManager) {
         assert!(matches!(
-            manager.reconciler.receiver().try_recv(),
+            manager.reconciler.receiver.try_recv(),
             Err(flume::TryRecvError::Empty)
         ));
     }

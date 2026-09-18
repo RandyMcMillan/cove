@@ -76,7 +76,7 @@ pub(crate) mod test_support {
 
     pub(crate) fn init_noop_updater() {
         let channel = ReconcileChannel::<AppStateReconcileMessage>::new(1000);
-        let receiver = channel.receiver();
+        let receiver = channel.receiver.clone();
         std::thread::Builder::new()
             .name("noop-app-updater-drain".into())
             .spawn(move || while receiver.recv().is_ok() {})

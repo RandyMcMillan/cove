@@ -50,7 +50,7 @@ pub(crate) use impl_reconcile_sink;
 #[derive(Debug)]
 pub struct ReconcileChannel<M: DebugSend> {
     sender: MessageSender<M>,
-    receiver: Arc<Receiver<SingleOrMany<M>>>,
+    pub(crate) receiver: Arc<Receiver<SingleOrMany<M>>>,
 }
 
 impl<M: DebugSend> Clone for ReconcileChannel<M> {
@@ -93,11 +93,6 @@ impl<M: DebugSend> ReconcileChannel<M> {
     /// `Sender<SingleOrMany<M>>` and feed the same channel
     pub fn raw_sender(&self) -> Sender<SingleOrMany<M>> {
         self.sender.raw()
-    }
-
-    #[cfg(test)]
-    pub fn receiver(&self) -> Arc<Receiver<SingleOrMany<M>>> {
-        self.receiver.clone()
     }
 
     /// Forward every message to `sink` from a dedicated OS thread
@@ -159,7 +154,7 @@ mod tests {
 
         channel.send_sync(TestMessage::One);
 
-        assert_eq!(channel.receiver().recv().unwrap(), SingleOrMany::Single(TestMessage::One));
+        assert_eq!(channel.receiver.recv().unwrap(), SingleOrMany::Single(TestMessage::One));
     }
 
     #[test]
@@ -174,7 +169,7 @@ mod tests {
         }
 
         assert_eq!(
-            channel.receiver().recv().unwrap(),
+            channel.receiver.recv().unwrap(),
             SingleOrMany::Many(vec![TestMessage::One, TestMessage::Two, TestMessage::Three])
         );
     }
