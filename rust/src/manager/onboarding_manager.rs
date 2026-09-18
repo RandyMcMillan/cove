@@ -2741,10 +2741,7 @@ mod tests {
     }
 
     fn assert_no_reconcile_messages(manager: &RustOnboardingManager) {
-        assert!(matches!(
-            manager.reconciler.receiver.try_recv(),
-            Err(flume::TryRecvError::Empty)
-        ));
+        assert!(matches!(manager.reconciler.receiver.try_recv(), Err(flume::TryRecvError::Empty)));
     }
 
     fn apply_action(flow: &mut FlowState, action: OnboardingAction) -> TransitionCommand {
