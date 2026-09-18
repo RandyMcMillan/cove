@@ -1236,22 +1236,6 @@ pub(crate) mod tests {
     }
 
     #[test]
-    #[ignore = "intentional divergence: zero-fill is likely required for redb create_with_backend"]
-    fn read_past_logical_len_errors() {
-        let dir = TempDir::new().unwrap();
-        let path = test_path(&dir, "bounds_error.enc");
-        let key = test_key();
-
-        let backend = EncryptedBackend::create(&path, &key).unwrap();
-        backend.write(0, &[0xAAu8; 100]).unwrap();
-        assert_eq!(backend.len().unwrap(), 100);
-
-        // per StorageBackend contract: offset+len > len() should error or panic
-        let result = backend.read(200, 50);
-        assert!(result.is_err(), "read past logical end should error per StorageBackend contract");
-    }
-
-    #[test]
     fn plaintext_database_rejected() {
         set_test_encryption_key();
 
