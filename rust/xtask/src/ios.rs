@@ -21,6 +21,7 @@ use xshell::{cmd, Shell};
 // iOS build constants
 const IOS_TARGET_DEVICE: &str = "aarch64-apple-ios";
 const IOS_TARGET_SIMULATOR: &str = "aarch64-apple-ios-sim";
+const IOS_TARGET_MAC: &str = "aarch64-apple-ios-macabi";
 const IOS_LIB_NAME: &str = "libcove.a";
 const BINDINGS_DIR: &str = "./bindings";
 // must match IPHONEOS_DEPLOYMENT_TARGET in ios/Cove.xcodeproj/project.pbxproj
@@ -391,16 +392,16 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
     // determine targets based on build type and device flag
     let targets = match build_type {
         IosBuildType::Release | IosBuildType::Custom(_) => {
-            // release builds only for actual device
-            vec![IOS_TARGET_DEVICE]
+            // release builds for device and mac
+            vec![IOS_TARGET_DEVICE, IOS_TARGET_MAC]
         }
         IosBuildType::Debug => {
             if device {
-                // debug on device and simulator
-                vec![IOS_TARGET_DEVICE, IOS_TARGET_SIMULATOR]
+                // debug on device, simulator, and mac
+                vec![IOS_TARGET_DEVICE, IOS_TARGET_SIMULATOR, IOS_TARGET_MAC]
             } else {
-                // debug on simulator only
-                vec![IOS_TARGET_SIMULATOR]
+                // debug on simulator and mac
+                vec![IOS_TARGET_SIMULATOR, IOS_TARGET_MAC]
             }
         }
     };

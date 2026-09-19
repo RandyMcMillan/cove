@@ -493,7 +493,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cd \"${SRCROOT}\" && ./build-rust.sh";
+			shellScript = "set -euo pipefail\n\n# Ensure cargo and just are on PATH\nexport PATH=\"$HOME/.cargo/bin:$PATH\"\n\nRUST_DIR=\"${SRCROOT}/../rust\"\nXCFRAMEWORK_PATH=\"${SRCROOT}/CoveCore/Sources/cove_core_ffi.xcframework\"\n\n# Check if xcframework exists and has all required slices\nif [ -d \"${XCFRAMEWORK_PATH}/ios-arm64\" ] && [ -d \"${XCFRAMEWORK_PATH}/ios-arm64-simulator\" ] && [ -d \"${XCFRAMEWORK_PATH}/ios-arm64-maccatalyst\" ]; then\n    echo \"xcframework is up to date\"\n    exit 0\nfi\n\ncd \"${RUST_DIR}\"\n\n# Install just if not available\nif ! command -v just >/dev/null 2>&1; then\n    echo \"just not found, installing via cargo...\"\n    cargo install just 2>/dev/null || true\nfi\n\nif [ \"${CONFIGURATION:-Debug}\" == \"Release\" ]; then\n    echo \"Building Rust library (release)...\"\n    just build-ios-release\nelse\n    echo \"Building Rust library (debug)...\"\n    just build-ios-debug-device\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
