@@ -157,6 +157,14 @@ impl NodeSelector {
 
     #[uniffi::method]
     pub async fn check_selected_node(&self, node: Node) -> Result<(), Error> {
+        let node = if node.name == LOCAL_NODE_NAME {
+            crate::local_node_manager::resolve_selected_node()
+                .await
+                .map_err(|e| Error::NodeAccessError(e.to_string()))?
+        } else {
+            node
+        };
+
         node.check_url().await.map_err_debug(Error::NodeAccessError)?;
 
         Ok(())
