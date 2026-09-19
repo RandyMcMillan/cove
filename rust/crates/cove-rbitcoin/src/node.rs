@@ -109,11 +109,9 @@ impl LocalNode {
         info!("starting local rbitcoin node for {}", self.network);
 
         let datadir = datadir_for_network(self.network);
-        std::fs::create_dir_all(&datadir).map_err(|e| LocalNodeError::Config(format!(
-            "create datadir {}: {}",
-            datadir.display(),
-            e
-        )))?;
+        std::fs::create_dir_all(&datadir).map_err(|e| {
+            LocalNodeError::Config(format!("create datadir {}: {}", datadir.display(), e))
+        })?;
 
         let free = available_disk_space(&datadir)?;
         if free < MIN_FREE_SPACE_BYTES {
