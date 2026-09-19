@@ -44528,6 +44528,30 @@ fileprivate struct FfiConverterOptionDouble: FfiConverterRustBuffer {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterOptionBool: FfiConverterRustBuffer {
+    typealias SwiftType = Bool?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterBool.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterBool.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
     typealias SwiftType = String?
 
@@ -46482,6 +46506,21 @@ public func localNodeEsploraUrl()async  -> String?  {
 
         )
 }
+public func localNodeIsInIbd()async  -> Bool?  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_is_in_ibd(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionBool.lift,
+            errorHandler: nil
+
+        )
+}
 public func localNodeIsRunning()async  -> Bool  {
     return
         try!  await uniffiRustCallAsync(
@@ -46522,6 +46561,21 @@ public func localNodeStop()async   {
             completeFunc: ffi_cove_rust_future_complete_void,
             freeFunc: ffi_cove_rust_future_free_void,
             liftFunc: { $0 },
+            errorHandler: nil
+
+        )
+}
+public func localNodeTipHeight()async  -> UInt32?  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_tip_height(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionUInt32.lift,
             errorHandler: nil
 
         )
@@ -47161,6 +47215,9 @@ private let initializationResult: InitializationResult = {
     if (uniffi_cove_checksum_func_local_node_esplora_url() != 39101) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_cove_checksum_func_local_node_is_in_ibd() != 55596) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_cove_checksum_func_local_node_is_running() != 5029) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -47168,6 +47225,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_stop() != 36976) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_tip_height() != 56362) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_set_root_data_dir() != 5349) {

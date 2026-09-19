@@ -192,3 +192,19 @@ async fn local_node_start(network: Network) -> Result<(), LocalNodeStartError> {
 async fn local_node_stop() {
     local_node_manager::LOCAL_NODE_MANAGER.lock().await.stop().await;
 }
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_tip_height() -> Option<u32> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .tip_height()
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_is_in_ibd() -> Option<bool> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .is_in_ibd()
+}

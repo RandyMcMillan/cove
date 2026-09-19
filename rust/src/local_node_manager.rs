@@ -31,6 +31,14 @@ impl LocalNodeManager {
         self.node.as_ref().and_then(LocalNode::urls)
     }
 
+    pub fn tip_height(&self) -> Option<u32> {
+        self.node.as_ref().and_then(LocalNode::tip_height)
+    }
+
+    pub fn is_in_ibd(&self) -> Option<bool> {
+        self.node.as_ref().and_then(LocalNode::is_in_ibd)
+    }
+
     #[allow(dead_code)]
     pub fn network(&self) -> Option<Network> {
         self.node.as_ref().map(LocalNode::network)

@@ -1079,11 +1079,15 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_cove_checksum_func_local_node_esplora_url(
     ): Short
+    external fun uniffi_cove_checksum_func_local_node_is_in_ibd(
+    ): Short
     external fun uniffi_cove_checksum_func_local_node_is_running(
     ): Short
     external fun uniffi_cove_checksum_func_local_node_start(
     ): Short
     external fun uniffi_cove_checksum_func_local_node_stop(
+    ): Short
+    external fun uniffi_cove_checksum_func_local_node_tip_height(
     ): Short
     external fun uniffi_cove_checksum_func_set_root_data_dir(
     ): Short
@@ -3655,11 +3659,15 @@ internal object UniffiLib {
     ): Long
     external fun uniffi_cove_fn_func_local_node_esplora_url(
     ): Long
+    external fun uniffi_cove_fn_func_local_node_is_in_ibd(
+    ): Long
     external fun uniffi_cove_fn_func_local_node_is_running(
     ): Long
     external fun uniffi_cove_fn_func_local_node_start(`network`: RustBufferNetwork.ByValue,
     ): Long
     external fun uniffi_cove_fn_func_local_node_stop(
+    ): Long
+    external fun uniffi_cove_fn_func_local_node_tip_height(
     ): Long
     external fun uniffi_cove_fn_func_set_root_data_dir(`path`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
@@ -3914,6 +3922,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_cove_checksum_func_local_node_esplora_url() != 39101.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_cove_checksum_func_local_node_is_in_ibd() != 55596.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_cove_checksum_func_local_node_is_running() != 5029.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -3921,6 +3932,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_cove_checksum_func_local_node_stop() != 36976.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_cove_checksum_func_local_node_tip_height() != 56362.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_cove_checksum_func_set_root_data_dir() != 5349.toShort()) {
@@ -66865,6 +66879,38 @@ public object FfiConverterOptionalDouble: FfiConverterRustBuffer<kotlin.Double?>
 /**
  * @suppress
  */
+public object FfiConverterOptionalBoolean: FfiConverterRustBuffer<kotlin.Boolean?> {
+    override fun read(buf: ByteBuffer): kotlin.Boolean? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterBoolean.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.Boolean?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterBoolean.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.Boolean?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterBoolean.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?> {
     override fun read(buf: ByteBuffer): kotlin.String? {
         if (buf.get().toInt() == 0) {
@@ -69143,6 +69189,20 @@ object UrExceptionExternalErrorHandler : UniffiRustCallStatusErrorHandler<UrExce
     }
 
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeIsInIbd`() : kotlin.Boolean? {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_is_in_ibd(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_rust_buffer(future) },
+        // lift function
+        { FfiConverterOptionalBoolean.lift(it) },
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
      suspend fun `localNodeIsRunning`() : kotlin.Boolean {
         return uniffiRustCallAsync(
         UniffiLib.uniffi_cove_fn_func_local_node_is_running(),
@@ -69183,6 +69243,20 @@ object UrExceptionExternalErrorHandler : UniffiRustCallStatusErrorHandler<UrExce
         // lift function
         { Unit },
         
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeTipHeight`() : kotlin.UInt? {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_tip_height(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_rust_buffer(future) },
+        // lift function
+        { FfiConverterOptionalUInt.lift(it) },
         // Error FFI converter
         UniffiNullRustCallStatusErrorHandler,
     )

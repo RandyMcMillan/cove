@@ -1,7 +1,8 @@
 use std::net::SocketAddr;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
 
-use rbitcoin_node::{run_p2p_with_shutdown, NodeError, Shutdown};
+use rbitcoin_node::{run_node, run_p2p_with_handle, NodeError, Shutdown};
 use tokio::net::TcpListener;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info, warn};
@@ -17,11 +18,20 @@ pub struct LocalNode {
     urls: Option<LocalNodeUrls>,
     task_handle: Option<JoinHandle<Result<(), NodeError>>>,
     shutdown: Option<Arc<Shutdown>>,
+    tip_height: Option<Arc<AtomicU32>>,
+    initial_block_download: Option<Arc<AtomicBool>>,
 }
 
 impl LocalNode {
     pub const fn new(network: Network) -> Self {
-        Self { network, urls: None, task_handle: None, shutdown: None }
+        Self {
+            network,
+            urls: None,
+            task_handle: None,
+            shutdown: None,
+            tip_height: None,
+            initial_block_download: None,
+        }
     }
 
     pub fn is_running(&self) -> bool {
@@ -38,7 +48,21 @@ impl LocalNode {
         self.network
     }
 
-    /// Start the local node: find free ports, build config, and spawn `run_p2p_with_shutdown`.
+    /// Best block height observed by the tip-follow loop, if the node is running.
+    pub fn tip_height(&self) -> Option<u32> {
+        self.tip_height
+            .as_ref()
+            .map(|a| a.load(Ordering::Relaxed))
+    }
+
+    /// `true` while the node has not yet met minimum chain work or is still in IBD.
+    pub fn is_in_ibd(&self) -> Option<bool> {
+        self.initial_block_download
+            .as_ref()
+            .map(|a| a.load(Ordering::SeqCst))
+    }
+
+    /// Start the local node: find free ports, build config, and spawn `run_p2p_with_handle`.
     pub async fn start(&mut self) -> Result<(), LocalNodeError> {
         if self.is_running() {
             warn!("local node already running");
@@ -64,11 +88,15 @@ impl LocalNode {
             esplora: format!("http://{}", esplora_addr),
         });
 
+        let node_handle = run_node(config).map_err(|e| LocalNodeError::StoreOpen(e.to_string()))?;
+        let tip_height = Arc::clone(&node_handle.tip_height);
+        let initial_block_download = Arc::clone(&node_handle.initial_block_download);
+
         let shutdown = Shutdown::new();
         let shutdown_for_task = Arc::clone(&shutdown);
 
         let task = tokio::spawn(async move {
-            let result = run_p2p_with_shutdown(config, shutdown_for_task).await;
+            let result = run_p2p_with_handle(node_handle, shutdown_for_task).await;
             if let Err(ref e) = result {
                 error!("rbitcoin run_p2p exited with error: {e}");
             }
@@ -77,6 +105,8 @@ impl LocalNode {
 
         self.task_handle = Some(task);
         self.shutdown = Some(shutdown);
+        self.tip_height = Some(tip_height);
+        self.initial_block_download = Some(initial_block_download);
 
         // Give the node a moment to open the store and bind listeners.
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
@@ -117,6 +147,8 @@ impl LocalNode {
         }
 
         self.urls = None;
+        self.tip_height = None;
+        self.initial_block_download = None;
     }
 }
 
