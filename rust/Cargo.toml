@@ -171,6 +171,7 @@ cove-bdk-progressive-scan = { path = "./crates/cove-bdk-progressive-scan" }
 cove-tokio = { path = "./crates/cove-tokio" }
 cove-http = { path = "./crates/cove-http" }
 cove-rbitcoin = { path = "./crates/cove-rbitcoin" }
+rbitcoin-log = { path = "./rbitcoin/crates/rbitcoin-log" }
 
 # bitcoin
 bitcoin = { workspace = true }

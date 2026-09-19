@@ -95,6 +95,8 @@ impl LocalNodeManager {
             }
         }
 
+        rbitcoin_log::global_capture_logs(true);
+
         let mut node = LocalNode::new(network);
         node.start(self.config.clone()).await?;
         self.node = Some(node);
@@ -106,6 +108,7 @@ impl LocalNodeManager {
         if let Some(mut node) = self.node.take() {
             node.stop().await;
         }
+        rbitcoin_log::global_capture_logs(false);
     }
 }
 

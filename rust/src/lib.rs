@@ -263,3 +263,36 @@ async fn local_node_app_foregrounded() {
         tracing::warn!("local node restart on foreground failed: {e}");
     }
 }
+
+/// Return the most recent `limit` log lines from the local node.
+/// Lines are formatted as `"LEVEL message"`.
+#[uniffi::export]
+fn local_node_logs(limit: u32) -> Vec<String> {
+    rbitcoin_log::global_logs_recent(limit as usize)
+        .into_iter()
+        .map(|(level, msg)| format!("{} {}", level.as_str(), msg))
+        .collect()
+}
+
+/// Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
+/// Returns `true` if the level was recognized and applied.
+#[uniffi::export]
+fn local_node_set_log_level(level: String) -> bool {
+    match rbitcoin_log::Level::parse(&level) {
+        Some(level) => {
+            rbitcoin_log::init(level);
+            true
+        }
+        None => {
+            if level.trim().eq_ignore_ascii_case("off")
+                || level.trim().eq_ignore_ascii_case("none")
+                || level.trim() == "0"
+            {
+                rbitcoin_log::init_off();
+                true
+            } else {
+                false
+            }
+        }
+    }
+}

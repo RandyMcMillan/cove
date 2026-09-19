@@ -1448,6 +1448,7 @@ dependencies = [
  "pretty_assertions",
  "pubport",
  "rand 0.10.1",
+ "rbitcoin-log",
  "redb",
  "reqwest 0.13.3",
  "rusqlite",
