@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 use std::path::Path;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 use rbitcoin_node::{NodeError, Shutdown, run_node, run_p2p_with_handle};
 use tokio::net::{TcpListener, TcpStream};
@@ -39,6 +39,7 @@ pub struct LocalNode {
     shutdown: Option<Arc<Shutdown>>,
     tip_height: Option<Arc<AtomicU32>>,
     initial_block_download: Option<Arc<AtomicBool>>,
+    connections: Option<Arc<AtomicUsize>>,
 }
 
 impl LocalNode {
@@ -50,6 +51,7 @@ impl LocalNode {
             shutdown: None,
             tip_height: None,
             initial_block_download: None,
+            connections: None,
         }
     }
 
@@ -73,6 +75,11 @@ impl LocalNode {
     /// `true` while the node has not yet met minimum chain work or is still in IBD.
     pub fn is_in_ibd(&self) -> Option<bool> {
         self.initial_block_download.as_ref().map(|a| a.load(Ordering::SeqCst))
+    }
+
+    /// Number of live peer connections.
+    pub fn peer_count(&self) -> Option<u32> {
+        self.connections.as_ref().map(|a| a.load(Ordering::Relaxed) as u32)
     }
 
     /// Total size of the rbitcoin datadir for this node's network.
@@ -139,6 +146,7 @@ impl LocalNode {
         let node_handle = run_node(config).map_err(|e| LocalNodeError::StoreOpen(e.to_string()))?;
         let tip_height = Arc::clone(&node_handle.tip_height);
         let initial_block_download = Arc::clone(&node_handle.initial_block_download);
+        let connections = Arc::clone(&node_handle.connections);
 
         let shutdown = Shutdown::new();
         let shutdown_for_task = Arc::clone(&shutdown);
@@ -155,6 +163,7 @@ impl LocalNode {
         self.shutdown = Some(shutdown);
         self.tip_height = Some(tip_height);
         self.initial_block_download = Some(initial_block_download);
+        self.connections = Some(connections);
 
         // Give the node a moment to open the store and bind listeners.
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;

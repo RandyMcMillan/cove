@@ -206,6 +206,11 @@ async fn local_node_is_in_ibd() -> Option<bool> {
 }
 
 #[uniffi::export(async_runtime = "tokio")]
+async fn local_node_peer_count() -> Option<u32> {
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.peer_count()
+}
+
+#[uniffi::export(async_runtime = "tokio")]
 async fn local_node_datadir_size() -> Result<u64, LocalNodeStartError> {
     local_node_manager::LOCAL_NODE_MANAGER
         .lock()

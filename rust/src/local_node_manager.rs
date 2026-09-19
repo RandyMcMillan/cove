@@ -50,6 +50,10 @@ impl LocalNodeManager {
         self.node.as_ref().and_then(LocalNode::is_in_ibd)
     }
 
+    pub fn peer_count(&self) -> Option<u32> {
+        self.node.as_ref().and_then(LocalNode::peer_count)
+    }
+
     pub fn datadir_size(&self) -> Result<u64, LocalNodeError> {
         let network = self
             .node
