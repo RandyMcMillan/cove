@@ -19,8 +19,6 @@ struct LocalNodeSettingsView: View {
     // logging
     @State private var logLines: [String] = []
     @State private var logLevel: String = "info"
-    @State private var showLogLevelPicker = false
-
     let logLevels = ["error", "warn", "info", "debug", "trace"]
 
     // approximate space taken by status + actions sections + nav bar + padding
@@ -45,8 +43,8 @@ struct LocalNodeSettingsView: View {
 
                 LocalNodeLogSection(
                     logLines: logLines,
-                    logLevel: logLevel,
-                    onChangeLogLevel: { showLogLevelPicker = true },
+                    logLevel: $logLevel,
+                    onSetLogLevel: setLogLevel,
                     maxHeight: max(120, geometry.size.height - fixedSectionsHeight)
                 )
             }
@@ -72,14 +70,6 @@ struct LocalNodeSettingsView: View {
             Button("Clear", role: .destructive) { clearDatadir() }
         } message: {
             Text("This will delete all local node data and require a full resync.")
-        }
-        .confirmationDialog("Log Level", isPresented: $showLogLevelPicker) {
-            ForEach(logLevels, id: \.self) { level in
-                Button(level.uppercased()) {
-                    setLogLevel(level)
-                }
-            }
-            Button("Cancel", role: .cancel) {}
         }
     }
 
@@ -227,19 +217,13 @@ private struct LocalNodeActionsSection: View {
 
 private struct LocalNodeLogSection: View {
     let logLines: [String]
-    let logLevel: String
-    let onChangeLogLevel: () -> Void
+    @Binding var logLevel: String
+    let onSetLogLevel: (String) -> Void
     let maxHeight: CGFloat
 
     var body: some View {
         Section {
-            HStack {
-                Text("Log Level")
-                Spacer()
-                Button(logLevel.uppercased(), action: onChangeLogLevel)
-                    .font(.subheadline)
-                    .foregroundStyle(.blue)
-            }
+            LogLevelPillBox(selected: $logLevel, onSelect: onSetLogLevel)
 
             if logLines.isEmpty {
                 Text("No logs yet…")
@@ -254,6 +238,41 @@ private struct LocalNodeLogSection: View {
         } header: {
             Text("Console")
         }
+    }
+}
+
+private struct LogLevelPillBox: View {
+    @Binding var selected: String
+    let onSelect: (String) -> Void
+
+    private let levels = ["error", "warn", "info", "debug", "trace"]
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(levels, id: \.self) { level in
+                Button {
+                    onSelect(level)
+                } label: {
+                    Text(level.uppercased())
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(isSelected(level) ? .white : .primary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .background(isSelected(level) ? Color.blue : Color.clear)
+                .clipShape(Capsule())
+            }
+        }
+        .padding(4)
+        .background(Color(.systemGray5))
+        .clipShape(Capsule())
+    }
+
+    private func isSelected(_ level: String) -> Bool {
+        selected == level
     }
 }
 
