@@ -1,6 +1,7 @@
 use std::net::SocketAddr;
+use std::sync::Arc;
 
-use rbitcoin_node::{run_p2p, NodeError};
+use rbitcoin_node::{run_p2p_with_shutdown, NodeError, Shutdown};
 use tokio::net::TcpListener;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info, warn};
@@ -15,11 +16,12 @@ pub struct LocalNode {
     network: Network,
     urls: Option<LocalNodeUrls>,
     task_handle: Option<JoinHandle<Result<(), NodeError>>>,
+    shutdown: Option<Arc<Shutdown>>,
 }
 
 impl LocalNode {
     pub const fn new(network: Network) -> Self {
-        Self { network, urls: None, task_handle: None }
+        Self { network, urls: None, task_handle: None, shutdown: None }
     }
 
     pub fn is_running(&self) -> bool {
@@ -36,7 +38,7 @@ impl LocalNode {
         self.network
     }
 
-    /// Start the local node: find free ports, build config, and spawn `run_p2p`.
+    /// Start the local node: find free ports, build config, and spawn `run_p2p_with_shutdown`.
     pub async fn start(&mut self) -> Result<(), LocalNodeError> {
         if self.is_running() {
             warn!("local node already running");
@@ -62,8 +64,11 @@ impl LocalNode {
             esplora: format!("http://{}", esplora_addr),
         });
 
+        let shutdown = Shutdown::new();
+        let shutdown_for_task = Arc::clone(&shutdown);
+
         let task = tokio::spawn(async move {
-            let result = run_p2p(config).await;
+            let result = run_p2p_with_shutdown(config, shutdown_for_task).await;
             if let Err(ref e) = result {
                 error!("rbitcoin run_p2p exited with error: {e}");
             }
@@ -71,6 +76,7 @@ impl LocalNode {
         });
 
         self.task_handle = Some(task);
+        self.shutdown = Some(shutdown);
 
         // Give the node a moment to open the store and bind listeners.
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
@@ -85,28 +91,28 @@ impl LocalNode {
         Ok(())
     }
 
-    /// Stop the local node by aborting the background task.
-    ///
-    /// NOTE: rbitcoin v0.7.0 does not expose the `Shutdown` flag used by
-    /// `run_p2p`, so we cannot request a graceful shutdown. Task abort is
-    /// the only available mechanism. Clean store flush requires upstream
-    /// changes (export `Shutdown` or add a `no_signal_handlers` mode).
+    /// Stop the local node by requesting cooperative shutdown and awaiting the task.
     pub async fn stop(&mut self) {
         if !self.is_running() {
             return;
         }
 
-        info!("stopping local rbitcoin node (task abort)");
+        info!("stopping local rbitcoin node (cooperative shutdown)");
+
+        if let Some(shutdown) = self.shutdown.take() {
+            shutdown.request();
+        }
 
         if let Some(handle) = self.task_handle.take() {
-            handle.abort();
-            let timeout = tokio::time::Duration::from_secs(10);
+            let timeout = tokio::time::Duration::from_secs(30);
             match tokio::time::timeout(timeout, handle).await {
                 Ok(Ok(Ok(()))) => info!("local node stopped cleanly"),
                 Ok(Ok(Err(e))) => warn!("local node stopped with error: {e}"),
                 Ok(Err(e)) if e.is_cancelled() => info!("local node task aborted"),
                 Ok(Err(e)) => warn!("local node task panicked: {e}"),
-                Err(_) => warn!("local node shutdown timed out"),
+                Err(_) => {
+                    warn!("local node shutdown timed out after 30s — task may still be running");
+                }
             }
         }
 
@@ -116,8 +122,13 @@ impl LocalNode {
 
 impl Drop for LocalNode {
     fn drop(&mut self) {
-        if self.is_running() && let Some(handle) = self.task_handle.take() {
-            handle.abort();
+        if self.is_running() {
+            if let Some(shutdown) = self.shutdown.take() {
+                shutdown.request();
+            }
+            if let Some(handle) = self.task_handle.take() {
+                handle.abort();
+            }
         }
     }
 }
