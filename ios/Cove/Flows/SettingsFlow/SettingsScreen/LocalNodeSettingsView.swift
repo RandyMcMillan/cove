@@ -23,29 +23,35 @@ struct LocalNodeSettingsView: View {
 
     let logLevels = ["error", "warn", "info", "debug", "trace"]
 
+    // approximate space taken by status + actions sections + nav bar + padding
+    private let fixedSectionsHeight: CGFloat = 320
+
     var body: some View {
-        Form {
-            LocalNodeStatusSection(
-                isRunning: isRunning,
-                tipHeight: tipHeight,
-                isInIbd: isInIbd,
-                datadirSize: datadirSize
-            )
+        GeometryReader { geometry in
+            Form {
+                LocalNodeStatusSection(
+                    isRunning: isRunning,
+                    tipHeight: tipHeight,
+                    isInIbd: isInIbd,
+                    datadirSize: datadirSize
+                )
 
-            LocalNodeActionsSection(
-                isRunning: isRunning,
-                onStart: startNode,
-                onStop: stopNode,
-                onClear: { showClearConfirm = true }
-            )
+                LocalNodeActionsSection(
+                    isRunning: isRunning,
+                    onStart: startNode,
+                    onStop: stopNode,
+                    onClear: { showClearConfirm = true }
+                )
 
-            LocalNodeLogSection(
-                logLines: logLines,
-                logLevel: logLevel,
-                onChangeLogLevel: { showLogLevelPicker = true }
-            )
+                LocalNodeLogSection(
+                    logLines: logLines,
+                    logLevel: logLevel,
+                    onChangeLogLevel: { showLogLevelPicker = true },
+                    maxHeight: max(120, geometry.size.height - fixedSectionsHeight)
+                )
+            }
+            .scrollContentBackground(.hidden)
         }
-        .scrollContentBackground(.hidden)
         .navigationTitle("Local Node")
         .onAppear {
             Task { await refreshState() }
@@ -223,6 +229,7 @@ private struct LocalNodeLogSection: View {
     let logLines: [String]
     let logLevel: String
     let onChangeLogLevel: () -> Void
+    let maxHeight: CGFloat
 
     var body: some View {
         Section {
@@ -238,11 +245,11 @@ private struct LocalNodeLogSection: View {
                 Text("No logs yet…")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .padding(.vertical, 8)
             } else {
                 LogConsoleView(lines: logLines)
-                    .frame(height: 280)
+                    .frame(maxWidth: .infinity, maxHeight: maxHeight)
             }
         } header: {
             Text("Console")
