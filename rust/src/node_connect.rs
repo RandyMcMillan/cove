@@ -135,9 +135,7 @@ impl NodeSelector {
     #[uniffi::method]
     pub fn select_local_node(&self) -> Result<(), Error> {
         if self.network == Network::Testnet4 {
-            return Err(NodeSelectorError::LocalNodeNotSupported(
-                "testnet4".to_string(),
-            ));
+            return Err(NodeSelectorError::LocalNodeNotSupported("testnet4".to_string()));
         }
 
         Database::global()

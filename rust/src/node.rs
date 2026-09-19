@@ -149,11 +149,9 @@ impl From<NodeSelection> for Node {
         match node {
             NodeSelection::Preset(node) => node,
             NodeSelection::Custom(node) => node,
-            NodeSelection::Local => Node::new_electrum(
-                "Local Node".to_string(),
-                String::new(),
-                Network::Bitcoin,
-            ),
+            NodeSelection::Local => {
+                Node::new_electrum("Local Node".to_string(), String::new(), Network::Bitcoin)
+            }
         }
     }
 }

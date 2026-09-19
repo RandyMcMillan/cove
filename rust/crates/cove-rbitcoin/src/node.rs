@@ -1,16 +1,16 @@
 use std::net::SocketAddr;
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use rbitcoin_node::{run_node, run_p2p_with_handle, NodeError, Shutdown};
+use rbitcoin_node::{NodeError, Shutdown, run_node, run_p2p_with_handle};
 use tokio::net::TcpListener;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{build_config, datadir_for_network, LocalNodeUrls};
+use crate::config::{LocalNodeUrls, build_config, datadir_for_network};
 use crate::error::LocalNodeError;
 
 /// Minimum free disk space required to start a local node (1 GB).
@@ -54,9 +54,7 @@ impl LocalNode {
     }
 
     pub fn is_running(&self) -> bool {
-        self.task_handle
-            .as_ref()
-            .is_some_and(|h| !h.is_finished())
+        self.task_handle.as_ref().is_some_and(|h| !h.is_finished())
     }
 
     pub fn urls(&self) -> Option<&LocalNodeUrls> {
@@ -69,16 +67,12 @@ impl LocalNode {
 
     /// Best block height observed by the tip-follow loop, if the node is running.
     pub fn tip_height(&self) -> Option<u32> {
-        self.tip_height
-            .as_ref()
-            .map(|a| a.load(Ordering::Relaxed))
+        self.tip_height.as_ref().map(|a| a.load(Ordering::Relaxed))
     }
 
     /// `true` while the node has not yet met minimum chain work or is still in IBD.
     pub fn is_in_ibd(&self) -> Option<bool> {
-        self.initial_block_download
-            .as_ref()
-            .map(|a| a.load(Ordering::SeqCst))
+        self.initial_block_download.as_ref().map(|a| a.load(Ordering::SeqCst))
     }
 
     /// Total size of the rbitcoin datadir for this node's network.
@@ -96,9 +90,8 @@ impl LocalNode {
     pub fn clear_datadir(&self) -> Result<(), LocalNodeError> {
         let path = datadir_for_network(self.network);
         if path.exists() {
-            std::fs::remove_dir_all(&path).map_err(|e| {
-                LocalNodeError::DatadirRemove(format!("{}: {e}", path.display()))
-            })?;
+            std::fs::remove_dir_all(&path)
+                .map_err(|e| LocalNodeError::DatadirRemove(format!("{}: {e}", path.display())))?;
         }
         Ok(())
     }
@@ -125,10 +118,7 @@ impl LocalNode {
         let electrum_addr = find_free_port().await?;
         let esplora_addr = find_free_port().await?;
 
-        debug!(
-            "local node will bind electrum={} esplora={}",
-            electrum_addr, esplora_addr
-        );
+        debug!("local node will bind electrum={} esplora={}", electrum_addr, esplora_addr);
 
         let mut config = build_config(self.network)?;
         config.listen.electrum = Some(electrum_addr);
@@ -163,9 +153,7 @@ impl LocalNode {
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
 
         if !self.is_running() {
-            return Err(LocalNodeError::P2PStart(
-                "run_p2p task exited immediately".to_string(),
-            ));
+            return Err(LocalNodeError::P2PStart("run_p2p task exited immediately".to_string()));
         }
 
         info!("local rbitcoin node started");
@@ -218,13 +206,13 @@ impl Drop for LocalNode {
 
 /// Bind to `127.0.0.1:0` to get a free port, then return the address.
 async fn find_free_port() -> Result<SocketAddr, LocalNodeError> {
-    let listener = TcpListener::bind("127.0.0.1:0").await.map_err(|e| {
-        LocalNodeError::Config(format!("failed to bind to find free port: {e}"))
-    })?;
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .map_err(|e| LocalNodeError::Config(format!("failed to bind to find free port: {e}")))?;
 
-    let addr = listener.local_addr().map_err(|e| {
-        LocalNodeError::Config(format!("failed to get local address: {e}"))
-    })?;
+    let addr = listener
+        .local_addr()
+        .map_err(|e| LocalNodeError::Config(format!("failed to get local address: {e}")))?;
 
     drop(listener);
 
@@ -241,11 +229,12 @@ pub fn dir_size(path: &Path) -> Result<u64, LocalNodeError> {
             .map_err(|e| LocalNodeError::Config(format!("read_dir {}: {e}", dir.display())))?;
 
         for entry in entries {
-            let entry = entry
-                .map_err(|e| LocalNodeError::Config(format!("dir entry in {}: {e}", dir.display())))?;
-            let meta = entry
-                .metadata()
-                .map_err(|e| LocalNodeError::Config(format!("metadata {}: {e}", entry.path().display())))?;
+            let entry = entry.map_err(|e| {
+                LocalNodeError::Config(format!("dir entry in {}: {e}", dir.display()))
+            })?;
+            let meta = entry.metadata().map_err(|e| {
+                LocalNodeError::Config(format!("metadata {}: {e}", entry.path().display()))
+            })?;
 
             if meta.is_dir() {
                 stack.push(entry.path());
@@ -282,9 +271,7 @@ fn available_disk_space(path: &Path) -> Result<u64, LocalNodeError> {
 
 #[cfg(not(unix))]
 fn available_disk_space(_path: &Path) -> Result<u64, LocalNodeError> {
-    Err(LocalNodeError::Config(
-        "disk space check not supported on this platform".to_string(),
-    ))
+    Err(LocalNodeError::Config("disk space check not supported on this platform".to_string()))
 }
 
 #[cfg(test)]

@@ -794,7 +794,8 @@ impl WalletActor {
         tx: BdkTransaction,
     ) -> Result<(), Error> {
         let node_client = self.node_client().ok().cloned();
-        let node = resolve_selected_node().await.map_err(|e| Error::BroadcastError(e.to_string()))?;
+        let node =
+            resolve_selected_node().await.map_err(|e| Error::BroadcastError(e.to_string()))?;
 
         broadcast_payjoin_terminal_with_client(node_client, node, tx).await
     }

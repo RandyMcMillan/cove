@@ -40,10 +40,10 @@ impl LocalNodeManager {
     }
 
     pub fn datadir_size(&self) -> Result<u64, LocalNodeError> {
-        let network = self.node.as_ref().map_or_else(
-            || Database::global().global_config.selected_network(),
-            |n| n.network(),
-        );
+        let network = self
+            .node
+            .as_ref()
+            .map_or_else(|| Database::global().global_config.selected_network(), |n| n.network());
         let path = cove_rbitcoin::datadir_for_network(network);
         if !path.exists() {
             return Ok(0);
@@ -119,9 +119,7 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
         manager.start(network).await?;
     }
 
-    let urls = manager.urls().ok_or_else(|| {
-        LocalNodeError::NotRunning
-    })?;
+    let urls = manager.urls().ok_or_else(|| LocalNodeError::NotRunning)?;
 
     let (api_type, url) = match network {
         Network::Bitcoin | Network::Testnet => (ApiType::Electrum, urls.electrum.clone()),
@@ -133,12 +131,7 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
         }
     };
 
-    let node = Node {
-        name: LOCAL_NODE_NAME.to_string(),
-        network,
-        api_type,
-        url,
-    };
+    let node = Node { name: LOCAL_NODE_NAME.to_string(), network, api_type, url };
 
     Ok(node)
 }
@@ -163,12 +156,7 @@ pub fn selected_node_identity_placeholder() -> Node {
         Network::Testnet4 => ApiType::Esplora,
     };
 
-    Node {
-        name: LOCAL_NODE_NAME.to_string(),
-        network,
-        api_type,
-        url: "local://".to_string(),
-    }
+    Node { name: LOCAL_NODE_NAME.to_string(), network, api_type, url: "local://".to_string() }
 }
 
 #[cfg(test)]

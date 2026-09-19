@@ -52,8 +52,8 @@ mod historical_price_service;
 mod key_teleport;
 mod keys;
 mod label_manager;
-mod local_node_manager;
 mod loading_popup;
+mod local_node_manager;
 mod manager;
 mod mnemonic;
 mod multi_format;
@@ -124,20 +124,12 @@ async fn local_node_is_running() -> bool {
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_esplora_url() -> Option<String> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
-        .urls()
-        .map(|u| u.esplora.clone())
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.urls().map(|u| u.esplora.clone())
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_electrum_url() -> Option<String> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
-        .urls()
-        .map(|u| u.electrum.clone())
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.urls().map(|u| u.electrum.clone())
 }
 
 #[derive(Debug, Clone, thiserror::Error, uniffi::Error)]
@@ -179,7 +171,9 @@ impl From<cove_rbitcoin::LocalNodeError> for LocalNodeStartError {
             cove_rbitcoin::LocalNodeError::EsploraStart(s) => Self::EsploraStart(s),
             cove_rbitcoin::LocalNodeError::NotRunning => Self::NotRunning,
             cove_rbitcoin::LocalNodeError::UnsupportedNetwork(s) => Self::UnsupportedNetwork(s),
-            cove_rbitcoin::LocalNodeError::InsufficientDiskSpace(s) => Self::InsufficientDiskSpace(s),
+            cove_rbitcoin::LocalNodeError::InsufficientDiskSpace(s) => {
+                Self::InsufficientDiskSpace(s)
+            }
             cove_rbitcoin::LocalNodeError::DatadirRemove(s) => Self::DatadirRemove(s),
             cove_rbitcoin::LocalNodeError::Config(s) => Self::Config(s),
         }
@@ -203,18 +197,12 @@ async fn local_node_stop() {
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_tip_height() -> Option<u32> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
-        .tip_height()
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.tip_height()
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_is_in_ibd() -> Option<bool> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
-        .is_in_ibd()
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.is_in_ibd()
 }
 
 #[uniffi::export(async_runtime = "tokio")]

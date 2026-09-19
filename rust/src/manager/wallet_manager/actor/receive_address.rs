@@ -551,12 +551,10 @@ impl WalletActor {
                     Ok(node_client) => node_client.sync(&graph, sync_request).await,
                     Err(error) => Err(error),
                 },
-                Err(_) => Err(NodeError::EsploraConnect(
-                    esplora_client::Error::HttpResponse {
-                        status: 0,
-                        message: "local node not available".to_string(),
-                    },
-                )),
+                Err(_) => Err(NodeError::EsploraConnect(esplora_client::Error::HttpResponse {
+                    status: 0,
+                    message: "local node not available".to_string(),
+                })),
             };
 
             send!(addr.handle_receive_address_sync_result(request_id, derivation_index, result));

@@ -14,7 +14,8 @@ pub fn build_config(network: Network) -> Result<NodeConfig, LocalNodeError> {
     let rbitcoin_network = map_network(network)?;
     let datadir = datadir_for_network(network);
 
-    let localhost = |port: u16| format!("127.0.0.1:{port}").parse().expect("hardcoded valid address");
+    let localhost =
+        |port: u16| format!("127.0.0.1:{port}").parse().expect("hardcoded valid address");
 
     let mut config = NodeConfig {
         datadir: DatadirOpts { path: datadir, cold: None },
@@ -24,10 +25,7 @@ pub fn build_config(network: Network) -> Result<NodeConfig, LocalNodeError> {
             esplora: Some(localhost(0)),
             ..ListenOpts::default()
         },
-        mempool: MempoolOpts {
-            persist: true,
-            ..MempoolOpts::default()
-        },
+        mempool: MempoolOpts { persist: true, ..MempoolOpts::default() },
         rpc: RpcOpts::default(),
         network: rbitcoin_network,
         shindex: true,
