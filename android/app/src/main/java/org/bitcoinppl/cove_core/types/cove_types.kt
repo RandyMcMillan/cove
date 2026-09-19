@@ -344,7 +344,7 @@ internal inline fun<T, reified E: Throwable> uniffiTraitInterfaceCallWithError(
         }
     }
 }
-// Initial value and increment amount for handles. 
+// Initial value and increment amount for handles.
 // These ensure that Kotlin-generated handles always have the lowest bit set
 private const val UNIFFI_HANDLEMAP_INITIAL = 1.toLong()
 private const val UNIFFI_HANDLEMAP_DELTA = 2.toLong()
@@ -354,7 +354,7 @@ private const val UNIFFI_HANDLEMAP_DELTA = 2.toLong()
 // This is used pass an opaque 64-bit handle representing a foreign object to the Rust code.
 internal class UniffiHandleMap<T: Any> {
     private val map = ConcurrentHashMap<Long, T>()
-    // Start 
+    // Start
     private val counter = java.util.concurrent.atomic.AtomicLong(UNIFFI_HANDLEMAP_INITIAL)
 
     val size: Int
@@ -930,408 +930,408 @@ internal object IntegrityCheckingUniffiLib {
     external fun ffi_cove_types_uniffi_contract_version(
     ): Int
 
-        
+
 }
 
 internal object UniffiLib {
-    
+
     // The Cleaner for the whole library
     internal val CLEANER: UniffiCleaner by lazy {
         UniffiCleaner.create()
     }
-    
+
 
     init {
         Native.register(UniffiLib::class.java, findLibraryName(componentName = "cove_types"))
-        
+
     }
-    external fun uniffi_cove_types_fn_clone_address(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_address(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_address(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_address(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_address_from_string(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_address_from_string(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_constructor_address_preview_new(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_address_preview_new(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_constructor_address_random(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_address_random(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_address_hashtouint(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_hashtouint(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_address_spaced_out(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_spaced_out(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_address_uniffi_trait_eq_eq(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_uniffi_trait_eq_eq(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_address_uniffi_trait_eq_ne(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_uniffi_trait_eq_ne(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_address_uniffi_trait_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_address_uniffi_trait_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_addressinfo(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_addressinfo(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_addressinfo(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_addressinfo(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_addressinfo_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfo_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_addressinfo_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfo_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addressinfo_index(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfo_index(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
-    external fun uniffi_cove_types_fn_clone_addressinfowithderivation(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_addressinfowithderivation(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_addressinfowithderivation(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_addressinfowithderivation(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address_spaced_out(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address_spaced_out(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfowithderivation_address_unformatted(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addressinfowithderivation_derivation_path(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfowithderivation_derivation_path(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addressinfowithderivation_index(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addressinfowithderivation_index(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
-    external fun uniffi_cove_types_fn_clone_addresswithnetwork(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_addresswithnetwork(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_addresswithnetwork(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_addresswithnetwork(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_addresswithnetwork_new(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_addresswithnetwork_new(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_addresswithnetwork_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addresswithnetwork_address(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_addresswithnetwork_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addresswithnetwork_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addresswithnetwork_isvalidfornetwork(`ptr`: Long,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addresswithnetwork_isvalidfornetwork(`ptr`: Long,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_addresswithnetwork_network(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addresswithnetwork_network(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_addresswithnetwork_payjoin(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_addresswithnetwork_payjoin(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_amount(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_amount(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_amount(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_amount(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_amount_from_sat(`sats`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_amount_from_sat(`sats`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_constructor_amount_one_btc(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_amount_one_btc(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_constructor_amount_one_sat(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_amount_one_sat(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_amount_as_btc(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_as_btc(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Double
-    external fun uniffi_cove_types_fn_method_amount_as_sats(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_as_sats(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_amount_btc_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_btc_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_amount_btc_string_with_unit(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_btc_string_with_unit(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_amount_fmt_string(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_fmt_string(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_amount_fmt_string_with_unit(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_fmt_string_with_unit(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_amount_sats_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_sats_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_amount_sats_string_with_unit(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_amount_sats_string_with_unit(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_chainposition(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_chainposition(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_chainposition(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_chainposition(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_clone_confirmdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_confirmdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_confirmdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_confirmdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_confirmdetails_fee_percentage(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_fee_percentage(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_fee_total(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_fee_total(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_id_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_id_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_inputs(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_inputs(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_normalized_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_normalized_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_outputs(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_outputs(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_bytes(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_bytes(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_density(`ptr`: Long,`density`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_density(`ptr`: Long,`density`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_max_version(`ptr`: Long,`maxVersion`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_max_version(`ptr`: Long,`maxVersion`: Byte,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_hex(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_hex(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur(`ptr`: Long,`maxFragmentLen`: Int,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur(`ptr`: Long,`maxFragmentLen`: Int,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur_with_density(`ptr`: Long,`density`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur_with_density(`ptr`: Long,`density`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_confirmdetails_sending_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_sending_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_sending_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_sending_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_confirmdetails_spending_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_confirmdetails_spending_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_inputoutputdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_inputoutputdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_inputoutputdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_inputoutputdetails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_clone_qrdensity(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_qrdensity(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_qrdensity(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_qrdensity(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_qrdensity_new(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_qrdensity_new(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_qrdensity_bbqr_animation_interval_ms(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_bbqr_animation_interval_ms(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
-    external fun uniffi_cove_types_fn_method_qrdensity_bbqr_max_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_bbqr_max_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_qrdensity_can_decrease(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_can_decrease(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_qrdensity_can_increase(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_can_increase(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_qrdensity_decrease(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_decrease(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_qrdensity_increase(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_increase(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_qrdensity_ur_animation_interval_ms(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_ur_animation_interval_ms(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
-    external fun uniffi_cove_types_fn_method_qrdensity_ur_fragment_len(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrdensity_ur_fragment_len(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
-    external fun uniffi_cove_types_fn_clone_feerate(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_feerate(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_feerate(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_feerate(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_feerate_from_sat_per_vb(`satPerVb`: Float,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_feerate_from_sat_per_vb(`satPerVb`: Float,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerate_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerate_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Float
-    external fun uniffi_cove_types_fn_method_feerate_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerate_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_feerateoption(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_feerateoption(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_feerateoption(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_feerateoption(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_feerateoption_new(`feeSpeed`: RustBuffer.ByValue,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_feerateoption_new(`feeSpeed`: RustBuffer.ByValue,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoption_duration(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_duration(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoption_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoption_fee_speed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_fee_speed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoption_is_equal(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_is_equal(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_feerateoption_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Float
-    external fun uniffi_cove_types_fn_method_feerateoption_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoption_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_feerateoptionwithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_feerateoptionwithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_feerateoptionwithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_feerateoptionwithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_feerateoptionwithtotalfee_new(`feeSpeed`: RustBuffer.ByValue,`feeRate`: Long,`totalFee`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_feerateoptionwithtotalfee_new(`feeSpeed`: RustBuffer.ByValue,`feeRate`: Long,`totalFee`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_duration(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_duration(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_rate(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_rate_options(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_rate_options(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_speed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_fee_speed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_is_custom(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_is_custom(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_is_equal(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_is_equal(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_sat_per_vb(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Float
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_sats_per_vbyte_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_total_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionwithtotalfee_total_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_feerateoptions(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_feerateoptions(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_feerateoptions(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_feerateoptions(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_feerateoptions_previewnew(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_feerateoptions_previewnew(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptions_fast(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptions_fast(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptions_medium(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptions_medium(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptions_slow(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptions_slow(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_feerateoptionswithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_feerateoptionswithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_feerateoptionswithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_feerateoptionswithtotalfee(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_feerateoptionswithtotalfee_previewnew(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_feerateoptionswithtotalfee_previewnew(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_add_custom_fee_rate(`ptr`: Long,`feeRate`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_add_custom_fee_rate(`ptr`: Long,`feeRate`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_calculate_custom_fee_speed(`ptr`: Long,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_calculate_custom_fee_speed(`ptr`: Long,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_custom(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_custom(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_fast(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_fast(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_fee_rate_options(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_fee_rate_options(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_get_fee_rate_with(`ptr`: Long,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_get_fee_rate_with(`ptr`: Long,`feeRate`: Float,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_medium(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_medium(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_remove_custom_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_remove_custom_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_slow(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_slow(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_transaction_size(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feerateoptionswithtotalfee_transaction_size(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_psbt(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_psbt(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_psbt(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_psbt(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_psbt_new(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_psbt_new(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_psbt_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_psbt_fee(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_psbt_output_total_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_psbt_output_total_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_psbt_tx_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_psbt_tx_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_psbt_weight(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_psbt_weight(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_outpoint(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_outpoint(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_outpoint(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_outpoint(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_constructor_outpoint_previewnew(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_outpoint_previewnew(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_constructor_outpoint_withvout(`vout`: Int,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_constructor_outpoint_withvout(`vout`: Int,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_outpoint_eq(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_outpoint_eq(`ptr`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_outpoint_hashtouint(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_outpoint_hashtouint(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_outpoint_txid(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_outpoint_txid(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_outpoint_txid_str(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_outpoint_txid_str(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_outpoint_txn_link(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_outpoint_txn_link(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_clone_sentandreceived(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_sentandreceived(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_sentandreceived(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_sentandreceived(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_sentandreceived_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_amount(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_sentandreceived_amount_fmt(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_amount_fmt(`ptr`: Long,`unit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_sentandreceived_direction(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_direction(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_sentandreceived_external_sent(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_external_sent(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_sentandreceived_label(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_label(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_sentandreceived_received(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_received(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_sentandreceived_sent(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_sentandreceived_sent(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_clone_txid(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_txid(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_txid(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_txid(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_txid_as_hash_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_as_hash_string(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_display(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_display(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_eq_eq(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_eq_eq(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_eq_ne(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_eq_ne(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_hash(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_ord_cmp(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_txid_uniffi_trait_ord_cmp(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_clone_txin(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_txin(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_txin(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_txin(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_clone_txout(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_txout(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_txout(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_txout(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_clone_utxolist(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_clone_utxolist(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_free_utxolist(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_free_utxolist(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_method_colorschemeselection_capitalized_string(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_colorschemeselection_capitalized_string(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_qrexportformat_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_qrexportformat_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_feespeed_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_feespeed_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_network_display_name(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_network_display_name(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_network_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_network_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_bitcoinunit_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_bitcoinunit_uniffi_trait_display(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_utxo_date(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_date(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_utxo_hash_to_uint(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_hash_to_uint(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_method_utxo_is_equal(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_is_equal(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_utxo_name(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_name(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_eq_eq(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_eq_eq(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_eq_ne(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_eq_ne(`ptr`: RustBuffer.ByValue,`other`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_hash(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_method_utxo_uniffi_trait_hash(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_func_address_is_valid(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_address_is_valid(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_func_address_is_valid_for_network(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_address_is_valid_for_network(`address`: RustBuffer.ByValue,`network`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun uniffi_cove_types_fn_func_address_string_spaced_out(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_address_string_spaced_out(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_all_color_schemes(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_all_color_schemes(uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_confirm_details_preview_new(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_confirm_details_preview_new(uniffi_out_err: UniffiRustCallStatus,
     ): Long
-    external fun uniffi_cove_types_fn_func_qr_density_is_equal(`lhs`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_qr_density_is_equal(`lhs`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_func_fee_rate_options_with_total_fee_is_equal(`lhs`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_fee_rate_options_with_total_fee_is_equal(`lhs`: Long,`rhs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_func_fee_speed_duration(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_fee_speed_duration(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_fee_speed_is_custom(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_fee_speed_is_custom(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
-    external fun uniffi_cove_types_fn_func_fee_speed_to_circle_color(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_fee_speed_to_circle_color(`feeSpeed`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_all_networks(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_all_networks(uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_all_units(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_all_units(uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun uniffi_cove_types_fn_func_previewnewutxolist(`outputCount`: Byte,`changeCount`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_cove_types_fn_func_previewnewutxolist(`outputCount`: Byte,`changeCount`: Byte,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun ffi_cove_types_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun ffi_cove_types_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
-    external fun ffi_cove_types_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
-    external fun ffi_cove_types_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
     external fun ffi_cove_types_rust_future_poll_u8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1339,7 +1339,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_u8(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
     external fun ffi_cove_types_rust_future_poll_i8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1347,7 +1347,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_i8(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Byte
     external fun ffi_cove_types_rust_future_poll_u16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1355,7 +1355,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_u16(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Short
     external fun ffi_cove_types_rust_future_poll_i16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1363,7 +1363,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_i16(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Short
     external fun ffi_cove_types_rust_future_poll_u32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1371,7 +1371,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_u32(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
     external fun ffi_cove_types_rust_future_poll_i32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1379,7 +1379,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_i32(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Int
     external fun ffi_cove_types_rust_future_poll_u64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1387,7 +1387,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_u64(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
     external fun ffi_cove_types_rust_future_poll_i64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1395,7 +1395,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_i64(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Long
     external fun ffi_cove_types_rust_future_poll_f32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1403,7 +1403,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_f32(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Float
     external fun ffi_cove_types_rust_future_poll_f64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1411,7 +1411,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_f64(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Double
     external fun ffi_cove_types_rust_future_poll_rust_buffer(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1419,7 +1419,7 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_rust_buffer(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
     external fun ffi_cove_types_rust_future_poll_void(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
@@ -1427,10 +1427,10 @@ internal object UniffiLib {
     ): Unit
     external fun ffi_cove_types_rust_future_free_void(`handle`: Long,
     ): Unit
-    external fun ffi_cove_types_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_cove_types_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
 
-        
+
 }
 
 private fun uniffiCheckContractApiVersion(lib: IntegrityCheckingUniffiLib) {
@@ -1900,7 +1900,7 @@ inline fun <T : Disposable?, R> T.use(block: (T) -> R) =
         }
     }
 
-/** 
+/**
  * Placeholder object used to signal that we're constructing an interface with a FFI handle.
  *
  * This is the first argument for interface constructors that input a raw handle. It exists is that
@@ -1911,7 +1911,7 @@ inline fun <T : Disposable?, R> T.use(block: (T) -> R) =
  * */
 object UniffiWithHandle
 
-/** 
+/**
  * Used to instantiate an interface without an actual pointer, for fakes in tests, mostly.
  *
  * @suppress
@@ -2357,13 +2357,13 @@ public object FfiConverterDuration: FfiConverterRustBuffer<java.time.Duration> {
 
 
 public interface AddressInterface {
-    
+
     fun `hashToUint`(): kotlin.ULong
-    
+
     fun `spacedOut`(): kotlin.String
-    
+
     fun `unformatted`(): kotlin.String
-    
+
     companion object
 }
 
@@ -2479,7 +2479,7 @@ open class Address: Disposable, AutoCloseable, AddressInterface
     }
     )
     }
-    
+
 
     override fun `spacedOut`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2492,7 +2492,7 @@ open class Address: Disposable, AutoCloseable, AddressInterface
     }
     )
     }
-    
+
 
     override fun `unformatted`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2505,11 +2505,11 @@ open class Address: Disposable, AutoCloseable, AddressInterface
     }
     )
     }
-    
 
-    
 
-    
+
+
+
 
     // The local Rust `Eq` implementation - only `eq` is used.
     override fun equals(other: Any?): Boolean {
@@ -2519,7 +2519,7 @@ open class Address: Disposable, AutoCloseable, AddressInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_address_uniffi_trait_eq_eq(
         it,
-        
+
         FfiConverterTypeAddress.lower(`other`),_status)
 }
     }
@@ -2538,9 +2538,9 @@ open class Address: Disposable, AutoCloseable, AddressInterface
     ).toInt()
     }
 
-    
+
     companion object {
-        
+
     /**
      * Creates an Address from a string and validates it for the given network
      *
@@ -2556,16 +2556,16 @@ open class Address: Disposable, AutoCloseable, AddressInterface
             return FfiConverterTypeAddress.lift(
     uniffiRustCallWithError(AddressException) { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_address_from_string(
-    
-        
+
+
         FfiConverterString.lower(`address`),
         FfiConverterTypeNetwork.lower(`network`),_status)
 }
     )
     }
-    
 
-        
+
+
     /**
      * Creates a preview address for testing/development
      *
@@ -2575,14 +2575,14 @@ open class Address: Disposable, AutoCloseable, AddressInterface
             return FfiConverterTypeAddress.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_address_preview_new(
-    
+
         _status)
 }
     )
     }
-    
 
-        
+
+
     /**
      * Creates a random address from a set of predefined test addresses
      *
@@ -2592,16 +2592,16 @@ open class Address: Disposable, AutoCloseable, AddressInterface
             return FfiConverterTypeAddress.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_address_random(
-    
+
         _status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -2725,13 +2725,13 @@ public object FfiConverterTypeAddress: FfiConverter<Address, Long> {
 
 
 public interface AddressInfoInterface {
-    
+
     fun `address`(): Address
-    
+
     fun `addressUnformatted`(): kotlin.String
-    
+
     fun `index`(): kotlin.UInt
-    
+
     companion object
 }
 
@@ -2847,7 +2847,7 @@ open class AddressInfo: Disposable, AutoCloseable, AddressInfoInterface
     }
     )
     }
-    
+
 
     override fun `addressUnformatted`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2860,7 +2860,7 @@ open class AddressInfo: Disposable, AutoCloseable, AddressInfoInterface
     }
     )
     }
-    
+
 
     override fun `index`(): kotlin.UInt {
             return FfiConverterUInt.lift(
@@ -2873,20 +2873,20 @@ open class AddressInfo: Disposable, AutoCloseable, AddressInfoInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -3010,17 +3010,17 @@ public object FfiConverterTypeAddressInfo: FfiConverter<AddressInfo, Long> {
 
 
 public interface AddressInfoWithDerivationInterface {
-    
+
     fun `address`(): Address
-    
+
     fun `addressSpacedOut`(): kotlin.String
-    
+
     fun `addressUnformatted`(): kotlin.String
-    
+
     fun `derivationPath`(): kotlin.String?
-    
+
     fun `index`(): kotlin.UInt
-    
+
     companion object
 }
 
@@ -3136,7 +3136,7 @@ open class AddressInfoWithDerivation: Disposable, AutoCloseable, AddressInfoWith
     }
     )
     }
-    
+
 
     override fun `addressSpacedOut`(): kotlin.String {
             return FfiConverterString.lift(
@@ -3149,7 +3149,7 @@ open class AddressInfoWithDerivation: Disposable, AutoCloseable, AddressInfoWith
     }
     )
     }
-    
+
 
     override fun `addressUnformatted`(): kotlin.String {
             return FfiConverterString.lift(
@@ -3162,7 +3162,7 @@ open class AddressInfoWithDerivation: Disposable, AutoCloseable, AddressInfoWith
     }
     )
     }
-    
+
 
     override fun `derivationPath`(): kotlin.String? {
             return FfiConverterOptionalString.lift(
@@ -3175,7 +3175,7 @@ open class AddressInfoWithDerivation: Disposable, AutoCloseable, AddressInfoWith
     }
     )
     }
-    
+
 
     override fun `index`(): kotlin.UInt {
             return FfiConverterUInt.lift(
@@ -3188,20 +3188,20 @@ open class AddressInfoWithDerivation: Disposable, AutoCloseable, AddressInfoWith
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -3325,17 +3325,17 @@ public object FfiConverterTypeAddressInfoWithDerivation: FfiConverter<AddressInf
 
 
 public interface AddressWithNetworkInterface {
-    
+
     fun `address`(): Address
-    
+
     fun `amount`(): Amount?
-    
+
     fun `isValidForNetwork`(`network`: Network): kotlin.Boolean
-    
+
     fun `network`(): Network
-    
+
     fun `payjoin`(): PayJoinParams?
-    
+
     companion object
 }
 
@@ -3370,11 +3370,11 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
      * Returns `AddressError` if the address is invalid or for an unsupported network
      */
     constructor(`address`: kotlin.String) :
-        this(UniffiWithHandle, 
+        this(UniffiWithHandle,
     uniffiRustCallWithError(AddressException) { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_addresswithnetwork_new(
-    
-        
+
+
         FfiConverterString.lower(`address`),_status)
 }
     )
@@ -3466,7 +3466,7 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
     }
     )
     }
-    
+
 
     override fun `amount`(): Amount? {
             return FfiConverterOptionalTypeAmount.lift(
@@ -3479,7 +3479,7 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
     }
     )
     }
-    
+
 
     override fun `isValidForNetwork`(`network`: Network): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -3487,13 +3487,13 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_addresswithnetwork_isvalidfornetwork(
         it,
-        
+
         FfiConverterTypeNetwork.lower(`network`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `network`(): Network {
             return FfiConverterTypeNetwork.lift(
@@ -3506,7 +3506,7 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
     }
     )
     }
-    
+
 
     override fun `payjoin`(): PayJoinParams? {
             return FfiConverterOptionalTypePayJoinParams.lift(
@@ -3519,20 +3519,20 @@ open class AddressWithNetwork: Disposable, AutoCloseable, AddressWithNetworkInte
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -3656,35 +3656,35 @@ public object FfiConverterTypeAddressWithNetwork: FfiConverter<AddressWithNetwor
 
 
 public interface AmountInterface {
-    
+
     fun `asBtc`(): kotlin.Double
-    
+
     fun `asSats`(): kotlin.ULong
-    
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
      */
     fun `btcString`(): kotlin.String
-    
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
      */
     fun `btcStringWithUnit`(): kotlin.String
-    
+
     fun `fmtString`(`unit`: BitcoinUnit): kotlin.String
-    
+
     fun `fmtStringWithUnit`(`unit`: BitcoinUnit): kotlin.String
-    
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
      */
     fun `satsString`(): kotlin.String
-    
+
     fun `satsStringWithUnit`(): kotlin.String
-    
+
     companion object
 }
 
@@ -3800,7 +3800,7 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
+
 
     override fun `asSats`(): kotlin.ULong {
             return FfiConverterULong.lift(
@@ -3813,9 +3813,9 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
@@ -3830,9 +3830,9 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
@@ -3847,7 +3847,7 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
+
 
     override fun `fmtString`(`unit`: BitcoinUnit): kotlin.String {
             return FfiConverterString.lift(
@@ -3855,13 +3855,13 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_amount_fmt_string(
         it,
-        
+
         FfiConverterTypeBitcoinUnit.lower(`unit`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `fmtStringWithUnit`(`unit`: BitcoinUnit): kotlin.String {
             return FfiConverterString.lift(
@@ -3869,15 +3869,15 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_amount_fmt_string_with_unit(
         it,
-        
+
         FfiConverterTypeBitcoinUnit.lower(`unit`),_status)
 }
     }
     )
     }
-    
 
-    
+
+
     /**
      * # Panics
      * Will not panic - separator is a valid character
@@ -3892,7 +3892,7 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
+
 
     override fun `satsStringWithUnit`(): kotlin.String {
             return FfiConverterString.lift(
@@ -3905,52 +3905,52 @@ open class Amount: Disposable, AutoCloseable, AmountInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
+
+
+
+
+
+
     companion object {
          fun `fromSat`(`sats`: kotlin.ULong): Amount {
             return FfiConverterTypeAmount.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_amount_from_sat(
-    
-        
+
+
         FfiConverterULong.lower(`sats`),_status)
 }
     )
     }
-    
+
 
          fun `oneBtc`(): Amount {
             return FfiConverterTypeAmount.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_amount_one_btc(
-    
+
         _status)
 }
     )
     }
-    
+
 
          fun `oneSat`(): Amount {
             return FfiConverterTypeAmount.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_amount_one_sat(
-    
+
         _status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -4074,7 +4074,7 @@ public object FfiConverterTypeAmount: FfiConverter<Amount, Long> {
 
 
 public interface ChainPositionInterface {
-    
+
     companion object
 }
 
@@ -4179,18 +4179,18 @@ open class ChainPosition: Disposable, AutoCloseable, ChainPositionInterface
         }
     }
 
-    
-
-    
 
 
-    
-    
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -4314,27 +4314,27 @@ public object FfiConverterTypeChainPosition: FfiConverter<ChainPosition, Long> {
 
 
 public interface ConfirmDetailsInterface {
-    
+
     fun `feePercentage`(): kotlin.ULong
-    
+
     fun `feeRate`(): FeeRate
-    
+
     fun `feeTotal`(): Amount
-    
+
     fun `id`(): TxId
-    
+
     fun `idHash`(): kotlin.String
-    
+
     fun `inputs`(): List<AddressAndAmount>
-    
+
     fun `normalizedId`(): kotlin.String
-    
+
     fun `outputs`(): List<AddressAndAmount>
-    
+
     fun `psbt`(): Psbt
-    
+
     fun `psbtBytes`(): kotlin.ByteArray
-    
+
     /**
      * Exports PSBT as `BBQr` encoded QR strings
      *
@@ -4342,7 +4342,7 @@ public interface ConfirmDetailsInterface {
      * Returns `ConfirmDetailsError::QrCodeCreation` if encoding fails
      */
     fun `psbtToBbqr`(): List<kotlin.String>
-    
+
     /**
      * Exports PSBT as `BBQr` with specified density
      *
@@ -4350,11 +4350,11 @@ public interface ConfirmDetailsInterface {
      * Returns `ConfirmDetailsError::QrCodeCreation` if encoding fails
      */
     fun `psbtToBbqrWithDensity`(`density`: QrDensity): List<kotlin.String>
-    
+
     fun `psbtToBbqrWithMaxVersion`(`maxVersion`: kotlin.UByte): List<kotlin.String>
-    
+
     fun `psbtToHex`(): kotlin.String
-    
+
     /**
      * Exports PSBT as UR-encoded QR strings for animated display
      *
@@ -4362,7 +4362,7 @@ public interface ConfirmDetailsInterface {
      * Returns `ConfirmDetailsError::QrCodeCreation` if encoding fails
      */
     fun `psbtToUr`(`maxFragmentLen`: kotlin.UInt): List<kotlin.String>
-    
+
     /**
      * Exports PSBT as UR with specified density
      *
@@ -4370,13 +4370,13 @@ public interface ConfirmDetailsInterface {
      * Returns `ConfirmDetailsError::QrCodeCreation` if encoding fails
      */
     fun `psbtToUrWithDensity`(`density`: QrDensity): List<kotlin.String>
-    
+
     fun `sendingAmount`(): Amount
-    
+
     fun `sendingTo`(): Address
-    
+
     fun `spendingAmount`(): Amount
-    
+
     companion object
 }
 
@@ -4492,7 +4492,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `feeRate`(): FeeRate {
             return FfiConverterTypeFeeRate.lift(
@@ -4505,7 +4505,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `feeTotal`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -4518,7 +4518,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `id`(): TxId {
             return FfiConverterTypeTxId.lift(
@@ -4531,7 +4531,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `idHash`(): kotlin.String {
             return FfiConverterString.lift(
@@ -4544,7 +4544,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `inputs`(): List<AddressAndAmount> {
             return FfiConverterSequenceTypeAddressAndAmount.lift(
@@ -4557,7 +4557,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `normalizedId`(): kotlin.String {
             return FfiConverterString.lift(
@@ -4570,7 +4570,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `outputs`(): List<AddressAndAmount> {
             return FfiConverterSequenceTypeAddressAndAmount.lift(
@@ -4583,7 +4583,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `psbt`(): Psbt {
             return FfiConverterTypePsbt.lift(
@@ -4596,7 +4596,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `psbtBytes`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -4609,9 +4609,9 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Exports PSBT as `BBQr` encoded QR strings
      *
@@ -4629,9 +4629,9 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Exports PSBT as `BBQr` with specified density
      *
@@ -4644,28 +4644,28 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     uniffiRustCallWithError(ConfirmDetailsException) { _status ->
     UniffiLib.uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_density(
         it,
-        
+
         FfiConverterTypeQrDensity.lower(`density`),_status)
 }
     }
     )
     }
-    
 
-    
+
+
     @Throws(ConfirmDetailsException::class)override fun `psbtToBbqrWithMaxVersion`(`maxVersion`: kotlin.UByte): List<kotlin.String> {
             return FfiConverterSequenceString.lift(
     callWithHandle {
     uniffiRustCallWithError(ConfirmDetailsException) { _status ->
     UniffiLib.uniffi_cove_types_fn_method_confirmdetails_psbt_to_bbqr_with_max_version(
         it,
-        
+
         FfiConverterUByte.lower(`maxVersion`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `psbtToHex`(): kotlin.String {
             return FfiConverterString.lift(
@@ -4678,9 +4678,9 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Exports PSBT as UR-encoded QR strings for animated display
      *
@@ -4693,15 +4693,15 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     uniffiRustCallWithError(ConfirmDetailsException) { _status ->
     UniffiLib.uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur(
         it,
-        
+
         FfiConverterUInt.lower(`maxFragmentLen`),_status)
 }
     }
     )
     }
-    
 
-    
+
+
     /**
      * Exports PSBT as UR with specified density
      *
@@ -4714,13 +4714,13 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     uniffiRustCallWithError(ConfirmDetailsException) { _status ->
     UniffiLib.uniffi_cove_types_fn_method_confirmdetails_psbt_to_ur_with_density(
         it,
-        
+
         FfiConverterTypeQrDensity.lower(`density`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `sendingAmount`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -4733,7 +4733,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `sendingTo`(): Address {
             return FfiConverterTypeAddress.lift(
@@ -4746,7 +4746,7 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
+
 
     override fun `spendingAmount`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -4759,20 +4759,20 @@ open class ConfirmDetails: Disposable, AutoCloseable, ConfirmDetailsInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -4896,11 +4896,11 @@ public object FfiConverterTypeConfirmDetails: FfiConverter<ConfirmDetails, Long>
 
 
 public interface FeeRateInterface {
-    
+
     fun `satPerVb`(): kotlin.Float
-    
+
     fun `satsPerVbyteString`(): kotlin.String
-    
+
     companion object
 }
 
@@ -5016,7 +5016,7 @@ open class FeeRate: Disposable, AutoCloseable, FeeRateInterface
     }
     )
     }
-    
+
 
     override fun `satsPerVbyteString`(): kotlin.String {
             return FfiConverterString.lift(
@@ -5029,30 +5029,30 @@ open class FeeRate: Disposable, AutoCloseable, FeeRateInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
+
+
+
+
+
+
     companion object {
          fun `fromSatPerVb`(`satPerVb`: kotlin.Float): FeeRate {
             return FfiConverterTypeFeeRate.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_feerate_from_sat_per_vb(
-    
-        
+
+
         FfiConverterFloat.lower(`satPerVb`),_status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -5176,19 +5176,19 @@ public object FfiConverterTypeFeeRate: FfiConverter<FeeRate, Long> {
 
 
 public interface FeeRateOptionInterface {
-    
+
     fun `duration`(): kotlin.String
-    
+
     fun `feeRate`(): FeeRate
-    
+
     fun `feeSpeed`(): FeeSpeed
-    
+
     fun `isEqual`(`rhs`: FeeRateOption): kotlin.Boolean
-    
+
     fun `satPerVb`(): kotlin.Float
-    
+
     fun `satsPerVbyteString`(): kotlin.String
-    
+
     companion object
 }
 
@@ -5217,11 +5217,11 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
         this.cleanable = null
     }
     constructor(`feeSpeed`: FeeSpeed, `feeRate`: kotlin.Float) :
-        this(UniffiWithHandle, 
+        this(UniffiWithHandle,
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_feerateoption_new(
-    
-        
+
+
         FfiConverterTypeFeeSpeed.lower(`feeSpeed`),
         FfiConverterFloat.lower(`feeRate`),_status)
 }
@@ -5314,7 +5314,7 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     }
     )
     }
-    
+
 
     override fun `feeRate`(): FeeRate {
             return FfiConverterTypeFeeRate.lift(
@@ -5327,7 +5327,7 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     }
     )
     }
-    
+
 
     override fun `feeSpeed`(): FeeSpeed {
             return FfiConverterTypeFeeSpeed.lift(
@@ -5340,7 +5340,7 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     }
     )
     }
-    
+
 
     override fun `isEqual`(`rhs`: FeeRateOption): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -5348,13 +5348,13 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_feerateoption_is_equal(
         it,
-        
+
         FfiConverterTypeFeeRateOption.lower(`rhs`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `satPerVb`(): kotlin.Float {
             return FfiConverterFloat.lift(
@@ -5367,7 +5367,7 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     }
     )
     }
-    
+
 
     override fun `satsPerVbyteString`(): kotlin.String {
             return FfiConverterString.lift(
@@ -5380,20 +5380,20 @@ open class FeeRateOption: Disposable, AutoCloseable, FeeRateOptionInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -5517,25 +5517,25 @@ public object FfiConverterTypeFeeRateOption: FfiConverter<FeeRateOption, Long> {
 
 
 public interface FeeRateOptionWithTotalFeeInterface {
-    
+
     fun `duration`(): kotlin.String
-    
+
     fun `feeRate`(): FeeRate
-    
+
     fun `feeRateOptions`(): FeeRateOption
-    
+
     fun `feeSpeed`(): FeeSpeed
-    
+
     fun `isCustom`(): kotlin.Boolean
-    
+
     fun `isEqual`(`rhs`: FeeRateOptionWithTotalFee): kotlin.Boolean
-    
+
     fun `satPerVb`(): kotlin.Float
-    
+
     fun `satsPerVbyteString`(): kotlin.String
-    
+
     fun `totalFee`(): Amount?
-    
+
     companion object
 }
 
@@ -5564,11 +5564,11 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
         this.cleanable = null
     }
     constructor(`feeSpeed`: FeeSpeed, `feeRate`: FeeRate, `totalFee`: Amount) :
-        this(UniffiWithHandle, 
+        this(UniffiWithHandle,
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_feerateoptionwithtotalfee_new(
-    
-        
+
+
         FfiConverterTypeFeeSpeed.lower(`feeSpeed`),
         FfiConverterTypeFeeRate.lower(`feeRate`),
         FfiConverterTypeAmount.lower(`totalFee`),_status)
@@ -5662,7 +5662,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `feeRate`(): FeeRate {
             return FfiConverterTypeFeeRate.lift(
@@ -5675,7 +5675,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `feeRateOptions`(): FeeRateOption {
             return FfiConverterTypeFeeRateOption.lift(
@@ -5688,7 +5688,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `feeSpeed`(): FeeSpeed {
             return FfiConverterTypeFeeSpeed.lift(
@@ -5701,7 +5701,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `isCustom`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -5714,7 +5714,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `isEqual`(`rhs`: FeeRateOptionWithTotalFee): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -5722,13 +5722,13 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_feerateoptionwithtotalfee_is_equal(
         it,
-        
+
         FfiConverterTypeFeeRateOptionWithTotalFee.lower(`rhs`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `satPerVb`(): kotlin.Float {
             return FfiConverterFloat.lift(
@@ -5741,7 +5741,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `satsPerVbyteString`(): kotlin.String {
             return FfiConverterString.lift(
@@ -5754,7 +5754,7 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
+
 
     override fun `totalFee`(): Amount? {
             return FfiConverterOptionalTypeAmount.lift(
@@ -5767,20 +5767,20 @@ open class FeeRateOptionWithTotalFee: Disposable, AutoCloseable, FeeRateOptionWi
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -5904,13 +5904,13 @@ public object FfiConverterTypeFeeRateOptionWithTotalFee: FfiConverter<FeeRateOpt
 
 
 public interface FeeRateOptionsInterface {
-    
+
     fun `fast`(): FeeRateOption
-    
+
     fun `medium`(): FeeRateOption
-    
+
     fun `slow`(): FeeRateOption
-    
+
     companion object
 }
 
@@ -6026,7 +6026,7 @@ open class FeeRateOptions: Disposable, AutoCloseable, FeeRateOptionsInterface
     }
     )
     }
-    
+
 
     override fun `medium`(): FeeRateOption {
             return FfiConverterTypeFeeRateOption.lift(
@@ -6039,7 +6039,7 @@ open class FeeRateOptions: Disposable, AutoCloseable, FeeRateOptionsInterface
     }
     )
     }
-    
+
 
     override fun `slow`(): FeeRateOption {
             return FfiConverterTypeFeeRateOption.lift(
@@ -6052,29 +6052,29 @@ open class FeeRateOptions: Disposable, AutoCloseable, FeeRateOptionsInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
+
+
+
+
+
+
     companion object {
          fun `previewNew`(): FeeRateOptions {
             return FfiConverterTypeFeeRateOptions.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_feerateoptions_previewnew(
-    
+
         _status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -6198,27 +6198,27 @@ public object FfiConverterTypeFeeRateOptions: FfiConverter<FeeRateOptions, Long>
 
 
 public interface FeeRateOptionsWithTotalFeeInterface {
-    
+
     fun `addCustomFeeRate`(`feeRate`: FeeRateOptionWithTotalFee): FeeRateOptionsWithTotalFee
-    
+
     fun `calculateCustomFeeSpeed`(`feeRate`: kotlin.Float): FeeSpeed
-    
+
     fun `custom`(): FeeRateOptionWithTotalFee?
-    
+
     fun `fast`(): FeeRateOptionWithTotalFee
-    
+
     fun `feeRateOptions`(): FeeRateOptions
-    
+
     fun `getFeeRateWith`(`feeRate`: kotlin.Float): FeeRateOptionWithTotalFee?
-    
+
     fun `medium`(): FeeRateOptionWithTotalFee
-    
+
     fun `removeCustomFee`(): FeeRateOptionsWithTotalFee
-    
+
     fun `slow`(): FeeRateOptionWithTotalFee
-    
+
     fun `transactionSize`(): kotlin.ULong
-    
+
     companion object
 }
 
@@ -6329,13 +6329,13 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_feerateoptionswithtotalfee_add_custom_fee_rate(
         it,
-        
+
         FfiConverterTypeFeeRateOptionWithTotalFee.lower(`feeRate`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `calculateCustomFeeSpeed`(`feeRate`: kotlin.Float): FeeSpeed {
             return FfiConverterTypeFeeSpeed.lift(
@@ -6343,13 +6343,13 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_feerateoptionswithtotalfee_calculate_custom_fee_speed(
         it,
-        
+
         FfiConverterFloat.lower(`feeRate`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `custom`(): FeeRateOptionWithTotalFee? {
             return FfiConverterOptionalTypeFeeRateOptionWithTotalFee.lift(
@@ -6362,7 +6362,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `fast`(): FeeRateOptionWithTotalFee {
             return FfiConverterTypeFeeRateOptionWithTotalFee.lift(
@@ -6375,7 +6375,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `feeRateOptions`(): FeeRateOptions {
             return FfiConverterTypeFeeRateOptions.lift(
@@ -6388,7 +6388,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `getFeeRateWith`(`feeRate`: kotlin.Float): FeeRateOptionWithTotalFee? {
             return FfiConverterOptionalTypeFeeRateOptionWithTotalFee.lift(
@@ -6396,13 +6396,13 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_feerateoptionswithtotalfee_get_fee_rate_with(
         it,
-        
+
         FfiConverterFloat.lower(`feeRate`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `medium`(): FeeRateOptionWithTotalFee {
             return FfiConverterTypeFeeRateOptionWithTotalFee.lift(
@@ -6415,7 +6415,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `removeCustomFee`(): FeeRateOptionsWithTotalFee {
             return FfiConverterTypeFeeRateOptionsWithTotalFee.lift(
@@ -6428,7 +6428,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `slow`(): FeeRateOptionWithTotalFee {
             return FfiConverterTypeFeeRateOptionWithTotalFee.lift(
@@ -6441,7 +6441,7 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
+
 
     override fun `transactionSize`(): kotlin.ULong {
             return FfiConverterULong.lift(
@@ -6454,29 +6454,29 @@ open class FeeRateOptionsWithTotalFee: Disposable, AutoCloseable, FeeRateOptions
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
+
+
+
+
+
+
     companion object {
          fun `previewNew`(): FeeRateOptionsWithTotalFee {
             return FfiConverterTypeFeeRateOptionsWithTotalFee.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_feerateoptionswithtotalfee_previewnew(
-    
+
         _status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -6600,7 +6600,7 @@ public object FfiConverterTypeFeeRateOptionsWithTotalFee: FfiConverter<FeeRateOp
 
 
 public interface InputOutputDetailsInterface {
-    
+
     companion object
 }
 
@@ -6705,18 +6705,18 @@ open class InputOutputDetails: Disposable, AutoCloseable, InputOutputDetailsInte
         }
     }
 
-    
-
-    
 
 
-    
-    
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -6840,17 +6840,17 @@ public object FfiConverterTypeInputOutputDetails: FfiConverter<InputOutputDetail
 
 
 public interface OutPointInterface {
-    
+
     fun `eq`(`rhs`: OutPoint): kotlin.Boolean
-    
+
     fun `hashToUint`(): kotlin.ULong
-    
+
     fun `txid`(): TxId
-    
+
     fun `txidStr`(): kotlin.String
-    
+
     fun `txnLink`(): kotlin.String
-    
+
     companion object
 }
 
@@ -6961,13 +6961,13 @@ open class OutPoint: Disposable, AutoCloseable, OutPointInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_outpoint_eq(
         it,
-        
+
         FfiConverterTypeOutPoint.lower(`rhs`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `hashToUint`(): kotlin.ULong {
             return FfiConverterULong.lift(
@@ -6980,7 +6980,7 @@ open class OutPoint: Disposable, AutoCloseable, OutPointInterface
     }
     )
     }
-    
+
 
     override fun `txid`(): TxId {
             return FfiConverterTypeTxId.lift(
@@ -6993,7 +6993,7 @@ open class OutPoint: Disposable, AutoCloseable, OutPointInterface
     }
     )
     }
-    
+
 
     override fun `txidStr`(): kotlin.String {
             return FfiConverterString.lift(
@@ -7006,7 +7006,7 @@ open class OutPoint: Disposable, AutoCloseable, OutPointInterface
     }
     )
     }
-    
+
 
     override fun `txnLink`(): kotlin.String {
             return FfiConverterString.lift(
@@ -7019,41 +7019,41 @@ open class OutPoint: Disposable, AutoCloseable, OutPointInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
+
+
+
+
+
+
     companion object {
          fun `previewNew`(): OutPoint {
             return FfiConverterTypeOutPoint.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_outpoint_previewnew(
-    
+
         _status)
 }
     )
     }
-    
+
 
          fun `withVout`(`vout`: kotlin.UInt): OutPoint {
             return FfiConverterTypeOutPoint.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_outpoint_withvout(
-    
-        
+
+
         FfiConverterUInt.lower(`vout`),_status)
 }
     )
     }
-    
 
-        
+
+
     }
-    
+
 }
 
 
@@ -7177,7 +7177,7 @@ public object FfiConverterTypeOutPoint: FfiConverter<OutPoint, Long> {
 
 
 public interface PsbtInterface {
-    
+
     /**
      * Total fee in sats
      *
@@ -7185,22 +7185,22 @@ public interface PsbtInterface {
      * Returns `PsbtError` variants if fee calculation fails
      */
     fun `fee`(): Amount
-    
+
     /**
      * Get total sending amount of all outputs
      */
     fun `outputTotalAmount`(): Amount
-    
+
     /**
      * Get the transaction id of the unsigned transaction
      */
     fun `txId`(): TxId
-    
+
     /**
      * The virtual size of the transaction
      */
     fun `weight`(): kotlin.ULong
-    
+
     companion object
 }
 
@@ -7235,11 +7235,11 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
      * Returns `PsbtError::Other` if deserialization fails
      */
     constructor(`data`: kotlin.ByteArray) :
-        this(UniffiWithHandle, 
+        this(UniffiWithHandle,
     uniffiRustCallWithError(PsbtException) { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_psbt_new(
-    
-        
+
+
         FfiConverterByteArray.lower(`data`),_status)
 }
     )
@@ -7320,7 +7320,7 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
         }
     }
 
-    
+
     /**
      * Total fee in sats
      *
@@ -7338,9 +7338,9 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Get total sending amount of all outputs
      */override fun `outputTotalAmount`(): Amount {
@@ -7354,9 +7354,9 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Get the transaction id of the unsigned transaction
      */override fun `txId`(): TxId {
@@ -7370,9 +7370,9 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * The virtual size of the transaction
      */override fun `weight`(): kotlin.ULong {
@@ -7386,20 +7386,20 @@ open class Psbt: Disposable, AutoCloseable, PsbtInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -7530,37 +7530,37 @@ public object FfiConverterTypePsbt: FfiConverter<Psbt, Long> {
  * Lower density = smaller/simpler QRs, more animation frames.
  */
 public interface QrDensityInterface {
-    
+
     /**
      * Get the recommended animation interval in milliseconds for BBQR format
      * Lower density (smaller max version) = slower animation for better scanning
      */
     fun `bbqrAnimationIntervalMs`(): kotlin.UInt
-    
+
     fun `bbqrMaxVersion`(): kotlin.UByte
-    
+
     fun `canDecrease`(): kotlin.Boolean
-    
+
     fun `canIncrease`(): kotlin.Boolean
-    
+
     /**
      * Decrease density (smaller QRs, more animation frames)
      */
     fun `decrease`(): QrDensity
-    
+
     /**
      * Increase density (larger QRs, fewer animation frames)
      */
     fun `increase`(): QrDensity
-    
+
     /**
      * Get the recommended animation interval in milliseconds for UR format
      * Lower density (smaller fragments) = slower animation for better scanning
      */
     fun `urAnimationIntervalMs`(): kotlin.UInt
-    
+
     fun `urFragmentLen`(): kotlin.UInt
-    
+
     companion object
 }
 
@@ -7596,10 +7596,10 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
         this.cleanable = null
     }
     constructor() :
-        this(UniffiWithHandle, 
+        this(UniffiWithHandle,
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_constructor_qrdensity_new(
-    
+
         _status)
 }
     )
@@ -7680,7 +7680,7 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
         }
     }
 
-    
+
     /**
      * Get the recommended animation interval in milliseconds for BBQR format
      * Lower density (smaller max version) = slower animation for better scanning
@@ -7695,7 +7695,7 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
+
 
     override fun `bbqrMaxVersion`(): kotlin.UByte {
             return FfiConverterUByte.lift(
@@ -7708,7 +7708,7 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
+
 
     override fun `canDecrease`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -7721,7 +7721,7 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
+
 
     override fun `canIncrease`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -7734,9 +7734,9 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Decrease density (smaller QRs, more animation frames)
      */override fun `decrease`(): QrDensity {
@@ -7750,9 +7750,9 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Increase density (larger QRs, fewer animation frames)
      */override fun `increase`(): QrDensity {
@@ -7766,9 +7766,9 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
 
-    
+
+
     /**
      * Get the recommended animation interval in milliseconds for UR format
      * Lower density (smaller fragments) = slower animation for better scanning
@@ -7783,7 +7783,7 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
+
 
     override fun `urFragmentLen`(): kotlin.UInt {
             return FfiConverterUInt.lift(
@@ -7796,20 +7796,20 @@ open class QrDensity: Disposable, AutoCloseable, QrDensityInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -7933,21 +7933,21 @@ public object FfiConverterTypeQrDensity: FfiConverter<QrDensity, Long> {
 
 
 public interface SentAndReceivedInterface {
-    
+
     fun `amount`(): Amount
-    
+
     fun `amountFmt`(`unit`: BitcoinUnit): kotlin.String
-    
+
     fun `direction`(): TransactionDirection
-    
+
     fun `externalSent`(): Amount
-    
+
     fun `label`(): kotlin.String
-    
+
     fun `received`(): Amount
-    
+
     fun `sent`(): Amount
-    
+
     companion object
 }
 
@@ -8063,7 +8063,7 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
+
 
     override fun `amountFmt`(`unit`: BitcoinUnit): kotlin.String {
             return FfiConverterString.lift(
@@ -8071,13 +8071,13 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_sentandreceived_amount_fmt(
         it,
-        
+
         FfiConverterTypeBitcoinUnit.lower(`unit`),_status)
 }
     }
     )
     }
-    
+
 
     override fun `direction`(): TransactionDirection {
             return FfiConverterTypeTransactionDirection.lift(
@@ -8090,7 +8090,7 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
+
 
     override fun `externalSent`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -8103,7 +8103,7 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
+
 
     override fun `label`(): kotlin.String {
             return FfiConverterString.lift(
@@ -8116,7 +8116,7 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
+
 
     override fun `received`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -8129,7 +8129,7 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
+
 
     override fun `sent`(): Amount {
             return FfiConverterTypeAmount.lift(
@@ -8142,20 +8142,20 @@ open class SentAndReceived: Disposable, AutoCloseable, SentAndReceivedInterface
     }
     )
     }
-    
-
-    
-
-    
 
 
-    
-    
+
+
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -8279,9 +8279,9 @@ public object FfiConverterTypeSentAndReceived: FfiConverter<SentAndReceived, Lon
 
 
 public interface TxIdInterface {
-    
+
     fun `asHashString`(): kotlin.String
-    
+
     companion object
 }
 
@@ -8398,11 +8398,11 @@ open class TxId: Disposable, AutoCloseable, TxIdInterface
     }
     )
     }
-    
 
-    
 
-    
+
+
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -8424,7 +8424,7 @@ open class TxId: Disposable, AutoCloseable, TxIdInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_txid_uniffi_trait_eq_eq(
         it,
-        
+
         FfiConverterTypeTxId.lower(`other`),_status)
 }
     }
@@ -8449,20 +8449,20 @@ open class TxId: Disposable, AutoCloseable, TxIdInterface
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_txid_uniffi_trait_ord_cmp(
         it,
-        
+
         FfiConverterTypeTxId.lower(`other`),_status)
 }
     }
     ).toInt()
     }
 
-    
-    
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -8586,7 +8586,7 @@ public object FfiConverterTypeTxId: FfiConverter<TxId, Long> {
 
 
 public interface TxInInterface {
-    
+
     companion object
 }
 
@@ -8691,18 +8691,18 @@ open class TxIn: Disposable, AutoCloseable, TxInInterface
         }
     }
 
-    
-
-    
 
 
-    
-    
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -8826,7 +8826,7 @@ public object FfiConverterTypeTxIn: FfiConverter<TxIn, Long> {
 
 
 public interface TxOutInterface {
-    
+
     companion object
 }
 
@@ -8931,18 +8931,18 @@ open class TxOut: Disposable, AutoCloseable, TxOutInterface
         }
     }
 
-    
-
-    
 
 
-    
-    
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -9066,7 +9066,7 @@ public object FfiConverterTypeTxOut: FfiConverter<TxOut, Long> {
 
 
 public interface UtxoListInterface {
-    
+
     companion object
 }
 
@@ -9171,18 +9171,18 @@ open class UtxoList: Disposable, AutoCloseable, UtxoListInterface
         }
     }
 
-    
-
-    
 
 
-    
-    
+
+
+
+
+
     /**
      * @suppress
      */
     companion object
-    
+
 }
 
 
@@ -9213,22 +9213,22 @@ public object FfiConverterTypeUtxoList: FfiConverter<UtxoList, Long> {
 
 data class AddressAndAmount (
     var `label`: kotlin.String?
-    , 
+    ,
     var `utxoType`: UtxoType?
-    , 
+    ,
     var `address`: Address
-    , 
+    ,
     var `amount`: Amount
-    
+
 ): Disposable{
-    
 
-    
 
-    
+
+
+
     @Suppress("UNNECESSARY_SAFE_CALL") // codegen is much simpler if we unconditionally emit safe calls here
     override fun destroy() {
-        
+
     Disposable.destroy(
         this.`label`,
         this.`utxoType`,
@@ -9236,7 +9236,7 @@ data class AddressAndAmount (
         this.`amount`
     )
     }
-    
+
     companion object
 }
 
@@ -9272,15 +9272,15 @@ public object FfiConverterTypeAddressAndAmount: FfiConverterRustBuffer<AddressAn
 
 data class AddressIndex (
     var `lastSeenIndex`: kotlin.UByte
-    , 
+    ,
     var `addressListHash`: kotlin.ULong
-    
+
 ){
-    
 
-    
 
-    
+
+
+
     companion object
 }
 
@@ -9310,15 +9310,15 @@ public object FfiConverterTypeAddressIndex: FfiConverterRustBuffer<AddressIndex>
 
 data class BlockSizeLast (
     var `blockHeight`: kotlin.ULong
-    , 
+    ,
     var `lastSeen`: java.time.Duration
-    
+
 ){
-    
 
-    
 
-    
+
+
+
     companion object
 }
 
@@ -9348,13 +9348,13 @@ public object FfiConverterTypeBlockSizeLast: FfiConverterRustBuffer<BlockSizeLas
 
 data class PayJoinParams (
     var `endpoint`: kotlin.String
-    
+
 ){
-    
 
-    
 
-    
+
+
+
     companion object
 }
 
@@ -9381,17 +9381,17 @@ public object FfiConverterTypePayJoinParams: FfiConverterRustBuffer<PayJoinParam
 
 data class Rgb (
     var `r`: kotlin.UByte
-    , 
+    ,
     var `g`: kotlin.UByte
-    , 
+    ,
     var `b`: kotlin.UByte
-    
+
 ){
-    
 
-    
 
-    
+
+
+
     companion object
 }
 
@@ -9424,24 +9424,24 @@ public object FfiConverterTypeRgb: FfiConverterRustBuffer<Rgb> {
 
 data class SplitOutput (
     var `external`: List<AddressAndAmount>
-    , 
+    ,
     var `internal`: List<AddressAndAmount>
-    
+
 ): Disposable{
-    
 
-    
 
-    
+
+
+
     @Suppress("UNNECESSARY_SAFE_CALL") // codegen is much simpler if we unconditionally emit safe calls here
     override fun destroy() {
-        
+
     Disposable.destroy(
         this.`external`,
         this.`internal`
     )
     }
-    
+
     companion object
 }
 
@@ -9471,26 +9471,26 @@ public object FfiConverterTypeSplitOutput: FfiConverterRustBuffer<SplitOutput> {
 
 data class Utxo (
     var `outpoint`: OutPoint
-    , 
+    ,
     var `label`: kotlin.String?
-    , 
+    ,
     var `datetime`: kotlin.ULong
-    , 
+    ,
     var `amount`: Amount
-    , 
+    ,
     var `address`: Address
-    , 
+    ,
     var `derivationIndex`: kotlin.UInt
-    , 
+    ,
     var `blockHeight`: kotlin.UInt
-    , 
+    ,
     var `type`: UtxoType
-    , 
+    ,
     /**
      * Cached lock state for display and selection filtering only; transaction building rechecks the labels DB
      */
     var `spendable`: kotlin.Boolean
-    
+
 ): Disposable{
      fun `date`(): kotlin.String {
             return FfiConverterString.lift(
@@ -9500,7 +9500,7 @@ data class Utxo (
 }
     )
     }
-    
+
 
      fun `hashToUint`(): kotlin.ULong {
             return FfiConverterULong.lift(
@@ -9510,18 +9510,18 @@ data class Utxo (
 }
     )
     }
-    
+
 
      fun `isEqual`(`other`: Utxo): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_utxo_is_equal(FfiConverterTypeUtxo.lower(this),
-        
+
         FfiConverterTypeUtxo.lower(`other`),_status)
 }
     )
     }
-    
+
 
      fun `name`(): kotlin.String {
             return FfiConverterString.lift(
@@ -9531,11 +9531,11 @@ data class Utxo (
 }
     )
     }
-    
 
-    
 
-    
+
+
+
 
     // The local Rust `Eq` implementation - only `eq` is used.
     override fun equals(other: Any?): Boolean {
@@ -9543,7 +9543,7 @@ data class Utxo (
         return FfiConverterBoolean.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_method_utxo_uniffi_trait_eq_eq(FfiConverterTypeUtxo.lower(this),
-        
+
         FfiConverterTypeUtxo.lower(`other`),_status)
 }
     )
@@ -9557,10 +9557,10 @@ data class Utxo (
 }
     ).toInt()
     }
-    
+
     @Suppress("UNNECESSARY_SAFE_CALL") // codegen is much simpler if we unconditionally emit safe calls here
     override fun destroy() {
-        
+
     Disposable.destroy(
         this.`outpoint`,
         this.`label`,
@@ -9573,7 +9573,7 @@ data class Utxo (
         this.`spendable`
     )
     }
-    
+
     companion object
 }
 
@@ -9625,58 +9625,58 @@ public object FfiConverterTypeUtxo: FfiConverterRustBuffer<Utxo> {
 
 
 sealed class AddressException: kotlin.Exception() {
-    
+
     class NoOutputs(
         ) : AddressException() {
         override val message
             get() = ""
     }
-    
+
     class ScriptException(
-        
+
         val v1: kotlin.String
         ) : AddressException() {
         override val message
             get() = "v1=${ v1 }"
     }
-    
+
     class InvalidAddress(
         ) : AddressException() {
         override val message
             get() = ""
     }
-    
+
     class UnsupportedNetwork(
         ) : AddressException() {
         override val message
             get() = ""
     }
-    
+
     class WrongNetwork(
-        
-        val `current`: Network, 
-        
+
+        val `current`: Network,
+
         val `validFor`: Network
         ) : AddressException() {
         override val message
             get() = "current=${ `current` }, validFor=${ `validFor` }"
     }
-    
+
     class EmptyAddress(
         ) : AddressException() {
         override val message
             get() = ""
     }
-    
 
-    
+
+
 
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<AddressException> {
         override fun lift(error_buf: RustBuffer.ByValue): AddressException = FfiConverterTypeAddressError.lift(error_buf)
     }
 
-    
+
 }
 
 /**
@@ -9684,7 +9684,7 @@ sealed class AddressException: kotlin.Exception() {
  */
 public object FfiConverterTypeAddressError : FfiConverterRustBuffer<AddressException> {
     override fun read(buf: ByteBuffer): AddressException {
-        
+
 
         return when(buf.getInt()) {
             1 -> AddressException.NoOutputs()
@@ -9772,11 +9772,11 @@ public object FfiConverterTypeAddressError : FfiConverterRustBuffer<AddressExcep
 
 
 enum class BitcoinUnit {
-    
+
     BTC,
     SAT;
 
-    
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -9815,7 +9815,7 @@ public object FfiConverterTypeBitcoinUnit: FfiConverterRustBuffer<BitcoinUnit> {
 
 
 enum class ColorSchemeSelection {
-    
+
     LIGHT,
     DARK,
     SYSTEM;
@@ -9828,9 +9828,9 @@ enum class ColorSchemeSelection {
 }
     )
     }
-    
 
-    
+
+
 
 
     companion object
@@ -9861,24 +9861,24 @@ public object FfiConverterTypeColorSchemeSelection: FfiConverterRustBuffer<Color
 
 
 sealed class ConfirmDetailsException: kotlin.Exception() {
-    
+
     class QrCodeCreation(
-        
+
         val v1: kotlin.String
         ) : ConfirmDetailsException() {
         override val message
             get() = "v1=${ v1 }"
     }
-    
 
-    
+
+
 
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<ConfirmDetailsException> {
         override fun lift(error_buf: RustBuffer.ByValue): ConfirmDetailsException = FfiConverterTypeConfirmDetailsError.lift(error_buf)
     }
 
-    
+
 }
 
 /**
@@ -9886,7 +9886,7 @@ sealed class ConfirmDetailsException: kotlin.Exception() {
  */
 public object FfiConverterTypeConfirmDetailsError : FfiConverterRustBuffer<ConfirmDetailsException> {
     override fun read(buf: ByteBuffer): ConfirmDetailsException {
-        
+
 
         return when(buf.getInt()) {
             1 -> ConfirmDetailsException.QrCodeCreation(
@@ -9921,21 +9921,21 @@ public object FfiConverterTypeConfirmDetailsError : FfiConverterRustBuffer<Confi
 
 
 sealed class FeeSpeed {
-    
+
     object Fast : FeeSpeed()
-    
-    
+
+
     object Medium : FeeSpeed()
-    
-    
+
+
     object Slow : FeeSpeed()
-    
-    
+
+
     data class Custom(
         val `durationMins`: kotlin.UInt) : FeeSpeed()
-        
+
     {
-        
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -9948,12 +9948,12 @@ sealed class FeeSpeed {
     }
         companion object
     }
-    
 
-    
 
-    
-    
+
+
+
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -10040,121 +10040,121 @@ public object FfiConverterTypeFeeSpeed : FfiConverterRustBuffer<FeeSpeed>{
 
 
 sealed class FfiColor {
-    
+
     data class Red(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Blue(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Green(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Yellow(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Orange(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Purple(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Pink(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class White(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Black(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Gray(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class CoolGray(
         val v1: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
+
     data class Custom(
-        val v1: org.bitcoinppl.cove_core.types.Rgb, 
+        val v1: org.bitcoinppl.cove_core.types.Rgb,
         val v2: org.bitcoinppl.cove_core.types.FfiOpacity) : FfiColor()
-        
+
     {
-        
+
 
         companion object
     }
-    
 
-    
 
-    
-    
+
+
+
+
 
 
     companion object
@@ -10368,11 +10368,11 @@ public object FfiConverterTypeFfiColor : FfiConverterRustBuffer<FfiColor>{
 
 
 enum class FfiColorScheme {
-    
+
     LIGHT,
     DARK;
 
-    
+
 
 
     companion object
@@ -10402,7 +10402,7 @@ public object FfiConverterTypeFfiColorScheme: FfiConverterRustBuffer<FfiColorSch
 
 
 enum class Network {
-    
+
     BITCOIN,
     TESTNET,
     TESTNET4,
@@ -10416,9 +10416,9 @@ enum class Network {
 }
     )
     }
-    
 
-    
+
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -10458,42 +10458,42 @@ public object FfiConverterTypeNetwork: FfiConverterRustBuffer<Network> {
 
 
 sealed class PsbtException: kotlin.Exception() {
-    
+
     class MissingUtxo(
         ) : PsbtException() {
         override val message
             get() = ""
     }
-    
+
     class NegativeFee(
         ) : PsbtException() {
         override val message
             get() = ""
     }
-    
+
     class FeeOverflow(
         ) : PsbtException() {
         override val message
             get() = ""
     }
-    
+
     class Other(
-        
+
         val v1: kotlin.String
         ) : PsbtException() {
         override val message
             get() = "v1=${ v1 }"
     }
-    
 
-    
+
+
 
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<PsbtException> {
         override fun lift(error_buf: RustBuffer.ByValue): PsbtException = FfiConverterTypePsbtError.lift(error_buf)
     }
 
-    
+
 }
 
 /**
@@ -10501,7 +10501,7 @@ sealed class PsbtException: kotlin.Exception() {
  */
 public object FfiConverterTypePsbtError : FfiConverterRustBuffer<PsbtException> {
     override fun read(buf: ByteBuffer): PsbtException {
-        
+
 
         return when(buf.getInt()) {
             1 -> PsbtException.MissingUtxo()
@@ -10567,7 +10567,7 @@ public object FfiConverterTypePsbtError : FfiConverterRustBuffer<PsbtException> 
  */
 
 enum class QrExportFormat {
-    
+
     /**
      * `BBQr` format (Binary Bitcoin QR)
      */
@@ -10577,7 +10577,7 @@ enum class QrExportFormat {
      */
     UR;
 
-    
+
 
     // The local Rust `Display`/`Debug` implementation.
     override fun toString(): String {
@@ -10616,11 +10616,11 @@ public object FfiConverterTypeQrExportFormat: FfiConverterRustBuffer<QrExportFor
 
 
 enum class TransactionDirection {
-    
+
     INCOMING,
     OUTGOING;
 
-    
+
 
 
     companion object
@@ -10650,11 +10650,11 @@ public object FfiConverterTypeTransactionDirection: FfiConverterRustBuffer<Trans
 
 
 enum class UtxoType {
-    
+
     OUTPUT,
     CHANGE;
 
-    
+
 
 
     companion object
@@ -11018,49 +11018,49 @@ public typealias FfiConverterTypeFfiOpacity = FfiConverterUByte
 public typealias WalletId = kotlin.String
 public typealias FfiConverterTypeWalletId = FfiConverterString
     @Throws(AddressException::class) fun `addressIsValid`(`address`: kotlin.String, `network`: Network)
-        = 
+        =
     uniffiRustCallWithError(AddressException) { _status ->
     UniffiLib.uniffi_cove_types_fn_func_address_is_valid(
-    
-        
+
+
         FfiConverterString.lower(`address`),
         FfiConverterTypeNetwork.lower(`network`),_status)
 }
-    
-    
+
+
 
     @Throws(AddressException::class) fun `addressIsValidForNetwork`(`address`: kotlin.String, `network`: Network)
-        = 
+        =
     uniffiRustCallWithError(AddressException) { _status ->
     UniffiLib.uniffi_cove_types_fn_func_address_is_valid_for_network(
-    
-        
+
+
         FfiConverterString.lower(`address`),
         FfiConverterTypeNetwork.lower(`network`),_status)
 }
-    
-    
+
+
  fun `addressStringSpacedOut`(`address`: kotlin.String): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_address_string_spaced_out(
-    
-        
+
+
         FfiConverterString.lower(`address`),_status)
 }
     )
     }
-    
+
  fun `allColorSchemes`(): List<ColorSchemeSelection> {
             return FfiConverterSequenceTypeColorSchemeSelection.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_all_color_schemes(
-    
+
         _status)
 }
     )
     }
-    
+
 
         /**
          * Preview `ConfirmDetails` for `SwiftUI` previews
@@ -11068,12 +11068,12 @@ public typealias FfiConverterTypeWalletId = FfiConverterString
             return FfiConverterTypeConfirmDetails.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_confirm_details_preview_new(
-    
+
         _status)
 }
     )
     }
-    
+
 
         /**
          * Check if two `QrDensity` values are equal (for Swift Equatable conformance)
@@ -11081,90 +11081,90 @@ public typealias FfiConverterTypeWalletId = FfiConverterString
             return FfiConverterBoolean.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_qr_density_is_equal(
-    
-        
+
+
         FfiConverterTypeQrDensity.lower(`lhs`),
         FfiConverterTypeQrDensity.lower(`rhs`),_status)
 }
     )
     }
-    
+
  fun `feeRateOptionsWithTotalFeeIsEqual`(`lhs`: FeeRateOptionsWithTotalFee, `rhs`: FeeRateOptionsWithTotalFee): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_fee_rate_options_with_total_fee_is_equal(
-    
-        
+
+
         FfiConverterTypeFeeRateOptionsWithTotalFee.lower(`lhs`),
         FfiConverterTypeFeeRateOptionsWithTotalFee.lower(`rhs`),_status)
 }
     )
     }
-    
+
  fun `feeSpeedDuration`(`feeSpeed`: FeeSpeed): kotlin.String {
             return FfiConverterString.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_fee_speed_duration(
-    
-        
+
+
         FfiConverterTypeFeeSpeed.lower(`feeSpeed`),_status)
 }
     )
     }
-    
+
  fun `feeSpeedIsCustom`(`feeSpeed`: FeeSpeed): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_fee_speed_is_custom(
-    
-        
+
+
         FfiConverterTypeFeeSpeed.lower(`feeSpeed`),_status)
 }
     )
     }
-    
+
  fun `feeSpeedToCircleColor`(`feeSpeed`: FeeSpeed): FfiColor {
             return FfiConverterTypeFfiColor.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_fee_speed_to_circle_color(
-    
-        
+
+
         FfiConverterTypeFeeSpeed.lower(`feeSpeed`),_status)
 }
     )
     }
-    
+
  fun `allNetworks`(): List<Network> {
             return FfiConverterSequenceTypeNetwork.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_all_networks(
-    
+
         _status)
 }
     )
     }
-    
+
  fun `allUnits`(): List<BitcoinUnit> {
             return FfiConverterSequenceTypeBitcoinUnit.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_all_units(
-    
+
         _status)
 }
     )
     }
-    
+
  fun `previewNewUtxoList`(`outputCount`: kotlin.UByte, `changeCount`: kotlin.UByte): List<Utxo> {
             return FfiConverterSequenceTypeUtxo.lift(
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_cove_types_fn_func_previewnewutxolist(
-    
-        
+
+
         FfiConverterUByte.lower(`outputCount`),
         FfiConverterUByte.lower(`changeCount`),_status)
 }
     )
     }
-    
+
 
 
