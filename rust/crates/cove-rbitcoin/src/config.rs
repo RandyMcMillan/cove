@@ -85,11 +85,8 @@ fn map_network(network: Network) -> Result<RbitcoinNetwork, LocalNodeError> {
     match network {
         Network::Bitcoin => Ok(RbitcoinNetwork::Mainnet),
         Network::Testnet => Ok(RbitcoinNetwork::Testnet),
+        Network::Testnet4 => Ok(RbitcoinNetwork::Testnet4),
         Network::Signet => Ok(RbitcoinNetwork::Signet),
-        // Testnet4 uses the same p2p protocol as Testnet; rbitcoin v0.7.0's
-        // underlying `bitcoin` crate lacks a distinct Testnet4 variant.
-        // We keep a separate datadir so testnet4 data never mixes with testnet.
-        Network::Testnet4 => Ok(RbitcoinNetwork::Testnet),
     }
 }
 

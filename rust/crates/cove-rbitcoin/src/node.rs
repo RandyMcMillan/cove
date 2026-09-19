@@ -359,9 +359,9 @@ mod tests {
     }
 
     #[test]
-    fn build_config_testnet4_maps_to_testnet() {
+    fn build_config_testnet4_maps_to_testnet4() {
         let config = build_config(Network::Testnet4).expect("should build config");
-        assert_eq!(config.network, rbitcoin_primitives::Network::Testnet);
+        assert_eq!(config.network, rbitcoin_primitives::Network::Testnet4);
     }
 
     #[test]
