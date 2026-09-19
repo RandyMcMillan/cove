@@ -15,6 +15,7 @@ struct LocalNodeSettingsView: View {
     @State private var errorMessage: String?
     @State private var showClearConfirm = false
     @State private var timer: Timer? = nil
+    @State private var isNetworkConnected = true
 
     // logging
     @State private var logLines: [String] = []
@@ -28,7 +29,8 @@ struct LocalNodeSettingsView: View {
                     isRunning: isRunning,
                     tipHeight: tipHeight,
                     isInIbd: isInIbd,
-                    datadirSize: datadirSize
+                    datadirSize: datadirSize,
+                    isNetworkConnected: isNetworkConnected
                 )
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
@@ -99,6 +101,7 @@ struct LocalNodeSettingsView: View {
             tipHeight = await localNodeTipHeight()
             isInIbd = await localNodeIsInIbd()
             datadirSize = try await localNodeDatadirSize()
+            isNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
 
             if wasRunning != isRunning || wasIbd != isInIbd {
                 await MainActor.run { restartPolling() }
@@ -158,6 +161,7 @@ private struct LocalNodeStatusSection: View {
     let tipHeight: UInt32?
     let isInIbd: Bool?
     let datadirSize: UInt64?
+    let isNetworkConnected: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -168,6 +172,9 @@ private struct LocalNodeStatusSection: View {
 
             VStack(spacing: 0) {
                 StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
+
+                Divider()
+                NetworkStatusRow(isConnected: isNetworkConnected)
 
                 if let tipHeight {
                     Divider()
@@ -202,6 +209,27 @@ private struct StatusRow: View {
             Text(value)
                 .foregroundStyle(.secondary)
                 .font(.subheadline)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+}
+
+private struct NetworkStatusRow: View {
+    let isConnected: Bool
+
+    var body: some View {
+        HStack {
+            Text("Network")
+            Spacer()
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(isConnected ? Color.green : Color.red)
+                    .frame(width: 8, height: 8)
+                Text(isConnected ? "Online" : "Offline")
+                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
