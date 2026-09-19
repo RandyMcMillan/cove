@@ -89,6 +89,8 @@
 			</dict>
 		</dict>
 	</array>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 Bitcoin People. All rights reserved.</string>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
 		<string>D2760000850101</string>
