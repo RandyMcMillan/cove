@@ -368,7 +368,8 @@ mod tests {
         ];
 
         for (input, expected) in cases {
-            let addr = parse_addr(input).unwrap_or_else(|e| panic!("parse_addr({input}) failed: {e}"));
+            let addr =
+                parse_addr(input).unwrap_or_else(|e| panic!("parse_addr({input}) failed: {e}"));
             assert_eq!(addr.to_string(), expected, "for input {input}");
         }
     }

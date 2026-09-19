@@ -14,18 +14,23 @@ private struct SelectedWalletSheetContent: View {
         switch sheet {
         case .receive:
             ReceiveView(manager: context.manager)
+                .environment(context.app)
 
         case let .chooseAddressType(foundAddresses):
             ChooseWalletTypeView(manager: context.manager, foundAddresses: foundAddresses)
+                .environment(context.app)
 
         case .qrLabelsImport:
             QrCodeLabelImportView(scannedCode: context.scannedLabels)
+                .environment(context.app)
 
         case .labelsQrExport:
             LabelQrExportSheet(manager: context.manager)
+                .environment(context.app)
 
         case .xpubQrExport:
             XpubQrExportSheet(manager: context.manager)
+                .environment(context.app)
 
         case .labelsFileImport, .exportLabelsConfirmation, .exportXpubConfirmation:
             EmptyView()
