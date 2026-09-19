@@ -267,7 +267,6 @@ private struct LocalNodeLogSection: View {
                 Spacer()
 
                 LogLevelPillBox(selected: $logLevel, onSelect: onSetLogLevel)
-                    .frame(width: 280)
             }
             .padding(.horizontal, 16)
 
