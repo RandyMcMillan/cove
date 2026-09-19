@@ -1075,6 +1075,10 @@ internal object IntegrityCheckingUniffiLib {
         uniffiCheckContractApiVersion(this)
         uniffiCheckApiChecksums(this)
     }
+    external fun uniffi_cove_checksum_func_local_node_app_backgrounded(
+    ): Short
+    external fun uniffi_cove_checksum_func_local_node_app_foregrounded(
+    ): Short
     external fun uniffi_cove_checksum_func_local_node_clear_datadir(
     ): Short
     external fun uniffi_cove_checksum_func_local_node_datadir_size(
@@ -3659,6 +3663,10 @@ internal object UniffiLib {
     ): Byte
     external fun uniffi_cove_fn_method_walletmetadata_uniffi_trait_hash(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
     ): Long
+    external fun uniffi_cove_fn_func_local_node_app_backgrounded(
+    ): Long
+    external fun uniffi_cove_fn_func_local_node_app_foregrounded(
+    ): Long
     external fun uniffi_cove_fn_func_local_node_clear_datadir(
     ): Long
     external fun uniffi_cove_fn_func_local_node_datadir_size(
@@ -3924,6 +3932,12 @@ private fun uniffiCheckContractApiVersion(lib: IntegrityCheckingUniffiLib) {
 }
 @Suppress("UNUSED_PARAMETER")
 private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
+    if (lib.uniffi_cove_checksum_func_local_node_app_backgrounded() != 51056.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_cove_checksum_func_local_node_app_foregrounded() != 55832.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_cove_checksum_func_local_node_clear_datadir() != 23646.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -69215,6 +69229,48 @@ object UrExceptionExternalErrorHandler : UniffiRustCallStatusErrorHandler<UrExce
 
 
 
+
+        /**
+         * Stop the local node when the app is backgrounded.
+         *
+         * Called from iOS `applicationDidEnterBackground` or Android `onStop`.
+         * This triggers cooperative shutdown to avoid the OS killing the process.
+         */
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeAppBackgrounded`() {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_app_backgrounded(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+        /**
+         * Resume the local node when the app is foregrounded.
+         *
+         * Called from iOS `applicationWillEnterForeground` or Android `onStart`.
+         * Only starts the node if the user has selected "Local Node".
+         */
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeAppForegrounded`() {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_app_foregrounded(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
 
     @Throws(LocalNodeStartException::class)
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")

@@ -46496,6 +46496,48 @@ private func uniffiForeignFutureDroppedCallback(handle: UInt64) {
 public func uniffiForeignFutureHandleCountCove() -> Int {
     UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.count
 }
+/**
+ * Stop the local node when the app is backgrounded.
+ *
+ * Called from iOS `applicationDidEnterBackground` or Android `onStop`.
+ * This triggers cooperative shutdown to avoid the OS killing the process.
+ */
+public func localNodeAppBackgrounded()async   {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_app_backgrounded(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_void,
+            completeFunc: ffi_cove_rust_future_complete_void,
+            freeFunc: ffi_cove_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: nil
+
+        )
+}
+/**
+ * Resume the local node when the app is foregrounded.
+ *
+ * Called from iOS `applicationWillEnterForeground` or Android `onStart`.
+ * Only starts the node if the user has selected "Local Node".
+ */
+public func localNodeAppForegrounded()async   {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_app_foregrounded(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_void,
+            completeFunc: ffi_cove_rust_future_complete_void,
+            freeFunc: ffi_cove_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: nil
+
+        )
+}
 public func localNodeClearDatadir()async throws   {
     return
         try  await uniffiRustCallAsync(
@@ -47256,6 +47298,12 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_cove_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_app_backgrounded() != 51056) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_app_foregrounded() != 55832) {
+        return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_clear_datadir() != 23646) {
         return InitializationResult.apiChecksumMismatch
