@@ -14,7 +14,7 @@
 		ACD0053C2DB5309A003DC493 /* CoveCore in Frameworks */ = {isa = PBXBuildFile; productRef = ACD0053B2DB5309A003DC493 /* CoveCore */; };
 		C0A000012EF0000000000001 /* OnboardingFullLaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A000002EF0000000000001 /* OnboardingFullLaunchUITests.swift */; };
 		C0B000012F00000000000001 /* OnboardingPromptLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B000032F00000000000001 /* OnboardingPromptLayoutTests.swift */; };
-		C0B000022F00000000000001 /* wallet_2_descriptors.txt in Resources */ = {isa = PBXBuildFile; fileRef = C0B000042F00000000000001 /* wallet_2_descriptors.txt */; };
+		C0B000022F00000000000001 /* Fixtures/wallet_2_descriptors.txt in Resources */ = {isa = PBXBuildFile; fileRef = C0B000042F00000000000001 /* Fixtures/wallet_2_descriptors.txt */; };
 		C0B000102F00000000000001 /* CloudBackupPresentationCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B000112F00000000000001 /* CloudBackupPresentationCoordinatorTests.swift */; };
 		C0B000122F00000000000001 /* TransactionsScanUiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B000132F00000000000001 /* TransactionsScanUiTests.swift */; };
 		C0B000142F00000000000001 /* OnboardingBackupViewsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B000152F00000000000001 /* OnboardingBackupViewsTests.swift */; };
@@ -81,7 +81,7 @@
 		C0A000002EF0000000000001 /* OnboardingFullLaunchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFullLaunchUITests.swift; sourceTree = "<group>"; };
 		C0A000022EF0000000000001 /* CoveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0B000032F00000000000001 /* OnboardingPromptLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPromptLayoutTests.swift; sourceTree = "<group>"; };
-		C0B000042F00000000000001 /* wallet_2_descriptors.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fixtures/wallet_2_descriptors.txt; sourceTree = "<group>"; };
+		C0B000042F00000000000001 /* Fixtures/wallet_2_descriptors.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fixtures/wallet_2_descriptors.txt; sourceTree = "<group>"; };
 		C0B000052F00000000000001 /* CoveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0B000112F00000000000001 /* CloudBackupPresentationCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupPresentationCoordinatorTests.swift; sourceTree = "<group>"; };
 		C0B000132F00000000000001 /* TransactionsScanUiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsScanUiTests.swift; sourceTree = "<group>"; };
@@ -105,14 +105,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		ACF539D02DB46DEF00755A33 /* Exceptions for "Cove" folder in "Cove" target */ = {
+		ACF539D02DB46DEF00755A33 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = D0245F4B2C0F7B4E0042B447 /* Cove */;
 		};
-		C0D000072F20000000000001 /* Exceptions for "Cove" folder in "CoveCloudBackupUITestHost" target */ = {
+		C0D000072F20000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CoveProductionApp.swift,
@@ -123,41 +123,9 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		AC8CF6022CF8C7D300F02F5C /* Cove */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				ACF539D02DB46DEF00755A33 /* Exceptions for "Cove" folder in "Cove" target */,
-				C0D000072F20000000000001 /* Exceptions for "Cove" folder in "CoveCloudBackupUITestHost" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Cove;
-			sourceTree = "<group>";
-		};
-		AC8CF66C2CF8C86600F02F5C /* CodeScanner */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = CodeScanner;
-			sourceTree = "<group>";
-		};
-		C0D000082F20000000000001 /* CoveCloudBackupUITestHost */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = CoveCloudBackupUITestHost;
-			sourceTree = "<group>";
-		};
+		AC8CF6022CF8C7D300F02F5C /* Cove */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (ACF539D02DB46DEF00755A33 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, C0D000072F20000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Cove; sourceTree = "<group>"; };
+		AC8CF66C2CF8C86600F02F5C /* CodeScanner */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CodeScanner; sourceTree = "<group>"; };
+		C0D000082F20000000000001 /* CoveCloudBackupUITestHost */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CoveCloudBackupUITestHost; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,7 +203,7 @@
 				C0F000022F40000000000001 /* PresentationTransitionCoordinatorTests.swift */,
 				C0B000132F00000000000001 /* TransactionsScanUiTests.swift */,
 				C0F000042F40000000000001 /* WalletSettingsPresentationTests.swift */,
-				C0B000042F00000000000001 /* wallet_2_descriptors.txt */,
+				C0B000042F00000000000001 /* Fixtures/wallet_2_descriptors.txt */,
 			);
 			path = CoveTests;
 			sourceTree = "<group>";
@@ -449,7 +417,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0B000022F00000000000001 /* wallet_2_descriptors.txt in Resources */,
+				C0B000022F00000000000001 /* Fixtures/wallet_2_descriptors.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,7 +693,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Cove/Cove.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 116;
 				DEVELOPMENT_ASSET_PATHS = "\"Cove/Preview Content\"";
@@ -753,6 +721,7 @@
 				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.bitcoincore.cove;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
