@@ -46633,6 +46633,30 @@ public func localNodeIsRunning()async  -> Bool  {
 
         )
 }
+/**
+ * Return the most recent `limit` log lines from the local node.
+ * Lines are formatted as `"LEVEL message"`.
+ */
+public func localNodeLogs(limit: UInt32) -> [String]  {
+    return try!  FfiConverterSequenceString.lift(try! rustCall() {
+        uniffiCallStatus in
+    uniffi_cove_fn_func_local_node_logs(
+        FfiConverterUInt32.lower(limit),uniffiCallStatus
+    )
+})
+}
+/**
+ * Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
+ * Returns `true` if the level was recognized and applied.
+ */
+public func localNodeSetLogLevel(level: String) -> Bool  {
+    return try!  FfiConverterBool.lift(try! rustCall() {
+        uniffiCallStatus in
+    uniffi_cove_fn_func_local_node_set_log_level(
+        FfiConverterString.lower(level),uniffiCallStatus
+    )
+})
+}
 public func localNodeStart(network: Network)async throws   {
     return
         try  await uniffiRustCallAsync(
@@ -47328,6 +47352,12 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_is_running() != 5029) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_logs() != 40418) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_set_log_level() != 4106) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_start() != 20017) {
