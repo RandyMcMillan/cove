@@ -10,6 +10,13 @@ name = "cove"
 [workspace]
 members = ["crates/*", "xtask"]
 
+[workspace.package]
+version = "1.4.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/RandyMcMillan/cove"
+rust-version = "1.95"
+
 ## MARK: WORKSPACE DEPENDENCIES
 [workspace.lints.clippy]
 redundant_clone = "deny"
@@ -25,7 +32,7 @@ parking_lot = { version = "0.12.5" }
 arc-swap = "1.9.1"
 
 # async
-tokio = { version = "1.52.3" }
+tokio = { version = "1.52.3", features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time", "rt", "signal", "fs"] }
 async-trait = "0.1.89"
 
 # encoding / decoding 
@@ -76,17 +83,28 @@ pubport = { version = "0.6.0" }
 bdk_esplora = { version = "0.22.2", features = ["async-https-rustls", "tokio"], default-features = false }
 bdk_electrum = { version = "0.24.0", features = ["use-rustls-ring"], default-features = false }
 # bdk_bitcoind_rpc = { version = "0.12", features = [] }
+bitcoin_hashes = "0.14.101"
+bip324 = { version = "0.11", default-features = true, features = ["tokio"] }
+axum = { version = "0.8", features = ["ws"] }
+tower = { version = "0.5", features = ["limit"] }
+tower-http = { version = "0.7", features = ["limit", "timeout"] }
+mimalloc = "0.1"
 
 # rbitcoin local node
-rbitcoin-node = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-query = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-mempool = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-primitives = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-net = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-store = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-consensus = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-electrum = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
-rbitcoin-esplora = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-log = { path = "./rbitcoin/crates/rbitcoin-log" }
+rbitcoin-node = { path = "./rbitcoin/crates/rbitcoin-node" }
+rbitcoin-query = { path = "./rbitcoin/crates/rbitcoin-query" }
+rbitcoin-mempool = { path = "./rbitcoin/crates/rbitcoin-mempool" }
+rbitcoin-primitives = { path = "./rbitcoin/crates/rbitcoin-primitives" }
+rbitcoin-net = { path = "./rbitcoin/crates/rbitcoin-net" }
+rbitcoin-store = { path = "./rbitcoin/crates/rbitcoin-store" }
+rbitcoin-consensus = { path = "./rbitcoin/crates/rbitcoin-consensus" }
+rbitcoin-rpc = { path = "./rbitcoin/crates/rbitcoin-rpc" }
+rbitcoin-electrum = { path = "./rbitcoin/crates/rbitcoin-electrum" }
+rbitcoin-esplora = { path = "./rbitcoin/crates/rbitcoin-esplora" }
+rbitcoin-cli = { path = "./rbitcoin/crates/rbitcoin-cli" }
+rbitcoin-test = { path = "./rbitcoin/crates/rbitcoin-test" }
+rbitcoin-bench = { path = "./rbitcoin/crates/rbitcoin-bench" }
 
 # fast hashmap
 ahash = "0.8.12"
