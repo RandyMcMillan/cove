@@ -329,11 +329,11 @@ private struct LogConsoleView: View {
                         Text(line)
                             .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(logColor(for: line))
-                            .textSelection(.enabled)
                     }
                 }
                 .padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
             }
             .background(Color(.systemGray6))
             .cornerRadius(10)
