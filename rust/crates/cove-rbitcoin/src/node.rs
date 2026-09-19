@@ -109,6 +109,12 @@ impl LocalNode {
         info!("starting local rbitcoin node for {}", self.network);
 
         let datadir = datadir_for_network(self.network);
+        std::fs::create_dir_all(&datadir).map_err(|e| LocalNodeError::Config(format!(
+            "create datadir {}: {}",
+            datadir.display(),
+            e
+        )))?;
+
         let free = available_disk_space(&datadir)?;
         if free < MIN_FREE_SPACE_BYTES {
             return Err(LocalNodeError::InsufficientDiskSpace(format!(
@@ -347,7 +353,7 @@ mod tests {
 
     #[test]
     fn build_config_maps_networks() {
-        for network in [Network::Bitcoin, Network::Testnet, Network::Signet] {
+        for network in [Network::Bitcoin, Network::Testnet, Network::Testnet4, Network::Signet] {
             let config = build_config(network).expect("should build config");
             assert!(config.shindex);
             assert!(config.prefill_compact);
@@ -355,9 +361,9 @@ mod tests {
     }
 
     #[test]
-    fn build_config_rejects_testnet4() {
-        let result = build_config(Network::Testnet4);
-        assert!(matches!(result, Err(LocalNodeError::UnsupportedNetwork(_))));
+    fn build_config_testnet4_maps_to_testnet() {
+        let config = build_config(Network::Testnet4).expect("should build config");
+        assert_eq!(config.network, rbitcoin_primitives::Network::Testnet);
     }
 
     #[test]

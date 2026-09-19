@@ -86,9 +86,10 @@ fn map_network(network: Network) -> Result<RbitcoinNetwork, LocalNodeError> {
         Network::Bitcoin => Ok(RbitcoinNetwork::Mainnet),
         Network::Testnet => Ok(RbitcoinNetwork::Testnet),
         Network::Signet => Ok(RbitcoinNetwork::Signet),
-        Network::Testnet4 => Err(LocalNodeError::UnsupportedNetwork(
-            "testnet4 is not supported by rbitcoin v0.7.0".to_string(),
-        )),
+        // Testnet4 uses the same p2p protocol as Testnet; rbitcoin v0.7.0's
+        // underlying `bitcoin` crate lacks a distinct Testnet4 variant.
+        // We keep a separate datadir so testnet4 data never mixes with testnet.
+        Network::Testnet4 => Ok(RbitcoinNetwork::Testnet),
     }
 }
 

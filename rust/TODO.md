@@ -230,6 +230,31 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
+## Phase 14: Swift UI for Local Node (DONE)
+
+**Goal:** Build the iOS Swift UI for local node management — status display, storage info, and controls.
+
+- [x] Add `SettingsRoute::LocalNode` to Rust router (`src/router.rs`)
+- [x] Regenerate iOS bindings
+- [x] Add `.localNode` case to `SettingsRouteContent` in `SettingsContainer.swift`
+- [x] Create `LocalNodeSettingsView.swift` with:
+  - Timer-based polling of `localNodeIsRunning()`, `localNodeTipHeight()`, `localNodeIsInIbd()`, `localNodeDatadirSize()`
+  - Status display: running/stopped, block height, IBD yes/no, datadir size
+  - Action buttons: Start Node, Stop Node, Clear Data Directory (with confirmation)
+  - Error handling alerts
+- [x] Add Local Node navigation row in `MainSettingsGeneralSection`
+- [x] iOS Simulator build: BUILD SUCCEEDED
+- [x] macOS Designed for iPad build: BUILD SUCCEEDED
+
+**Files touched:**
+- `src/router.rs`
+- `ios/Cove/Flows/SettingsFlow/SettingsContainer.swift`
+- `ios/Cove/Flows/SettingsFlow/MainSettingsSections.swift`
+- `ios/Cove/Flows/SettingsFlow/SettingsScreen/LocalNodeSettingsView.swift`
+- `ios/CoveCore/Sources/CoveCore/generated/cove.swift`
+
+---
+
 ## Phase 8: End-to-End Verification (PARTIAL)
 
 **Goal:** Validate the full flow on device/simulator.
@@ -238,6 +263,8 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - [x] Rust lib tests: `cargo test --lib` — 1647 passed, 1 pre-existing flaky failure (fee_client)
 - [x] rbitcoin-node tests: `cargo test -p rbitcoin-node --lib run::tests` — 35 passed
 - [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 8 passed
+- [x] iOS Simulator build (Xcode): BUILD SUCCEEDED
+- [x] macOS Designed for iPad build (Xcode): BUILD SUCCEEDED
 - [ ] iOS: `just build-run-ios --udid <device>` with local node selected
 - [x] Android: `just build-android` — BUILD SUCCEEDED (Kotlin bindings regenerated)
 - [ ] Verify wallet sync completes against local Esplora/Electrum
