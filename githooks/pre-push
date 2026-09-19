@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "Running cargo fmt..."
+cd rust && cargo fmt --check

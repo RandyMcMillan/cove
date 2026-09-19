@@ -16,6 +16,29 @@ list:
 # utilities
 # ------------------------------------------------------------------------------
 
+# [quick] Symlink githooks from ./githooks into .git/hooks
+[group('utils')]
+[script('bash')]
+install-githooks:
+    set -e
+    mkdir -p .git/hooks
+    for hook in githooks/*; do
+        [ -f "$hook" ] || continue
+        name=$(basename "$hook")
+        target=".git/hooks/$name"
+        if [ -L "$target" ] && [ "$(readlink "$target")" = "../../$hook" ]; then
+            echo "  $name already linked"
+            continue
+        fi
+        if [ -e "$target" ]; then
+            echo "  replacing existing $name"
+            rm -f "$target"
+        fi
+        ln -s "../../$hook" "$target"
+        echo "  linked $name"
+    done
+    echo "Done"
+
 # [variable] Run an xtask command
 [group('utils')]
 xtask *args:
