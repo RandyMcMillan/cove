@@ -10,7 +10,7 @@ use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{LocalNodeUrls, build_config_with_options, datadir_for_network};
+use crate::config::{LocalNodeUrls, build_config, build_config_with_options, datadir_for_network};
 use crate::error::LocalNodeError;
 
 /// Minimum free disk space required to start a local node (1 GB).
@@ -381,5 +381,28 @@ mod tests {
     fn parse_addr_rejects_invalid() {
         assert!(parse_addr("not-an-address").is_err());
         assert!(parse_addr("").is_err());
+    }
+
+    #[test]
+    fn build_config_with_options_applies_overrides() {
+        use crate::config::LocalNodeConfig;
+
+        let config = build_config_with_options(
+            Network::Bitcoin,
+            Some(LocalNodeConfig { max_outbound: Some(2), blocksonly: Some(true) }),
+        )
+        .expect("should build config with options");
+
+        assert_eq!(config.listen.max_outbound, 2);
+        assert!(config.mempool.blocksonly);
+    }
+
+    #[test]
+    fn build_config_with_options_uses_defaults_when_none() {
+        let config = build_config_with_options(Network::Bitcoin, None)
+            .expect("should build config with defaults");
+
+        assert_eq!(config.listen.max_outbound, 4);
+        assert!(!config.mempool.blocksonly);
     }
 }
