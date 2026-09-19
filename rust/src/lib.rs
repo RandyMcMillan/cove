@@ -140,14 +140,52 @@ async fn local_node_electrum_url() -> Option<String> {
         .map(|u| u.electrum.clone())
 }
 
+#[derive(Debug, Clone, thiserror::Error, uniffi::Error)]
+pub enum LocalNodeStartError {
+    #[error("failed to open rbitcoin store: {0}")]
+    StoreOpen(String),
+
+    #[error("failed to start P2P: {0}")]
+    P2PStart(String),
+
+    #[error("failed to start Electrum server: {0}")]
+    ElectrumStart(String),
+
+    #[error("failed to start Esplora server: {0}")]
+    EsploraStart(String),
+
+    #[error("local node is not running")]
+    NotRunning,
+
+    #[error("unsupported network for local node: {0}")]
+    UnsupportedNetwork(String),
+
+    #[error("rbitcoin config error: {0}")]
+    Config(String),
+}
+
+impl From<cove_rbitcoin::LocalNodeError> for LocalNodeStartError {
+    fn from(err: cove_rbitcoin::LocalNodeError) -> Self {
+        match err {
+            cove_rbitcoin::LocalNodeError::StoreOpen(s) => Self::StoreOpen(s),
+            cove_rbitcoin::LocalNodeError::P2PStart(s) => Self::P2PStart(s),
+            cove_rbitcoin::LocalNodeError::ElectrumStart(s) => Self::ElectrumStart(s),
+            cove_rbitcoin::LocalNodeError::EsploraStart(s) => Self::EsploraStart(s),
+            cove_rbitcoin::LocalNodeError::NotRunning => Self::NotRunning,
+            cove_rbitcoin::LocalNodeError::UnsupportedNetwork(s) => Self::UnsupportedNetwork(s),
+            cove_rbitcoin::LocalNodeError::Config(s) => Self::Config(s),
+        }
+    }
+}
+
 #[uniffi::export(async_runtime = "tokio")]
-async fn local_node_start(network: Network) -> Result<(), String> {
+async fn local_node_start(network: Network) -> Result<(), LocalNodeStartError> {
     local_node_manager::LOCAL_NODE_MANAGER
         .lock()
         .await
         .start(network)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(LocalNodeStartError::from)
 }
 
 #[uniffi::export(async_runtime = "tokio")]

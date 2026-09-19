@@ -4828,6 +4828,8 @@ public protocol GlobalConfigTableProtocol: AnyObject, Sendable {
 
     func selectedNode()  -> Node
 
+    func selectedNodeIsLocal()  -> Bool
+
     func selectedWallet()  -> WalletId?
 
     func set(key: GlobalConfigKey, value: String) throws
@@ -4841,6 +4843,8 @@ public protocol GlobalConfigTableProtocol: AnyObject, Sendable {
     func setSelectedNetwork(network: Network) throws
 
     func setSelectedNode(node: Node) throws
+
+    func setSelectedNodeIsLocal(isLocal: Bool) throws
 
     func walletMode()  -> WalletMode
 
@@ -5067,6 +5071,15 @@ open func selectedNode() -> Node  {
 })
 }
 
+open func selectedNodeIsLocal() -> Bool  {
+    return try!  FfiConverterBool.lift(try! rustCall() {
+        uniffiCallStatus in
+    uniffi_cove_fn_method_globalconfigtable_selected_node_is_local(
+            self.uniffiCloneHandle(),uniffiCallStatus
+    )
+})
+}
+
 open func selectedWallet() -> WalletId?  {
     return try!  FfiConverterOptionTypeWalletId.lift(try! rustCall() {
         uniffiCallStatus in
@@ -5131,6 +5144,15 @@ open func setSelectedNode(node: Node)throws   {try rustCallWithError(FfiConverte
     uniffi_cove_fn_method_globalconfigtable_set_selected_node(
             self.uniffiCloneHandle(),
         FfiConverterTypeNode_lower(node),uniffiCallStatus
+    )
+}
+}
+
+open func setSelectedNodeIsLocal(isLocal: Bool)throws   {try rustCallWithError(FfiConverterTypeDatabaseError_lift) {
+        uniffiCallStatus in
+    uniffi_cove_fn_method_globalconfigtable_set_selected_node_is_local(
+            self.uniffiCloneHandle(),
+        FfiConverterBool.lower(isLocal),uniffiCallStatus
     )
 }
 }
@@ -6872,6 +6894,8 @@ public protocol NodeSelectorProtocol: AnyObject, Sendable {
      */
     func parseCustomNode(url: String, name: String, enteredName: String) throws  -> Node
 
+    func selectLocalNode() throws
+
     func selectPresetNode(name: String) throws  -> Node
 
     func selectedNode()  -> NodeSelection
@@ -6997,6 +7021,14 @@ open func parseCustomNode(url: String, name: String, enteredName: String)throws 
         FfiConverterString.lower(enteredName),uniffiCallStatus
     )
 })
+}
+
+open func selectLocalNode()throws   {try rustCallWithError(FfiConverterTypeNodeSelectorError_lift) {
+        uniffiCallStatus in
+    uniffi_cove_fn_method_nodeselector_select_local_node(
+            self.uniffiCloneHandle(),uniffiCallStatus
+    )
+}
 }
 
 open func selectPresetNode(name: String)throws  -> Node  {
@@ -28963,6 +28995,8 @@ public enum GlobalConfigKey: Equatable, Hashable {
     case selectedFiatCurrency
     case selectedNode(Network
     )
+    case selectedNodeIsLocal(Network
+    )
     case colorScheme
     case authType
     case hashedPinCode
@@ -29005,27 +29039,30 @@ public struct FfiConverterTypeGlobalConfigKey: FfiConverterRustBuffer {
         case 4: return .selectedNode(try FfiConverterTypeNetwork.read(from: &buf)
         )
 
-        case 5: return .colorScheme
+        case 5: return .selectedNodeIsLocal(try FfiConverterTypeNetwork.read(from: &buf)
+        )
 
-        case 6: return .authType
+        case 6: return .colorScheme
 
-        case 7: return .hashedPinCode
+        case 7: return .authType
 
-        case 8: return .wipeDataPin
+        case 8: return .hashedPinCode
 
-        case 9: return .decoyPin
+        case 9: return .wipeDataPin
 
-        case 10: return .inDecoyMode
+        case 10: return .decoyPin
 
-        case 11: return .mainSelectedWalletId
+        case 11: return .inDecoyMode
 
-        case 12: return .decoySelectedWalletId
+        case 12: return .mainSelectedWalletId
 
-        case 13: return .lockedAt
+        case 13: return .decoySelectedWalletId
 
-        case 14: return .onboardingProgress
+        case 14: return .lockedAt
 
-        case 15: return .customBlockExplorer(try FfiConverterTypeNetwork.read(from: &buf)
+        case 15: return .onboardingProgress
+
+        case 16: return .customBlockExplorer(try FfiConverterTypeNetwork.read(from: &buf)
         )
 
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -29053,48 +29090,53 @@ public struct FfiConverterTypeGlobalConfigKey: FfiConverterRustBuffer {
             FfiConverterTypeNetwork.write(v1, into: &buf)
 
 
-        case .colorScheme:
+        case let .selectedNodeIsLocal(v1):
             writeInt(&buf, Int32(5))
+            FfiConverterTypeNetwork.write(v1, into: &buf)
 
 
-        case .authType:
+        case .colorScheme:
             writeInt(&buf, Int32(6))
 
 
-        case .hashedPinCode:
+        case .authType:
             writeInt(&buf, Int32(7))
 
 
-        case .wipeDataPin:
+        case .hashedPinCode:
             writeInt(&buf, Int32(8))
 
 
-        case .decoyPin:
+        case .wipeDataPin:
             writeInt(&buf, Int32(9))
 
 
-        case .inDecoyMode:
+        case .decoyPin:
             writeInt(&buf, Int32(10))
 
 
-        case .mainSelectedWalletId:
+        case .inDecoyMode:
             writeInt(&buf, Int32(11))
 
 
-        case .decoySelectedWalletId:
+        case .mainSelectedWalletId:
             writeInt(&buf, Int32(12))
 
 
-        case .lockedAt:
+        case .decoySelectedWalletId:
             writeInt(&buf, Int32(13))
 
 
-        case .onboardingProgress:
+        case .lockedAt:
             writeInt(&buf, Int32(14))
 
 
-        case let .customBlockExplorer(v1):
+        case .onboardingProgress:
             writeInt(&buf, Int32(15))
+
+
+        case let .customBlockExplorer(v1):
+            writeInt(&buf, Int32(16))
             FfiConverterTypeNetwork.write(v1, into: &buf)
 
         }
@@ -31835,6 +31877,137 @@ public func FfiConverterTypeLocalDataResetStage_lower(_ value: LocalDataResetSta
 
 
 public
+enum LocalNodeStartError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
+
+
+
+    case StoreOpen(String
+    )
+    case P2pStart(String
+    )
+    case ElectrumStart(String
+    )
+    case EsploraStart(String
+    )
+    case NotRunning
+    case UnsupportedNetwork(String
+    )
+    case Config(String
+    )
+
+
+
+
+
+
+    public var errorDescription: String? {
+        String(reflecting: self)
+    }
+
+}
+
+#if compiler(>=6)
+extension LocalNodeStartError: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeLocalNodeStartError: FfiConverterRustBuffer {
+    typealias SwiftType = LocalNodeStartError
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LocalNodeStartError {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+
+
+
+
+        case 1: return .StoreOpen(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 2: return .P2pStart(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 3: return .ElectrumStart(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 4: return .EsploraStart(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 5: return .NotRunning
+        case 6: return .UnsupportedNetwork(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 7: return .Config(
+            try FfiConverterString.read(from: &buf)
+            )
+
+         default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: LocalNodeStartError, into buf: inout [UInt8]) {
+        switch value {
+
+
+
+
+
+        case let .StoreOpen(v1):
+            writeInt(&buf, Int32(1))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .P2pStart(v1):
+            writeInt(&buf, Int32(2))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .ElectrumStart(v1):
+            writeInt(&buf, Int32(3))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .EsploraStart(v1):
+            writeInt(&buf, Int32(4))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case .NotRunning:
+            writeInt(&buf, Int32(5))
+
+
+        case let .UnsupportedNetwork(v1):
+            writeInt(&buf, Int32(6))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .Config(v1):
+            writeInt(&buf, Int32(7))
+            FfiConverterString.write(v1, into: &buf)
+
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeLocalNodeStartError_lift(_ buf: RustBuffer) throws -> LocalNodeStartError {
+    return try FfiConverterTypeLocalNodeStartError.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeLocalNodeStartError_lower(_ value: LocalNodeStartError) -> RustBuffer {
+    return FfiConverterTypeLocalNodeStartError.lower(value)
+}
+
+
+public
 enum MnemonicError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
 
 
@@ -32550,6 +32723,7 @@ public enum NodeSelection: Equatable, Hashable {
     )
     case custom(Node
     )
+    case local
 
 
 
@@ -32586,6 +32760,8 @@ public struct FfiConverterTypeNodeSelection: FfiConverterRustBuffer {
         case 2: return .custom(try FfiConverterTypeNode.read(from: &buf)
         )
 
+        case 3: return .local
+
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
@@ -32602,6 +32778,10 @@ public struct FfiConverterTypeNodeSelection: FfiConverterRustBuffer {
         case let .custom(v1):
             writeInt(&buf, Int32(2))
             FfiConverterTypeNode.write(v1, into: &buf)
+
+
+        case .local:
+            writeInt(&buf, Int32(3))
 
         }
     }
@@ -32636,6 +32816,8 @@ enum NodeSelectorError: Swift.Error, Equatable, Hashable, Foundation.LocalizedEr
     case NodeAccessError(String
     )
     case ParseNodeUrlError(String
+    )
+    case LocalNodeNotSupported(String
     )
 
 
@@ -32678,6 +32860,9 @@ public struct FfiConverterTypeNodeSelectorError: FfiConverterRustBuffer {
         case 4: return .ParseNodeUrlError(
             try FfiConverterString.read(from: &buf)
             )
+        case 5: return .LocalNodeNotSupported(
+            try FfiConverterString.read(from: &buf)
+            )
 
          default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -32707,6 +32892,11 @@ public struct FfiConverterTypeNodeSelectorError: FfiConverterRustBuffer {
 
         case let .ParseNodeUrlError(v1):
             writeInt(&buf, Int32(4))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .LocalNodeNotSupported(v1):
+            writeInt(&buf, Int32(5))
             FfiConverterString.write(v1, into: &buf)
 
         }
@@ -46262,6 +46452,80 @@ private func uniffiForeignFutureDroppedCallback(handle: UInt64) {
 public func uniffiForeignFutureHandleCountCove() -> Int {
     UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.count
 }
+public func localNodeElectrumUrl()async  -> String?  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_electrum_url(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionString.lift,
+            errorHandler: nil
+
+        )
+}
+public func localNodeEsploraUrl()async  -> String?  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_esplora_url(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionString.lift,
+            errorHandler: nil
+
+        )
+}
+public func localNodeIsRunning()async  -> Bool  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_is_running(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_i8,
+            completeFunc: ffi_cove_rust_future_complete_i8,
+            freeFunc: ffi_cove_rust_future_free_i8,
+            liftFunc: FfiConverterBool.lift,
+            errorHandler: nil
+
+        )
+}
+public func localNodeStart(network: Network)async throws   {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_start(FfiConverterTypeNetwork_lower(network)
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_void,
+            completeFunc: ffi_cove_rust_future_complete_void,
+            freeFunc: ffi_cove_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: FfiConverterTypeLocalNodeStartError_lift
+        )
+}
+public func localNodeStop()async   {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_stop(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_void,
+            completeFunc: ffi_cove_rust_future_complete_void,
+            freeFunc: ffi_cove_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: nil
+
+        )
+}
 /**
  * set root data directory before any database access
  * required for Android to specify app-specific storage path
@@ -46891,6 +47155,21 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
+    if (uniffi_cove_checksum_func_local_node_electrum_url() != 10327) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_esplora_url() != 39101) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_is_running() != 5029) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_start() != 20017) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_stop() != 36976) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_cove_checksum_func_set_root_data_dir() != 5349) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -47335,6 +47614,9 @@ private let initializationResult: InitializationResult = {
     if (uniffi_cove_checksum_method_globalconfigtable_selected_node() != 230) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_cove_checksum_method_globalconfigtable_selected_node_is_local() != 31770) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_cove_checksum_method_globalconfigtable_selected_wallet() != 6128) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -47354,6 +47636,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_globalconfigtable_set_selected_node() != 4222) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_method_globalconfigtable_set_selected_node_is_local() != 44409) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_globalconfigtable_wallet_mode() != 27720) {
@@ -47978,6 +48263,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_nodeselector_parse_custom_node() != 26788) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_method_nodeselector_select_local_node() != 29208) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_nodeselector_select_preset_node() != 55812) {
