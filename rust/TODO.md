@@ -255,6 +255,36 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
+## Phase 15: IBD tip_height + keepalive fixes (DONE)
+
+**Goal:** Fix two rbitcoin issues discovered during real-world testing:
+1. Block Height stays at 0 during IBD because `tip_height` atomic is only updated in `tip_follow` loop.
+2. Node exits when catch-up is incomplete (e.g. internet disconnected).
+
+- [x] Add background `tokio::spawn` loop that polls `node.hub.tip_height()` and `node.hub.in_ibd()` every second, updating shared atomics for the full node lifetime
+- [x] Add keepalive loop when `tip_follow_ready` is false but shutdown not requested, so RPC stays up and the node doesn't exit on IBD failure
+- [x] All 91 rbitcoin-node tests pass; `max_run_secs = Some(0)` test behavior preserved
+- [x] Rebuild xcframework with device + simulator + macabi slices
+
+**Files touched (rbitcoin nested repo):**
+- `crates/rbitcoin-node/src/run.rs`
+
+---
+
+## Phase 16: Log Console Polish + Network Reachability (DONE)
+
+**Goal:** Improve the Local Node log console UX and add network connectivity feedback.
+
+- [x] Move `.textSelection(.enabled)` from individual `Text` lines to the `VStack` container for multi-line selection
+- [x] Add `NetworkStatusRow` with red/green indicator dot in Status section
+- [x] Poll `CloudConnectivityMonitor.shared.isConnected()` on each refresh tick
+- [x] Mac Catalyst build: BUILD SUCCEEDED
+
+**Files touched:**
+- `ios/Cove/Flows/SettingsFlow/SettingsScreen/LocalNodeSettingsView.swift`
+
+---
+
 ## Phase 8: End-to-End Verification (PARTIAL)
 
 **Goal:** Validate the full flow on device/simulator.
