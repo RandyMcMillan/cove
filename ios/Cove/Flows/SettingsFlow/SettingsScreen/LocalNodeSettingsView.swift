@@ -51,6 +51,7 @@ struct LocalNodeSettingsView: View {
                     logLevel: $logLevel,
                     onSetLogLevel: setLogLevel
                 )
+                .padding(.top, 16)
                 .frame(maxHeight: .infinity)
             }
         }
