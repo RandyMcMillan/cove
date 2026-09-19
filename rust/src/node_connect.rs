@@ -1,4 +1,4 @@
-use tracing::error;
+use tracing::{error, info, warn};
 use url::Url;
 
 use crate::{database::Database, network::Network, node::Node};
@@ -149,6 +149,27 @@ impl NodeSelector {
             .global_config
             .set_selected_node(&fallback)
             .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
+
+        // Eager-start the local node in the background so it is ready before
+        // the first wallet sync tries to use it.
+        let network = self.network;
+        cove_tokio::task::spawn(async move {
+            if !cove_tokio::is_tokio_initialized() {
+                warn!("tokio not initialized, skipping eager local node start");
+                return;
+            }
+
+            let result = crate::local_node_manager::LOCAL_NODE_MANAGER
+                .lock()
+                .await
+                .start(network)
+                .await;
+
+            match result {
+                Ok(()) => info!("local node eager-started after selection"),
+                Err(e) => warn!("local node eager-start failed: {e}"),
+            }
+        });
 
         Ok(())
     }

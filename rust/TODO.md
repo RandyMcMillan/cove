@@ -157,14 +157,14 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - [x] rbitcoin-node tests: `cargo test -p rbitcoin-node --lib run::tests` — 35 passed
 - [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 4 passed
 - [ ] iOS: `just build-run-ios --udid <device>` with local node selected
-- [ ] Android: `just build-android` + install on device with local node selected
+- [x] Android: `just build-android` — BUILD SUCCEEDED (Kotlin bindings regenerated)
 - [ ] Verify wallet sync completes against local Esplora/Electrum
 - [ ] Verify app backgrounding triggers cooperative shutdown
 - [ ] Verify app relaunch resumes sync from last tip
 
 **Blockers:**
 - No iOS device UDID available in this environment
-- Android NDK not installed (`ANDROID_NDK_HOME` missing)
+- Android device E2E not yet run (Gradle build / install pending)
 
 ---
 
