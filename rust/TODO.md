@@ -126,18 +126,29 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
-## Phase 7: Resource Management (PENDING)
+## Phase 7: Resource Management (DONE)
 
 **Goal:** Guard against disk exhaustion and provide datadir cleanup.
 
-- [ ] Add pre-start disk check (require N GB free)
-- [ ] Add `local_node_datadir_size() -> u64` UniFFI export
-- [ ] Add `local_node_clear_datadir()` for reset / troubleshooting
-- [ ] Expose storage metrics in Settings → Node → Local Node
+- [x] Add pre-start disk check (1 GB minimum) using `libc::statvfs`
+- [x] Add `local_node_datadir_size() -> u64` UniFFI export
+- [x] Add `local_node_clear_datadir() -> Result<(), LocalNodeStartError>` UniFFI export
+- [x] Export `dir_size` and `format_bytes` helpers from cove-rbitcoin
+- [x] Add `InsufficientDiskSpace` and `DatadirRemove` error variants
+
+**Files touched:**
+- `crates/cove-rbitcoin/src/node.rs`
+- `crates/cove-rbitcoin/src/error.rs`
+- `crates/cove-rbitcoin/src/lib.rs`
+- `crates/cove-rbitcoin/Cargo.toml`
+- `src/lib.rs`
+- `src/local_node_manager.rs`
+
+**Note:** UI integration (Settings → Node → Local Node storage metrics) is left for the mobile frontend teams.
 
 ---
 
-## Phase 8: End-to-End Verification (PENDING)
+## Phase 8: End-to-End Verification (BLOCKED)
 
 **Goal:** Validate the full flow on device/simulator.
 
@@ -146,6 +157,10 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - [ ] Verify wallet sync completes against local Esplora/Electrum
 - [ ] Verify app backgrounding triggers cooperative shutdown
 - [ ] Verify app relaunch resumes sync from last tip
+
+**Blockers:**
+- No iOS device UDID available in this environment
+- Android NDK not installed (`ANDROID_NDK_HOME` missing)
 
 ---
 
