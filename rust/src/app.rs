@@ -634,11 +634,8 @@ impl FfiApp {
             let global_config = &crate::database::Database::global().global_config;
             if global_config.selected_node_is_local() {
                 let network = global_config.selected_network();
-                let result = crate::local_node_manager::LOCAL_NODE_MANAGER
-                    .lock()
-                    .await
-                    .start(network)
-                    .await;
+                let result =
+                    crate::local_node_manager::LOCAL_NODE_MANAGER.lock().await.start(network).await;
                 match result {
                     Ok(()) => tracing::info!("local node eager-started on app init"),
                     Err(e) => tracing::warn!("local node eager-start on init failed: {e}"),
