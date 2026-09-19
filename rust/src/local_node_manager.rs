@@ -16,11 +16,20 @@ pub static LOCAL_NODE_MANAGER: LazyLock<Arc<Mutex<LocalNodeManager>>> =
 
 pub struct LocalNodeManager {
     node: Option<LocalNode>,
+    config: Option<cove_rbitcoin::LocalNodeConfig>,
 }
 
 impl LocalNodeManager {
     pub const fn new() -> Self {
-        Self { node: None }
+        Self { node: None, config: None }
+    }
+
+    pub fn set_config(&mut self, config: cove_rbitcoin::LocalNodeConfig) {
+        self.config = Some(config);
+    }
+
+    pub fn clear_config(&mut self) {
+        self.config = None;
     }
 
     pub fn is_running(&self) -> bool {
@@ -81,7 +90,7 @@ impl LocalNodeManager {
         }
 
         let mut node = LocalNode::new(network);
-        node.start().await?;
+        node.start(self.config.clone()).await?;
         self.node = Some(node);
 
         Ok(())

@@ -10,7 +10,7 @@ use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{LocalNodeUrls, build_config, datadir_for_network};
+use crate::config::{LocalNodeUrls, build_config, build_config_with_options, datadir_for_network};
 use crate::error::LocalNodeError;
 
 /// Minimum free disk space required to start a local node (1 GB).
@@ -97,7 +97,7 @@ impl LocalNode {
     }
 
     /// Start the local node: find free ports, build config, check disk, and spawn `run_p2p_with_handle`.
-    pub async fn start(&mut self) -> Result<(), LocalNodeError> {
+    pub async fn start(&mut self, config_override: Option<crate::LocalNodeConfig>) -> Result<(), LocalNodeError> {
         if self.is_running() {
             warn!("local node already running");
             return Ok(());
@@ -120,7 +120,7 @@ impl LocalNode {
 
         debug!("local node will bind electrum={} esplora={}", electrum_addr, esplora_addr);
 
-        let mut config = build_config(self.network)?;
+        let mut config = build_config_with_options(self.network, config_override)?;
         config.listen.electrum = Some(electrum_addr);
         config.listen.esplora = Some(esplora_addr);
 
