@@ -23,6 +23,17 @@ use cove_types::fees::{FeeRate, FeeRateOption, FeeRateOptions, FeeSpeed};
 
 const FEE_URL: &str = "https://mempool.space/api/v1/fees/recommended";
 
+/// Return the local node's Esplora fee endpoint if the local node is running,
+/// otherwise fall back to the default mempool.space URL.
+fn fee_url() -> String {
+    if let Ok(manager) = crate::local_node_manager::LOCAL_NODE_MANAGER.try_lock()
+        && let Some(urls) = manager.urls()
+    {
+        return format!("{}/api/v1/fees/recommended", urls.esplora);
+    }
+    FEE_URL.to_string()
+}
+
 /// Background refresh interval in seconds
 const BACKGROUND_REFRESH_INTERVAL: u64 = 60;
 
@@ -45,7 +56,6 @@ pub static FEES: LazyLock<ArcSwap<Option<CachedFeeResponse>>> =
     LazyLock::new(|| ArcSwap::from_pointee(None));
 
 pub struct FeeClient {
-    url: String,
     client: OnceCell<reqwest::Client>,
 }
 
@@ -116,11 +126,12 @@ struct ValidatedFeeResponse(FeeResponse);
 
 impl FeeClient {
     pub fn new() -> Self {
-        Self::new_with_url(FEE_URL.to_string())
+        Self { client: OnceCell::new() }
     }
 
-    pub fn new_with_url(url: String) -> Self {
-        Self { url, client: OnceCell::new() }
+    #[allow(dead_code)]
+    pub fn new_with_url(_url: String) -> Self {
+        Self { client: OnceCell::new() }
     }
 
     /// Get cached fees, will trigger background refresh if stale
@@ -178,7 +189,8 @@ impl FeeClient {
 
     /// Always gets new fees from the server
     async fn get_new_fees(&self) -> Result<ValidatedFeeResponse, FeeClientError> {
-        let response = self.client()?.get(&self.url).send().await?.error_for_status()?;
+        let url = fee_url();
+        let response = self.client()?.get(&url).send().await?.error_for_status()?;
         let fees: FeeResponse = response.json().await?;
         Ok(fees.try_into()?)
     }

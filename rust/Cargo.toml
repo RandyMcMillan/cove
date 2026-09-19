@@ -77,6 +77,17 @@ bdk_esplora = { version = "0.22.2", features = ["async-https-rustls", "tokio"], 
 bdk_electrum = { version = "0.24.0", features = ["use-rustls-ring"], default-features = false }
 # bdk_bitcoind_rpc = { version = "0.12", features = [] }
 
+# rbitcoin local node
+rbitcoin-node = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-query = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-mempool = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-primitives = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-net = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-store = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-consensus = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-electrum = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+rbitcoin-esplora = { git = "https://github.com/RandyMcMillan/rbitcoin", branch = "1849/967636/619995/68ae5d73/d5d56ace" }
+
 # fast hashmap
 ahash = "0.8.12"
 
@@ -141,6 +152,7 @@ cove-bdk = { path = "./crates/cove-bdk" }
 cove-bdk-progressive-scan = { path = "./crates/cove-bdk-progressive-scan" }
 cove-tokio = { path = "./crates/cove-tokio" }
 cove-http = { path = "./crates/cove-http" }
+cove-rbitcoin = { path = "./crates/cove-rbitcoin" }
 
 # bitcoin
 bitcoin = { workspace = true }

@@ -1,0 +1,39 @@
+[package]
+name = "cove-rbitcoin"
+version = "0.1.0"
+edition = "2024"
+description = "Local rbitcoin node wrapper for Cove"
+
+[dependencies]
+# rbitcoin crates
+rbitcoin-node = { workspace = true }
+rbitcoin-query = { workspace = true }
+rbitcoin-mempool = { workspace = true }
+rbitcoin-primitives = { workspace = true }
+rbitcoin-net = { workspace = true }
+rbitcoin-store = { workspace = true }
+rbitcoin-consensus = { workspace = true }
+rbitcoin-electrum = { workspace = true }
+rbitcoin-esplora = { workspace = true }
+
+# cove crates
+cove-common = { path = "../cove-common" }
+cove-types = { path = "../cove-types" }
+cove-util = { path = "../cove-util" }
+cove-tokio = { path = "../cove-tokio" }
+
+# async
+tokio = { workspace = true }
+
+# error handling
+thiserror = { workspace = true }
+eyre = { workspace = true }
+
+# logging
+tracing = { workspace = true }
+
+# bitcoin
+bitcoin = { workspace = true }
+
+[lints]
+workspace = true

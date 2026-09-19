@@ -52,6 +52,7 @@ mod historical_price_service;
 mod key_teleport;
 mod keys;
 mod label_manager;
+mod local_node_manager;
 mod loading_popup;
 mod manager;
 mod mnemonic;
@@ -111,4 +112,45 @@ pub enum InitError {
 fn set_root_data_dir(path: String) -> Result<(), InitError> {
     cove_common::consts::set_root_data_dir(PathBuf::from(path))
         .map_err(InitError::RootDataDirAlreadySet)
+}
+
+// Local node exports
+use crate::network::Network;
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_is_running() -> bool {
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.is_running()
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_esplora_url() -> Option<String> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .urls()
+        .map(|u| u.esplora.clone())
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_electrum_url() -> Option<String> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .urls()
+        .map(|u| u.electrum.clone())
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_start(network: Network) -> Result<(), String> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .start(network)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_stop() {
+    local_node_manager::LOCAL_NODE_MANAGER.lock().await.stop().await;
 }
