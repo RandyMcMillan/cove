@@ -25,26 +25,25 @@ struct LocalNodeSettingsView: View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 ScrollView {
-                    VStack(spacing: 16) {
-                        LocalNodeStatusSection(
-                            isRunning: isRunning,
-                            tipHeight: tipHeight,
-                            isInIbd: isInIbd,
-                            datadirSize: datadirSize
-                        )
-
-                        LocalNodeActionsSection(
-                            isRunning: isRunning,
-                            onStart: startNode,
-                            onStop: stopNode,
-                            onClear: { showClearConfirm = true }
-                        )
-                    }
+                    LocalNodeStatusSection(
+                        isRunning: isRunning,
+                        tipHeight: tipHeight,
+                        isInIbd: isInIbd,
+                        datadirSize: datadirSize
+                    )
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                 }
                 .scrollIndicators(.hidden)
-                .frame(maxHeight: geometry.size.height * 0.35)
+
+                LocalNodeActionsSection(
+                    isRunning: isRunning,
+                    onStart: startNode,
+                    onStop: stopNode,
+                    onClear: { showClearConfirm = true }
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
 
                 LocalNodeLogSection(
                     logLines: logLines,
