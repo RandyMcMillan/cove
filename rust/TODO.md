@@ -148,6 +148,20 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
+## Phase 9: Eager Local Node Start (DONE)
+
+**Goal:** Start the local node immediately when selected or on app launch, rather than waiting for the first wallet sync.
+
+- [x] Spawn background task in `NodeSelector::select_local_node()` to start node after selection
+- [x] Spawn background task in `App::init_data()` to start node if already selected on launch
+- [x] Graceful error handling — logs warnings on failure, never blocks UI
+
+**Files touched:**
+- `src/node_connect.rs`
+- `src/app.rs`
+
+---
+
 ## Phase 8: End-to-End Verification (PARTIAL)
 
 **Goal:** Validate the full flow on device/simulator.
