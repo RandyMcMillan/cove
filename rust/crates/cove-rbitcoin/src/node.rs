@@ -97,7 +97,10 @@ impl LocalNode {
     }
 
     /// Start the local node: find free ports, build config, check disk, and spawn `run_p2p_with_handle`.
-    pub async fn start(&mut self, config_override: Option<crate::LocalNodeConfig>) -> Result<(), LocalNodeError> {
+    pub async fn start(
+        &mut self,
+        config_override: Option<crate::LocalNodeConfig>,
+    ) -> Result<(), LocalNodeError> {
         if self.is_running() {
             warn!("local node already running");
             return Ok(());

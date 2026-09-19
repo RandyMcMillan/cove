@@ -76,6 +76,10 @@ impl LocalNodeManager {
         self.node.as_ref().map(LocalNode::network)
     }
 
+    pub fn running_network(&self) -> Option<Network> {
+        self.node.as_ref().filter(|n| n.is_running()).map(LocalNode::network)
+    }
+
     pub async fn start(&mut self, network: Network) -> Result<(), LocalNodeError> {
         if let Some(ref node) = self.node {
             if node.is_running() && node.network() == network {

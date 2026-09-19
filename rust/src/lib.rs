@@ -223,3 +223,43 @@ async fn local_node_clear_datadir() -> Result<(), LocalNodeStartError> {
         .await
         .map_err(LocalNodeStartError::from)
 }
+
+/// Stop the local node when the app is backgrounded.
+///
+/// Called from iOS `applicationDidEnterBackground` or Android `onStop`.
+/// This triggers cooperative shutdown to avoid the OS killing the process.
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_app_backgrounded() {
+    let mut manager = local_node_manager::LOCAL_NODE_MANAGER.lock().await;
+    if manager.is_running() {
+        tracing::info!("app backgrounded — stopping local node");
+        manager.stop().await;
+    }
+}
+
+/// Resume the local node when the app is foregrounded.
+///
+/// Called from iOS `applicationWillEnterForeground` or Android `onStart`.
+/// Only starts the node if the user has selected "Local Node".
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_app_foregrounded() {
+    let global_config = &crate::database::Database::global().global_config;
+    if !global_config.selected_node_is_local() {
+        return;
+    }
+
+    let network = global_config.selected_network();
+    let mut manager = local_node_manager::LOCAL_NODE_MANAGER.lock().await;
+
+    if manager.is_running() {
+        if manager.running_network() == Some(network) {
+            return;
+        }
+        manager.stop().await;
+    }
+
+    tracing::info!("app foregrounded — restarting local node for {network}");
+    if let Err(e) = manager.start(network).await {
+        tracing::warn!("local node restart on foreground failed: {e}");
+    }
+}
