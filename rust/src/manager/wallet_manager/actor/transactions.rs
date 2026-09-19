@@ -25,7 +25,7 @@ use tap::TapFallible as _;
 use tracing::{debug, error, warn};
 
 use crate::{
-    database::Database,
+    local_node_manager::resolve_selected_node,
     manager::wallet_manager::{
         Error, SendFlowErrorAlert, WalletManagerBuildTxError, WalletManagerError,
         WalletManagerFeesError, WalletManagerReconcileMessage,
@@ -772,12 +772,15 @@ impl WalletActor {
 
     /// Schedule best-effort broadcast of the exact committed Payjoin transaction
     pub(crate) fn schedule_payjoin_terminal_broadcast(&mut self, tx: BdkTransaction) {
-        let node = Database::global().global_config.selected_node();
         let node_client = self.node_client().ok().cloned();
 
         cove_tokio::task::spawn(async move {
-            if let Err(error) = broadcast_payjoin_terminal_with_client(node_client, node, tx).await
-            {
+            let result = match resolve_selected_node().await {
+                Ok(node) => broadcast_payjoin_terminal_with_client(node_client, node, tx).await,
+                Err(error) => Err(Error::BroadcastError(error.to_string())),
+            };
+
+            if let Err(error) = result {
                 warn!(
                     "failed to broadcast committed Payjoin transaction during destructive wallet shutdown; the durable terminal marker remains for retry: {error}"
                 );
@@ -790,8 +793,8 @@ impl WalletActor {
         &mut self,
         tx: BdkTransaction,
     ) -> Result<(), Error> {
-        let node = Database::global().global_config.selected_node();
         let node_client = self.node_client().ok().cloned();
+        let node = resolve_selected_node().await.map_err(|e| Error::BroadcastError(e.to_string()))?;
 
         broadcast_payjoin_terminal_with_client(node_client, node, tx).await
     }

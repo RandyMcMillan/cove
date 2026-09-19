@@ -13,7 +13,11 @@ use act_zero::{
 use bdk_wallet::chain::bitcoin::Address;
 use tracing::{debug, error, trace, warn};
 
-use crate::{manager::wallet_manager::actor::WalletActor, node::client_builder::NodeClientBuilder};
+use crate::{
+    local_node_manager::resolve_selected_node,
+    manager::wallet_manager::actor::WalletActor,
+    node::client::{NodeClient, NodeClientOptions},
+};
 
 pub const RECEIVE_ADDRESS_WATCH_INTERVAL: Duration = Duration::from_secs(20);
 
@@ -24,7 +28,7 @@ pub struct ReceiveAddressWatcher {
     request_id: u64,
     derivation_index: u32,
     address: Arc<Address>,
-    client_builder: NodeClientBuilder,
+    options: NodeClientOptions,
     poll_interval: Duration,
     watch_duration: Duration,
     poll_timer: Timer,
@@ -51,7 +55,7 @@ impl ReceiveAddressWatcher {
         request_id: u64,
         derivation_index: u32,
         address: Address,
-        client_builder: NodeClientBuilder,
+        options: NodeClientOptions,
         watch_duration: Duration,
     ) -> Self {
         debug!("creating receive address watcher for index={derivation_index}");
@@ -62,7 +66,7 @@ impl ReceiveAddressWatcher {
             request_id,
             derivation_index,
             address: Arc::new(address),
-            client_builder,
+            options,
             poll_interval: RECEIVE_ADDRESS_WATCH_INTERVAL,
             watch_duration,
             poll_timer: Timer::default(),
@@ -105,9 +109,15 @@ impl Tick for ReceiveAddressWatcher {
             return Produces::ok(());
         }
 
-        let result = match self.client_builder.build().await {
-            Ok(client) => client.check_address_for_txn((*self.address).clone()).await,
-            Err(error) => Err(error),
+        let result = match resolve_selected_node().await {
+            Ok(node) => match NodeClient::new_with_options(&node, self.options).await {
+                Ok(client) => client.check_address_for_txn((*self.address).clone()).await,
+                Err(error) => Err(error),
+            },
+            Err(error) => {
+                warn!("Failed to resolve node for receive address watcher: {error}");
+                return Produces::ok(());
+            }
         };
 
         match result {

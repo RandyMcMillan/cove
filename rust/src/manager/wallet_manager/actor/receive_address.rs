@@ -12,9 +12,12 @@ use cove_tokio::{AbortableTask, FutureTimeoutExt as _};
 use cove_util::result_ext::ResultExt as _;
 use tracing::warn;
 
+use bdk_esplora::esplora_client;
+
 use crate::{
     database::wallet::{WalletInternalMetadataPatch, WalletMetadataPatch},
-    database::{Database, wallet_data::ReceiveAddressCache},
+    database::wallet_data::ReceiveAddressCache,
+    local_node_manager::resolve_selected_node,
     manager::wallet_manager::{
         Error, WalletManagerReconcileMessage,
         actor::WalletActor,
@@ -23,11 +26,7 @@ use crate::{
             ReceiveAddressState, ReceiveAddressStatus, RefreshExpiredAddressDecision,
         },
     },
-    node::{
-        Node,
-        client::{Error as NodeError, NodeClient, NodeClientOptions},
-        client_builder::NodeClientBuilder,
-    },
+    node::client::{Error as NodeError, NodeClient, NodeClientOptions},
     receive_address_watcher::ReceiveAddressWatcher,
     wallet::AddressInfo,
 };
@@ -107,28 +106,31 @@ impl WalletActor {
         now: u64,
         derivation_index: u32,
     ) -> Produces<()> {
-        let (node, graph, sync_request) = self.receive_address_sync_inputs(derivation_index);
+        let (graph, sync_request) = self.receive_address_sync_inputs(derivation_index);
         let address =
             self.wallet.bdk.peek_address(KeychainKind::External, derivation_index).address;
         let (reply, receiver) = futures::channel::oneshot::channel();
 
         self.addr.send_fut_with(|addr| async move {
-            let sync_result = match NodeClient::new(&node).await {
-                Ok(node_client) => {
-                    match node_client
-                        .check_address_for_txn(address)
-                        .with_timeout(RECEIVE_ADDRESS_FRESHNESS_TIMEOUT)
-                        .await
-                    {
-                        Ok(Ok(true)) => Some(
-                            node_client
-                                .sync(&graph, sync_request)
-                                .await
-                                .map_err_str(Error::ReceiveAddressError),
-                        ),
-                        Ok(Ok(false)) | Ok(Err(_)) | Err(_) => None,
+            let sync_result = match resolve_selected_node().await {
+                Ok(node) => match NodeClient::new(&node).await {
+                    Ok(node_client) => {
+                        match node_client
+                            .check_address_for_txn(address)
+                            .with_timeout(RECEIVE_ADDRESS_FRESHNESS_TIMEOUT)
+                            .await
+                        {
+                            Ok(Ok(true)) => Some(
+                                node_client
+                                    .sync(&graph, sync_request)
+                                    .await
+                                    .map_err_str(Error::ReceiveAddressError),
+                            ),
+                            Ok(Ok(false)) | Ok(Err(_)) | Err(_) => None,
+                        }
                     }
-                }
+                    Err(_) => None,
+                },
                 Err(_) => None,
             };
 
@@ -433,13 +435,15 @@ impl WalletActor {
         request_id: u64,
         derivation_index: u32,
     ) {
-        let node = Database::global().global_config.selected_node();
         let address =
             self.wallet.bdk.peek_address(KeychainKind::External, derivation_index).address;
         self.addr.send_fut_with(|addr| async move {
-            let result = match NodeClient::new(&node).await {
-                Ok(node_client) => node_client.check_address_for_txn(address).await,
-                Err(error) => Err(error),
+            let result = match resolve_selected_node().await {
+                Ok(node) => match NodeClient::new(&node).await {
+                    Ok(node_client) => node_client.check_address_for_txn(address).await,
+                    Err(error) => Err(error),
+                },
+                Err(_) => Ok(false),
             };
 
             send!(addr.handle_receive_address_activity_result(
@@ -499,9 +503,7 @@ impl WalletActor {
     fn start_receive_address_watcher(&mut self, request_id: u64, derivation_index: u32) {
         self.stop_receive_address_watcher();
 
-        let node = Database::global().global_config.selected_node();
         let options = NodeClientOptions { batch_size: 1 };
-        let client_builder = NodeClientBuilder { node, options };
 
         let address =
             self.wallet.bdk.peek_address(KeychainKind::External, derivation_index).address;
@@ -511,7 +513,7 @@ impl WalletActor {
             request_id,
             derivation_index,
             address,
-            client_builder,
+            options,
             CACHE_WINDOW,
         );
 
@@ -542,11 +544,19 @@ impl WalletActor {
     }
 
     fn start_targeted_receive_address_sync(&mut self, request_id: u64, derivation_index: u32) {
-        let (node, graph, sync_request) = self.receive_address_sync_inputs(derivation_index);
+        let (graph, sync_request) = self.receive_address_sync_inputs(derivation_index);
         self.addr.send_fut_with(|addr| async move {
-            let result = match NodeClient::new(&node).await {
-                Ok(node_client) => node_client.sync(&graph, sync_request).await,
-                Err(error) => Err(error),
+            let result = match resolve_selected_node().await {
+                Ok(node) => match NodeClient::new(&node).await {
+                    Ok(node_client) => node_client.sync(&graph, sync_request).await,
+                    Err(error) => Err(error),
+                },
+                Err(_) => Err(NodeError::EsploraConnect(
+                    esplora_client::Error::HttpResponse {
+                        status: 0,
+                        message: "local node not available".to_string(),
+                    },
+                )),
             };
 
             send!(addr.handle_receive_address_sync_result(request_id, derivation_index, result));
@@ -574,8 +584,7 @@ impl WalletActor {
     fn receive_address_sync_inputs(
         &mut self,
         derivation_index: u32,
-    ) -> (Node, TxGraph, SyncRequest<(KeychainKind, u32)>) {
-        let node = Database::global().global_config.selected_node();
+    ) -> (TxGraph, SyncRequest<(KeychainKind, u32)>) {
         let address =
             self.wallet.bdk.peek_address(KeychainKind::External, derivation_index).address;
         let script_pubkey = address.script_pubkey();
@@ -588,7 +597,7 @@ impl WalletActor {
 
         let graph = self.wallet.bdk.tx_graph().clone();
 
-        (node, graph, sync_request)
+        (graph, sync_request)
     }
 
     async fn handle_receive_address_sync_result(

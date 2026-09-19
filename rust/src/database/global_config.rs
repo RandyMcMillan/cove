@@ -32,6 +32,7 @@ pub enum GlobalConfigKey {
     SelectedNetwork,
     SelectedFiatCurrency,
     SelectedNode(Network),
+    SelectedNodeIsLocal(Network),
     ColorScheme,
     AuthType,
     HashedPinCode,
@@ -55,6 +56,10 @@ impl From<GlobalConfigKey> for &'static str {
             GlobalConfigKey::SelectedNode(Network::Testnet) => "selected_node_testnet",
             GlobalConfigKey::SelectedNode(Network::Testnet4) => "selected_node_testnet4",
             GlobalConfigKey::SelectedNode(Network::Signet) => "selected_node_signet",
+            GlobalConfigKey::SelectedNodeIsLocal(Network::Bitcoin) => "selected_node_is_local_bitcoin",
+            GlobalConfigKey::SelectedNodeIsLocal(Network::Testnet) => "selected_node_is_local_testnet",
+            GlobalConfigKey::SelectedNodeIsLocal(Network::Testnet4) => "selected_node_is_local_testnet4",
+            GlobalConfigKey::SelectedNodeIsLocal(Network::Signet) => "selected_node_is_local_signet",
             GlobalConfigKey::ColorScheme => "color_scheme",
             GlobalConfigKey::AuthType => "auth_type",
             GlobalConfigKey::HashedPinCode => "hashed_pin_code",
@@ -301,6 +306,23 @@ impl GlobalConfigTable {
         self.set(selected_node_key, node_json)?;
         Updater::send_update(Update::SelectedNodeChanged(node.clone()));
 
+        Ok(())
+    }
+
+    pub fn selected_node_is_local(&self) -> bool {
+        let network = self.selected_network();
+        self.get(GlobalConfigKey::SelectedNodeIsLocal(network))
+            .unwrap_or(None)
+            .unwrap_or_else(|| "false".to_string())
+            == "true"
+    }
+
+    pub fn set_selected_node_is_local(&self, is_local: bool) -> Result<()> {
+        let network = self.selected_network();
+        self.set(
+            GlobalConfigKey::SelectedNodeIsLocal(network),
+            is_local.to_string(),
+        )?;
         Ok(())
     }
 

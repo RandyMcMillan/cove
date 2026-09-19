@@ -34,6 +34,8 @@ pub const TESTNET4_ELECTRUM: [(&str, &str); 1] =
 
 pub const SIGNET_ESPLORA: [(&str, &str); 1] = [("mutinynet", "https://mutinynet.com/api")];
 
+pub const LOCAL_NODE_NAME: &str = "Local Node";
+
 #[derive(Debug, Clone, uniffi::Object)]
 pub struct NodeSelector {
     network: Network,
@@ -44,6 +46,7 @@ pub struct NodeSelector {
 pub enum NodeSelection {
     Preset(Node),
     Custom(Node),
+    Local,
 }
 
 type Error = NodeSelectorError;
@@ -61,6 +64,9 @@ pub enum NodeSelectorError {
 
     #[error("unable to parse node url: {0}")]
     ParseNodeUrlError(String),
+
+    #[error("local node is not supported on {0}")]
+    LocalNodeNotSupported(String),
 }
 
 impl_default_for!(NodeSelector);
@@ -69,21 +75,8 @@ impl NodeSelector {
     #[uniffi::constructor]
     pub fn new() -> Self {
         let network = Database::global().global_config.selected_network();
-        let selected_node = Database::global().global_config.selected_node();
-
-        let node_list = node_list(network);
-
-        let node_selection_list = if node_list.contains(&selected_node) {
-            node_list.into_iter().map(NodeSelection::Preset).collect()
-        } else {
-            let mut node_selection_list =
-                node_list.into_iter().map(NodeSelection::Preset).collect::<Vec<NodeSelection>>();
-
-            node_selection_list.push(NodeSelection::Custom(selected_node));
-            node_selection_list
-        };
-
-        Self { network, node_list: node_selection_list }
+        let node_list = build_node_selection_list(network);
+        Self { network, node_list }
     }
 
     #[uniffi::method]
@@ -93,9 +86,14 @@ impl NodeSelector {
 
     #[uniffi::method]
     pub fn selected_node(&self) -> NodeSelection {
+        let is_local = Database::global().global_config.selected_node_is_local();
+        if is_local {
+            return NodeSelection::Local;
+        }
+
         let selected_node = Database::global().global_config.selected_node();
 
-        if node_list(self.network).contains(&selected_node) {
+        if preset_nodes(self.network).contains(&selected_node) {
             NodeSelection::Preset(selected_node)
         } else {
             NodeSelection::Custom(selected_node)
@@ -104,7 +102,12 @@ impl NodeSelector {
 
     #[uniffi::method]
     pub fn select_preset_node(&self, name: String) -> Result<Node, Error> {
-        let node = node_list(self.network)
+        if name == LOCAL_NODE_NAME {
+            self.select_local_node()?;
+            return Ok(Node::default(self.network));
+        }
+
+        let node = preset_nodes(self.network)
             .into_iter()
             .find(|node| node.name == name)
             .or_else(|| {
@@ -121,7 +124,35 @@ impl NodeSelector {
             .set_selected_node(&node)
             .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
 
+        Database::global()
+            .global_config
+            .set_selected_node_is_local(false)
+            .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
+
         Ok(node)
+    }
+
+    #[uniffi::method]
+    pub fn select_local_node(&self) -> Result<(), Error> {
+        if self.network == Network::Testnet4 {
+            return Err(NodeSelectorError::LocalNodeNotSupported(
+                "testnet4".to_string(),
+            ));
+        }
+
+        Database::global()
+            .global_config
+            .set_selected_node_is_local(true)
+            .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
+
+        // Store the default node as a fallback for sync contexts
+        let fallback = Node::default(self.network);
+        Database::global()
+            .global_config
+            .set_selected_node(&fallback)
+            .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
+
+        Ok(())
     }
 
     #[uniffi::method]
@@ -178,13 +209,36 @@ impl NodeSelector {
         Database::global()
             .global_config
             .set_selected_node(&node)
-            .map_err_str(Error::SetSelectedNodeError)?;
+            .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
+
+        Database::global()
+            .global_config
+            .set_selected_node_is_local(false)
+            .map_err_str(NodeSelectorError::SetSelectedNodeError)?;
 
         Ok(())
     }
 }
 
-fn node_list(network: Network) -> Vec<Node> {
+fn build_node_selection_list(network: Network) -> Vec<NodeSelection> {
+    let mut list: Vec<NodeSelection> =
+        preset_nodes(network).into_iter().map(NodeSelection::Preset).collect();
+
+    if network != Network::Testnet4 {
+        list.push(NodeSelection::Local);
+    }
+
+    let selected_node = Database::global().global_config.selected_node();
+    let is_local = Database::global().global_config.selected_node_is_local();
+
+    if !is_local && !preset_nodes(network).contains(&selected_node) {
+        list.push(NodeSelection::Custom(selected_node));
+    }
+
+    list
+}
+
+fn preset_nodes(network: Network) -> Vec<Node> {
     match network {
         Network::Bitcoin => {
             let mut nodes = BITCOIN_ELECTRUM

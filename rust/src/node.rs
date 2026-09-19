@@ -36,11 +36,36 @@ pub struct Node {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub(crate) struct NodeConnectionIdentity {
     network: Network,
     api_type: ApiType,
     url: String,
+    is_local: bool,
+}
+
+impl PartialEq for NodeConnectionIdentity {
+    fn eq(&self, other: &Self) -> bool {
+        if self.is_local && other.is_local {
+            self.network == other.network && self.api_type == other.api_type
+        } else {
+            self.network == other.network
+                && self.api_type == other.api_type
+                && self.url == other.url
+        }
+    }
+}
+
+impl Eq for NodeConnectionIdentity {}
+
+impl std::hash::Hash for NodeConnectionIdentity {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.network.hash(state);
+        self.api_type.hash(state);
+        if !self.is_local {
+            self.url.hash(state);
+        }
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -55,6 +80,7 @@ impl Node {
             network: self.network,
             api_type: self.api_type,
             url: self.url.clone(),
+            is_local: self.name == crate::node_connect::LOCAL_NODE_NAME,
         }
     }
 
@@ -123,6 +149,11 @@ impl From<NodeSelection> for Node {
         match node {
             NodeSelection::Preset(node) => node,
             NodeSelection::Custom(node) => node,
+            NodeSelection::Local => Node::new_electrum(
+                "Local Node".to_string(),
+                String::new(),
+                Network::Bitcoin,
+            ),
         }
     }
 }

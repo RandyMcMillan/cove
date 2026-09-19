@@ -13,6 +13,7 @@ use crate::{
         Database,
         wallet::{WalletInternalMetadataPatch, WalletMetadataPatch},
     },
+    local_node_manager::{resolve_selected_node, selected_node_identity_placeholder},
     manager::wallet_manager::{
         Error, WalletManagerReconcileMessage,
         actor::{WalletActor, WalletScanGeneration},
@@ -84,10 +85,13 @@ impl fmt::Debug for HeightRefreshInFlight {
 impl WalletActor {
     #[into_actor_result]
     pub async fn check_node_connection(&mut self) {
-        let node = Database::global().global_config.selected_node();
+        let node = selected_node_identity_placeholder();
 
         self.addr.send_fut_with(|addr| async move {
-            let result = check_node_connection_inner(&node).await;
+            let result = match resolve_selected_node().await {
+                Ok(resolved) => check_node_connection_inner(&resolved).await,
+                Err(error) => Err(error.to_string()),
+            };
             send!(addr.handle_node_connection_check_result(node, result));
         });
     }
@@ -129,7 +133,7 @@ impl WalletActor {
         reply: Option<HeightReply>,
         generation: Option<WalletScanGeneration>,
     ) {
-        let node = Database::global().global_config.selected_node();
+        let node = selected_node_identity_placeholder();
         let key = NodeRefreshKey { connection_identity: node.connection_identity(), generation };
         if let Some(in_flight) = self.height_refreshes_in_flight.get_mut(&key) {
             in_flight.attach(reply);
@@ -141,7 +145,13 @@ impl WalletActor {
         let node_client = self.node_client.clone();
 
         self.addr.send_fut_with(|addr| async move {
-            let result = fetch_node_height(node, key, node_client).await;
+            let result = match resolve_selected_node().await {
+                Ok(resolved) => fetch_node_height(resolved, key, node_client).await,
+                Err(error) => NodeRefreshResult {
+                    key,
+                    result: Err(Error::NodeConnectionFailed(error.to_string())),
+                },
+            };
             let _ = call!(addr.handle_height_refresh_result(result)).await;
         });
     }
@@ -151,7 +161,7 @@ impl WalletActor {
         reply: Option<BlockIdReply>,
         generation: WalletScanGeneration,
     ) {
-        let node = Database::global().global_config.selected_node();
+        let node = selected_node_identity_placeholder();
         let key = NodeRefreshKey {
             connection_identity: node.connection_identity(),
             generation: Some(generation),
@@ -159,7 +169,13 @@ impl WalletActor {
         let node_client = self.node_client.clone();
 
         self.addr.send_fut_with(|addr| async move {
-            let result = fetch_node_block_id(node, key, node_client).await;
+            let result = match resolve_selected_node().await {
+                Ok(resolved) => fetch_node_block_id(resolved, key, node_client).await,
+                Err(error) => NodeRefreshResult {
+                    key,
+                    result: Err(Error::NodeConnectionFailed(error.to_string())),
+                },
+            };
             let applied = call!(addr.handle_block_id_refresh_result(result)).await;
 
             if let Some(reply) = reply {
@@ -169,10 +185,13 @@ impl WalletActor {
     }
 
     fn start_node_connection(&mut self, reply: Option<NodeConnectionReply>) {
-        let node = Database::global().global_config.selected_node();
+        let node = selected_node_identity_placeholder();
 
         self.addr.send_fut_with(|addr| async move {
-            let result = checked_node_client(&node).await;
+            let result = match resolve_selected_node().await {
+                Ok(resolved) => checked_node_client(&resolved).await,
+                Err(error) => Err(Error::NodeConnectionFailed(error.to_string())),
+            };
             let applied = call!(addr.handle_node_connection_result(node, result)).await;
 
             if let Some(reply) = reply {
@@ -316,7 +335,7 @@ impl WalletActor {
     }
 
     fn is_selected_connection(&self, identity: &NodeConnectionIdentity) -> bool {
-        Database::global().global_config.selected_node().connection_identity() == *identity
+        selected_node_identity_placeholder().connection_identity() == *identity
     }
 
     fn should_apply_node_refresh(&self, key: &NodeRefreshKey) -> bool {
@@ -377,8 +396,7 @@ impl WalletActor {
     }
 
     pub(crate) fn node_client(&mut self) -> Result<&NodeClient, Error> {
-        let selected_node = Database::global().global_config.selected_node();
-        let selected_identity = selected_node.connection_identity();
+        let selected_identity = selected_node_identity_placeholder().connection_identity();
         if self
             .node_client
             .as_ref()

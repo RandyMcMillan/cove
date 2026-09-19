@@ -6,7 +6,7 @@ use cove_types::Network;
 use tracing::{debug, error, info, trace};
 
 use crate::{
-    database::Database,
+    local_node_manager::{resolve_selected_node, selected_node_identity_placeholder},
     manager::wallet_manager::actor::WalletActor,
     node::{
         client::{Error as NodeError, NodeClient, NodeClientOptions},
@@ -93,18 +93,28 @@ impl TransactionWatcher {
             return Produces::ok(());
         }
 
-        let selected_node = Database::global().global_config.selected_node();
-        let connection_identity = selected_node.connection_identity();
+        let connection_identity = selected_node_identity_placeholder().connection_identity();
         let client = self
             .client
             .take()
             .filter(|client| client.connection_identity() == &connection_identity);
-        let builder = NodeClientBuilder { node: selected_node, options: self.options };
+        let options = self.options;
         let tx_id = self.tx_id;
 
         trace!("checking txn: {tx_id}");
         self.addr.send_fut_with(|addr| async move {
-            let result = poll_transaction(client, builder, tx_id).await;
+            let result = match resolve_selected_node().await {
+                Ok(node) => {
+                    let builder = NodeClientBuilder { node, options };
+                    poll_transaction(client, builder, tx_id).await
+                }
+                Err(error) => TransactionWatcherPollResult::Failed(NodeError::EsploraConnect(
+                    bdk_esplora::esplora_client::Error::HttpResponse {
+                        status: 0,
+                        message: error.to_string(),
+                    },
+                )),
+            };
             send!(addr.handle_poll_result(result));
         });
 
