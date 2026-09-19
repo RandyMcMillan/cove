@@ -195,7 +195,10 @@ impl LocalNode {
     /// Polls the electrum and esplora ports with a short timeout until one
     /// responds or the overall deadline expires. Returns the URL that became
     /// ready first.
-    pub async fn wait_for_ready(&self, timeout_secs: u64) -> Result<&LocalNodeUrls, LocalNodeError> {
+    pub async fn wait_for_ready(
+        &self,
+        timeout_secs: u64,
+    ) -> Result<&LocalNodeUrls, LocalNodeError> {
         let urls = self.urls.as_ref().ok_or_else(|| LocalNodeError::NotRunning)?;
         let deadline = tokio::time::Instant::now() + tokio::time::Duration::from_secs(timeout_secs);
 
@@ -352,5 +355,27 @@ mod tests {
     fn build_config_rejects_testnet4() {
         let result = build_config(Network::Testnet4);
         assert!(matches!(result, Err(LocalNodeError::UnsupportedNetwork(_))));
+    }
+
+    #[test]
+    fn parse_addr_parses_url_schemes() {
+        let cases = [
+            ("ssl://127.0.0.1:50001", "127.0.0.1:50001"),
+            ("tcp://127.0.0.1:50001", "127.0.0.1:50001"),
+            ("http://127.0.0.1:3000", "127.0.0.1:3000"),
+            ("https://127.0.0.1:3000", "127.0.0.1:3000"),
+            ("127.0.0.1:8080", "127.0.0.1:8080"),
+        ];
+
+        for (input, expected) in cases {
+            let addr = parse_addr(input).unwrap_or_else(|e| panic!("parse_addr({input}) failed: {e}"));
+            assert_eq!(addr.to_string(), expected, "for input {input}");
+        }
+    }
+
+    #[test]
+    fn parse_addr_rejects_invalid() {
+        assert!(parse_addr("not-an-address").is_err());
+        assert!(parse_addr("").is_err());
     }
 }
