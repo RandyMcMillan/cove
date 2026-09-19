@@ -195,6 +195,41 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
+## Phase 12: App Lifecycle Hooks (DONE)
+
+**Goal:** Provide Rust hooks for mobile frontends to stop/resume the local node on app background/foreground.
+
+- [x] Add `local_node_app_backgrounded()` UniFFI export — stops node cooperatively
+- [x] Add `local_node_app_foregrounded()` UniFFI export — restarts node if selected
+- [x] Regenerate iOS Swift and Android Kotlin bindings
+
+**Files touched:**
+- `src/lib.rs`
+- `src/local_node_manager.rs`
+
+**Note:** iOS/Android call sites (`applicationDidEnterBackground`, `onStop`, etc.) are left for mobile frontend teams.
+
+---
+
+## Phase 13: Local Node Config (DONE)
+
+**Goal:** Allow mobile-friendly tuning of rbitcoin peer and bandwidth settings.
+
+- [x] Add `LocalNodeConfig` struct with `max_outbound` and `blocksonly` fields
+- [x] Add `build_config_with_options(network, options)` in `cove-rbitcoin`
+- [x] Wire `LocalNodeConfig` through `LocalNode::start()` and `LocalNodeManager`
+- [x] Mobile defaults: `max_outbound: 4`, `blocksonly: false`
+
+**Files touched:**
+- `crates/cove-rbitcoin/src/config.rs`
+- `crates/cove-rbitcoin/src/node.rs`
+- `crates/cove-rbitcoin/src/lib.rs`
+- `src/local_node_manager.rs`
+
+**Note:** Database persistence and UI controls for config are left for later when the frontend exposes settings.
+
+---
+
 ## Phase 8: End-to-End Verification (PARTIAL)
 
 **Goal:** Validate the full flow on device/simulator.
@@ -225,6 +260,8 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 3. **Testnet4** intentionally excludes Local node (rbitcoin doesn't support it).
 
 4. **rbitcoin nested repo** changes were committed separately; remember to push both repos.
+
+5. **iOS `AppManager` environment in sheets on Mac Catalyst** — fixed by explicitly injecting `.environment(context.app)` into `SelectedWalletSheetContent` views.
 
 ---
 
