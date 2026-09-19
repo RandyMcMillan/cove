@@ -119,6 +119,12 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
         manager.start(network).await?;
     }
 
+    // Ensure the RPC endpoint is actually accepting connections before handing
+    // the URL to wallet sync code.
+    if let Some(ref node) = manager.node {
+        node.wait_for_ready(30).await?;
+    }
+
     let urls = manager.urls().ok_or_else(|| LocalNodeError::NotRunning)?;
 
     let (api_type, url) = match network {

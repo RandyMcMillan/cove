@@ -4,7 +4,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 use rbitcoin_node::{NodeError, Shutdown, run_node, run_p2p_with_handle};
-use tokio::net::TcpListener;
+use tokio::net::{TcpListener, TcpStream};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info, warn};
 
@@ -189,6 +189,39 @@ impl LocalNode {
         self.tip_height = None;
         self.initial_block_download = None;
     }
+
+    /// Wait for the RPC listener to accept connections.
+    ///
+    /// Polls the electrum and esplora ports with a short timeout until one
+    /// responds or the overall deadline expires. Returns the URL that became
+    /// ready first.
+    pub async fn wait_for_ready(&self, timeout_secs: u64) -> Result<&LocalNodeUrls, LocalNodeError> {
+        let urls = self.urls.as_ref().ok_or_else(|| LocalNodeError::NotRunning)?;
+        let deadline = tokio::time::Instant::now() + tokio::time::Duration::from_secs(timeout_secs);
+
+        let electrum_addr = parse_addr(&urls.electrum)?;
+        let esplora_addr = parse_addr(&urls.esplora)?;
+
+        loop {
+            if tokio::time::Instant::now() >= deadline {
+                return Err(LocalNodeError::P2PStart(format!(
+                    "RPC did not become ready within {timeout_secs}s"
+                )));
+            }
+
+            if TcpStream::connect(electrum_addr).await.is_ok() {
+                debug!("electrum port {electrum_addr} is ready");
+                return Ok(urls);
+            }
+
+            if TcpStream::connect(esplora_addr).await.is_ok() {
+                debug!("esplora port {esplora_addr} is ready");
+                return Ok(urls);
+            }
+
+            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+        }
+    }
 }
 
 impl Drop for LocalNode {
@@ -205,6 +238,20 @@ impl Drop for LocalNode {
 }
 
 /// Bind to `127.0.0.1:0` to get a free port, then return the address.
+/// Parse a `host:port` address from a URL string like `ssl://127.0.0.1:50001`.
+fn parse_addr(url: &str) -> Result<SocketAddr, LocalNodeError> {
+    let stripped = url
+        .strip_prefix("ssl://")
+        .or_else(|| url.strip_prefix("tcp://"))
+        .or_else(|| url.strip_prefix("http://"))
+        .or_else(|| url.strip_prefix("https://"))
+        .unwrap_or(url);
+
+    stripped.parse().map_err(|e| {
+        LocalNodeError::Config(format!("failed to parse socket address from '{url}': {e}"))
+    })
+}
+
 async fn find_free_port() -> Result<SocketAddr, LocalNodeError> {
     let listener = TcpListener::bind("127.0.0.1:0")
         .await
