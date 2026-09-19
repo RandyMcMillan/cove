@@ -1,0 +1,3 @@
+[submodule "rust/rbitcoin"]
+	path = rust/rbitcoin
+	url = https://github.com/RandyMcMillan/rbitcoin.git
