@@ -237,7 +237,7 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - [x] iOS Swift compilation: `just compile-ios` — BUILD SUCCEEDED
 - [x] Rust lib tests: `cargo test --lib` — 1647 passed, 1 pre-existing flaky failure (fee_client)
 - [x] rbitcoin-node tests: `cargo test -p rbitcoin-node --lib run::tests` — 35 passed
-- [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 6 passed
+- [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 8 passed
 - [ ] iOS: `just build-run-ios --udid <device>` with local node selected
 - [x] Android: `just build-android` — BUILD SUCCEEDED (Kotlin bindings regenerated)
 - [ ] Verify wallet sync completes against local Esplora/Electrum
