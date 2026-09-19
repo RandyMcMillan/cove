@@ -10,7 +10,7 @@ use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{LocalNodeUrls, build_config, build_config_with_options, datadir_for_network};
+use crate::config::{LocalNodeUrls, build_config_with_options, datadir_for_network};
 use crate::error::LocalNodeError;
 
 /// Minimum free disk space required to start a local node (1 GB).
