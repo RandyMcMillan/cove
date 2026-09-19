@@ -21,34 +21,38 @@ struct LocalNodeSettingsView: View {
     @State private var logLevel: String = "info"
     let logLevels = ["error", "warn", "info", "debug", "trace"]
 
-    // approximate space taken by status + actions sections + nav bar + padding
-    private let fixedSectionsHeight: CGFloat = 320
-
     var body: some View {
         GeometryReader { geometry in
-            Form {
-                LocalNodeStatusSection(
-                    isRunning: isRunning,
-                    tipHeight: tipHeight,
-                    isInIbd: isInIbd,
-                    datadirSize: datadirSize
-                )
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        LocalNodeStatusSection(
+                            isRunning: isRunning,
+                            tipHeight: tipHeight,
+                            isInIbd: isInIbd,
+                            datadirSize: datadirSize
+                        )
 
-                LocalNodeActionsSection(
-                    isRunning: isRunning,
-                    onStart: startNode,
-                    onStop: stopNode,
-                    onClear: { showClearConfirm = true }
-                )
+                        LocalNodeActionsSection(
+                            isRunning: isRunning,
+                            onStart: startNode,
+                            onStop: stopNode,
+                            onClear: { showClearConfirm = true }
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                }
+                .scrollIndicators(.hidden)
+                .frame(maxHeight: geometry.size.height * 0.35)
 
                 LocalNodeLogSection(
                     logLines: logLines,
                     logLevel: $logLevel,
-                    onSetLogLevel: setLogLevel,
-                    maxHeight: max(120, geometry.size.height - fixedSectionsHeight)
+                    onSetLogLevel: setLogLevel
                 )
+                .frame(maxHeight: .infinity)
             }
-            .scrollContentBackground(.hidden)
         }
         .navigationTitle("Local Node")
         .onAppear {
@@ -74,7 +78,6 @@ struct LocalNodeSettingsView: View {
     }
 
     private func startPolling() {
-        // Poll faster during IBD (0.5s) vs idle (2s)
         let interval = (isRunning && isInIbd == true) ? 0.5 : 2.0
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             Task { await refreshState() }
@@ -100,12 +103,10 @@ struct LocalNodeSettingsView: View {
             isInIbd = await localNodeIsInIbd()
             datadirSize = try await localNodeDatadirSize()
 
-            // Adjust polling speed when IBD state changes
             if wasRunning != isRunning || wasIbd != isInIbd {
                 await MainActor.run { restartPolling() }
             }
 
-            // Fetch logs
             let logs = await localNodeLogs(limit: 100)
             await MainActor.run {
                 logLines = logs
@@ -162,20 +163,33 @@ private struct LocalNodeStatusSection: View {
     let datadirSize: UInt64?
 
     var body: some View {
-        Section("Status") {
-            StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Status")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
 
-            if let tipHeight {
-                StatusRow(title: "Block Height", value: "\(tipHeight)")
-            }
+            VStack(spacing: 0) {
+                StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
 
-            if let isInIbd {
-                StatusRow(title: "Initial Block Download", value: isInIbd ? "Yes" : "No")
-            }
+                if let tipHeight {
+                    Divider()
+                    StatusRow(title: "Block Height", value: "\(tipHeight)")
+                }
 
-            if let datadirSize {
-                StatusRow(title: "Data Directory", value: formatBytes(datadirSize))
+                if let isInIbd {
+                    Divider()
+                    StatusRow(title: "Initial Block Download", value: isInIbd ? "Yes" : "No")
+                }
+
+                if let datadirSize {
+                    Divider()
+                    StatusRow(title: "Data Directory", value: formatBytes(datadirSize))
+                }
             }
+            .padding(.vertical, 4)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(10)
         }
     }
 }
@@ -192,6 +206,8 @@ private struct StatusRow: View {
                 .foregroundStyle(.secondary)
                 .font(.subheadline)
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 }
 
@@ -202,15 +218,35 @@ private struct LocalNodeActionsSection: View {
     let onClear: () -> Void
 
     var body: some View {
-        Section("Actions") {
-            if isRunning {
-                Button("Stop Node", role: .destructive, action: onStop)
-            } else {
-                Button("Start Node", action: onStart)
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Actions")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
 
-            Button("Clear Data Directory", role: .destructive, action: onClear)
-                .disabled(isRunning)
+            VStack(spacing: 0) {
+                if isRunning {
+                    Button("Stop Node", role: .destructive, action: onStop)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                } else {
+                    Button("Start Node", action: onStart)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                }
+
+                Divider()
+
+                Button("Clear Data Directory", role: .destructive, action: onClear)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .disabled(isRunning)
+            }
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(10)
         }
     }
 }
@@ -219,25 +255,35 @@ private struct LocalNodeLogSection: View {
     let logLines: [String]
     @Binding var logLevel: String
     let onSetLogLevel: (String) -> Void
-    let maxHeight: CGFloat
 
     var body: some View {
-        Section {
-            LogLevelPillBox(selected: $logLevel, onSelect: onSetLogLevel)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Console")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                LogLevelPillBox(selected: $logLevel, onSelect: onSetLogLevel)
+                    .frame(width: 280)
+            }
+            .padding(.horizontal, 16)
 
             if logLines.isEmpty {
                 Text("No logs yet…")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                    .padding(.vertical, 8)
             } else {
                 LogConsoleView(lines: logLines)
-                    .frame(maxWidth: .infinity, maxHeight: maxHeight)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-        } header: {
-            Text("Console")
         }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
+        .frame(maxHeight: .infinity)
     }
 }
 
@@ -294,7 +340,7 @@ private struct LogConsoleView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(Color(.systemGray6))
-            .cornerRadius(8)
+            .cornerRadius(10)
             .scrollIndicators(.hidden)
             .onChange(of: lines.count) { _, _ in
                 if let last = lines.indices.last {
