@@ -36,7 +36,7 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - `crates/cove-rbitcoin/src/error.rs`
 - `crates/cove-rbitcoin/src/lib.rs`
 
-**Tests:** `cargo test -p cove-rbitcoin --lib` — 4 passed
+**Tests:** `cargo test -p cove-rbitcoin --lib` — 6 passed
 
 ---
 
@@ -162,6 +162,39 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
+## Phase 10: iOS Xcode Auto-Build + Mac Catalyst (DONE)
+
+**Goal:** Ensure Xcode builds the Rust library automatically and supports Mac Catalyst.
+
+- [x] Add inline Run Script build phase to Cove target for automatic xcframework rebuild
+- [x] Handle sandbox restrictions by embedding script directly in build phase
+- [x] Auto-install `just` via cargo if not available in Xcode env
+- [x] Add `aarch64-apple-ios-macabi` target to xtask build
+- [x] Update `compile-ios` justfile recipe to check for macabi slice
+- [x] xcframework now contains: ios-arm64, ios-arm64-simulator, ios-arm64-maccatalyst
+
+**Files touched:**
+- `xtask/src/ios.rs`
+- `justfile`
+- `ios/Cove.xcodeproj/project.pbxproj`
+
+---
+
+## Phase 11: RPC Health Check (DONE)
+
+**Goal:** Ensure the local node's RPC endpoint is actually accepting connections before wallet sync tries to use it.
+
+- [x] Add `LocalNode::wait_for_ready(timeout_secs)` that polls electrum/esplora ports
+- [x] Add `parse_addr()` helper for URL → SocketAddr parsing
+- [x] Call `wait_for_ready(30)` in `resolve_selected_node()` after start
+- [x] Add unit tests for `parse_addr`
+
+**Files touched:**
+- `crates/cove-rbitcoin/src/node.rs`
+- `src/local_node_manager.rs`
+
+---
+
 ## Phase 8: End-to-End Verification (PARTIAL)
 
 **Goal:** Validate the full flow on device/simulator.
@@ -169,7 +202,7 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 - [x] iOS Swift compilation: `just compile-ios` — BUILD SUCCEEDED
 - [x] Rust lib tests: `cargo test --lib` — 1647 passed, 1 pre-existing flaky failure (fee_client)
 - [x] rbitcoin-node tests: `cargo test -p rbitcoin-node --lib run::tests` — 35 passed
-- [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 4 passed
+- [x] cove-rbitcoin tests: `cargo test -p cove-rbitcoin --lib` — 6 passed
 - [ ] iOS: `just build-run-ios --udid <device>` with local node selected
 - [x] Android: `just build-android` — BUILD SUCCEEDED (Kotlin bindings regenerated)
 - [ ] Verify wallet sync completes against local Esplora/Electrum
@@ -184,8 +217,7 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ## Blockers / Notes
 
-1. **Android NDK** not installed on build machine. `just build-android` fails at `cargo ndk`.
-   Workaround: generate Kotlin bindings from host `libcove.dylib` via `uniffi_cli`.
+1. ~~**Android NDK** not installed on build machine.~~ RESOLVED — NDK installed via brew, `just build-android` passes.
 
 2. **Global cargo target-dir** is `~/.cache/cargo`. xtask expects `./target/`.
    Workaround: symlink `rust/target -> ~/.cache/cargo`.
