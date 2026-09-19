@@ -276,6 +276,7 @@ private struct LogConsoleView: View {
             }
             .background(Color(.systemGray6))
             .cornerRadius(8)
+            .scrollIndicators(.hidden)
             .onChange(of: lines.count) { _, _ in
                 if let last = lines.indices.last {
                     withAnimation {
