@@ -24,10 +24,12 @@ impl LocalNodeManager {
         Self { node: None, config: None }
     }
 
+    #[allow(dead_code)]
     pub fn set_config(&mut self, config: cove_rbitcoin::LocalNodeConfig) {
         self.config = Some(config);
     }
 
+    #[allow(dead_code)]
     pub fn clear_config(&mut self) {
         self.config = None;
     }
