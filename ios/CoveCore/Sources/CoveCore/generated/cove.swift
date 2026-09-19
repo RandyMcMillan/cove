@@ -37134,6 +37134,7 @@ public enum SettingsRoute: Equatable, Hashable {
     case allWallets
     case about
     case cloudBackup
+    case localNode
 
 
 
@@ -37175,6 +37176,8 @@ public struct FfiConverterTypeSettingsRoute: FfiConverterRustBuffer {
         case 9: return .about
 
         case 10: return .cloudBackup
+
+        case 11: return .localNode
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -37224,6 +37227,10 @@ public struct FfiConverterTypeSettingsRoute: FfiConverterRustBuffer {
 
         case .cloudBackup:
             writeInt(&buf, Int32(10))
+
+
+        case .localNode:
+            writeInt(&buf, Int32(11))
 
         }
     }
