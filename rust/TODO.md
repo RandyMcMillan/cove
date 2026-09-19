@@ -102,21 +102,27 @@ Users can select "Local Node" from the node selector to run a lightweight Bitcoi
 
 ---
 
-## Phase 6: Local Node Auto-Start / Status Reporting (PENDING)
+## Phase 6: Local Node Status Reporting (DONE)
 
-**Goal:** Expose IBD progress, tip height, and running state to the UI so users know
-the local node is syncing.
+**Goal:** Expose IBD status and tip height to the UI so users know the local node is syncing.
 
-- [ ] Add `local_node_ibd_progress() -> Option<f64>` UniFFI export
-- [ ] Add `local_node_tip_height() -> Option<u32>` UniFFI export
-- [ ] Add `local_node_status() -> LocalNodeStatus` enum (`Idle`, `Starting`, `IBD(f64)`, `Ready`)
-- [ ] Bridge status into Swift/Kotlin UI (settings screen, status bar)
-- [ ] Consider auto-starting local node when selected and not running
+- [x] Add `tip_height: Arc<AtomicU32>` and `initial_block_download: Arc<AtomicBool>` to `NodeHandle`
+- [x] Add `run_p2p_with_handle(handle: NodeHandle, shutdown)` so callers can inspect status atomics
+- [x] Update cove-rbitcoin to use `run_p2p_with_handle` and expose `tip_height()` / `is_in_ibd()`
+- [x] UniFFI-export `local_node_tip_height() -> Option<u32>`
+- [x] UniFFI-export `local_node_is_in_ibd() -> Option<bool>`
+- [x] Regenerate iOS Swift and Android Kotlin bindings
 
-**Open questions:**
-- Should selecting "Local Node" immediately trigger `local_node_start()`?
-- Or should we show a "Start Local Node" toggle and let the user control it?
-- How do we handle IBD on mobile (battery, storage, bandwidth)?
+**Files touched (rbitcoin nested repo):**
+- `crates/rbitcoin-node/src/run.rs`
+- `crates/rbitcoin-node/src/lib.rs`
+
+**Files touched (cove repo):**
+- `crates/cove-rbitcoin/src/node.rs`
+- `src/lib.rs`
+- `src/local_node_manager.rs`
+
+**Note:** IBD progress percentage is not yet available — rbitcoin's progress internals are `pub(crate)`. For now the UI can show tip height + "Syncing" / "Ready" based on `is_in_ibd`.
 
 ---
 
