@@ -160,6 +160,12 @@ pub enum LocalNodeStartError {
     #[error("unsupported network for local node: {0}")]
     UnsupportedNetwork(String),
 
+    #[error("insufficient disk space: {0}")]
+    InsufficientDiskSpace(String),
+
+    #[error("failed to remove datadir: {0}")]
+    DatadirRemove(String),
+
     #[error("rbitcoin config error: {0}")]
     Config(String),
 }
@@ -173,6 +179,8 @@ impl From<cove_rbitcoin::LocalNodeError> for LocalNodeStartError {
             cove_rbitcoin::LocalNodeError::EsploraStart(s) => Self::EsploraStart(s),
             cove_rbitcoin::LocalNodeError::NotRunning => Self::NotRunning,
             cove_rbitcoin::LocalNodeError::UnsupportedNetwork(s) => Self::UnsupportedNetwork(s),
+            cove_rbitcoin::LocalNodeError::InsufficientDiskSpace(s) => Self::InsufficientDiskSpace(s),
+            cove_rbitcoin::LocalNodeError::DatadirRemove(s) => Self::DatadirRemove(s),
             cove_rbitcoin::LocalNodeError::Config(s) => Self::Config(s),
         }
     }
@@ -207,4 +215,23 @@ async fn local_node_is_in_ibd() -> Option<bool> {
         .lock()
         .await
         .is_in_ibd()
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_datadir_size() -> Result<u64, LocalNodeStartError> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .datadir_size()
+        .map_err(LocalNodeStartError::from)
+}
+
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_clear_datadir() -> Result<(), LocalNodeStartError> {
+    local_node_manager::LOCAL_NODE_MANAGER
+        .lock()
+        .await
+        .clear_datadir()
+        .await
+        .map_err(LocalNodeStartError::from)
 }

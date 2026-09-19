@@ -31892,6 +31892,10 @@ enum LocalNodeStartError: Swift.Error, Equatable, Hashable, Foundation.Localized
     case NotRunning
     case UnsupportedNetwork(String
     )
+    case InsufficientDiskSpace(String
+    )
+    case DatadirRemove(String
+    )
     case Config(String
     )
 
@@ -31939,7 +31943,13 @@ public struct FfiConverterTypeLocalNodeStartError: FfiConverterRustBuffer {
         case 6: return .UnsupportedNetwork(
             try FfiConverterString.read(from: &buf)
             )
-        case 7: return .Config(
+        case 7: return .InsufficientDiskSpace(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 8: return .DatadirRemove(
+            try FfiConverterString.read(from: &buf)
+            )
+        case 9: return .Config(
             try FfiConverterString.read(from: &buf)
             )
 
@@ -31983,8 +31993,18 @@ public struct FfiConverterTypeLocalNodeStartError: FfiConverterRustBuffer {
             FfiConverterString.write(v1, into: &buf)
 
 
-        case let .Config(v1):
+        case let .InsufficientDiskSpace(v1):
             writeInt(&buf, Int32(7))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .DatadirRemove(v1):
+            writeInt(&buf, Int32(8))
+            FfiConverterString.write(v1, into: &buf)
+
+
+        case let .Config(v1):
+            writeInt(&buf, Int32(9))
             FfiConverterString.write(v1, into: &buf)
 
         }
@@ -46476,6 +46496,34 @@ private func uniffiForeignFutureDroppedCallback(handle: UInt64) {
 public func uniffiForeignFutureHandleCountCove() -> Int {
     UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.count
 }
+public func localNodeClearDatadir()async throws   {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_clear_datadir(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_void,
+            completeFunc: ffi_cove_rust_future_complete_void,
+            freeFunc: ffi_cove_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: FfiConverterTypeLocalNodeStartError_lift
+        )
+}
+public func localNodeDatadirSize()async throws  -> UInt64  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_datadir_size(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_u64,
+            completeFunc: ffi_cove_rust_future_complete_u64,
+            freeFunc: ffi_cove_rust_future_free_u64,
+            liftFunc: FfiConverterUInt64.lift,
+            errorHandler: FfiConverterTypeLocalNodeStartError_lift
+        )
+}
 public func localNodeElectrumUrl()async  -> String?  {
     return
         try!  await uniffiRustCallAsync(
@@ -47208,6 +47256,12 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_cove_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_clear_datadir() != 23646) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_datadir_size() != 18142) {
+        return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_electrum_url() != 10327) {
         return InitializationResult.apiChecksumMismatch

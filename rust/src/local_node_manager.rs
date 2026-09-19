@@ -39,6 +39,29 @@ impl LocalNodeManager {
         self.node.as_ref().and_then(LocalNode::is_in_ibd)
     }
 
+    pub fn datadir_size(&self) -> Result<u64, LocalNodeError> {
+        let network = self.node.as_ref().map_or_else(
+            || Database::global().global_config.selected_network(),
+            |n| n.network(),
+        );
+        let path = cove_rbitcoin::datadir_for_network(network);
+        if !path.exists() {
+            return Ok(0);
+        }
+        cove_rbitcoin::dir_size(&path)
+    }
+
+    pub async fn clear_datadir(&mut self) -> Result<(), LocalNodeError> {
+        self.stop().await;
+        let network = Database::global().global_config.selected_network();
+        let path = cove_rbitcoin::datadir_for_network(network);
+        if path.exists() {
+            std::fs::remove_dir_all(&path)
+                .map_err(|e| LocalNodeError::DatadirRemove(format!("{}: {e}", path.display())))?;
+        }
+        Ok(())
+    }
+
     #[allow(dead_code)]
     pub fn network(&self) -> Option<Network> {
         self.node.as_ref().map(LocalNode::network)

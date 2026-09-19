@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
 
@@ -9,8 +10,26 @@ use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{build_config, LocalNodeUrls};
+use crate::config::{build_config, datadir_for_network, LocalNodeUrls};
 use crate::error::LocalNodeError;
+
+/// Minimum free disk space required to start a local node (1 GB).
+const MIN_FREE_SPACE_BYTES: u64 = 1024 * 1024 * 1024;
+
+/// Format a byte count as human-readable string (GB, MB, KB).
+pub fn format_bytes(bytes: u64) -> String {
+    const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB"];
+    let mut size = bytes as f64;
+    let mut unit = UNITS[0];
+    for &next in UNITS {
+        unit = next;
+        if size < 1024.0 {
+            break;
+        }
+        size /= 1024.0;
+    }
+    format!("{size:.1} {unit}")
+}
 
 /// Running local rbitcoin node.
 pub struct LocalNode {
@@ -62,7 +81,29 @@ impl LocalNode {
             .map(|a| a.load(Ordering::SeqCst))
     }
 
-    /// Start the local node: find free ports, build config, and spawn `run_p2p_with_handle`.
+    /// Total size of the rbitcoin datadir for this node's network.
+    pub fn datadir_size(&self) -> Result<u64, LocalNodeError> {
+        let path = datadir_for_network(self.network);
+        if !path.exists() {
+            return Ok(0);
+        }
+        dir_size(&path)
+    }
+
+    /// Remove the rbitcoin datadir for this node's network.
+    ///
+    /// The caller should ensure the node is stopped first.
+    pub fn clear_datadir(&self) -> Result<(), LocalNodeError> {
+        let path = datadir_for_network(self.network);
+        if path.exists() {
+            std::fs::remove_dir_all(&path).map_err(|e| {
+                LocalNodeError::DatadirRemove(format!("{}: {e}", path.display()))
+            })?;
+        }
+        Ok(())
+    }
+
+    /// Start the local node: find free ports, build config, check disk, and spawn `run_p2p_with_handle`.
     pub async fn start(&mut self) -> Result<(), LocalNodeError> {
         if self.is_running() {
             warn!("local node already running");
@@ -70,6 +111,16 @@ impl LocalNode {
         }
 
         info!("starting local rbitcoin node for {}", self.network);
+
+        let datadir = datadir_for_network(self.network);
+        let free = available_disk_space(&datadir)?;
+        if free < MIN_FREE_SPACE_BYTES {
+            return Err(LocalNodeError::InsufficientDiskSpace(format!(
+                "{} free ({} required)",
+                format_bytes(free),
+                format_bytes(MIN_FREE_SPACE_BYTES)
+            )));
+        }
 
         let electrum_addr = find_free_port().await?;
         let esplora_addr = find_free_port().await?;
@@ -178,6 +229,62 @@ async fn find_free_port() -> Result<SocketAddr, LocalNodeError> {
     drop(listener);
 
     Ok(addr)
+}
+
+/// Recursively calculate the total size of a directory in bytes.
+pub fn dir_size(path: &Path) -> Result<u64, LocalNodeError> {
+    let mut total = 0u64;
+    let mut stack = vec![path.to_path_buf()];
+
+    while let Some(dir) = stack.pop() {
+        let entries = std::fs::read_dir(&dir)
+            .map_err(|e| LocalNodeError::Config(format!("read_dir {}: {e}", dir.display())))?;
+
+        for entry in entries {
+            let entry = entry
+                .map_err(|e| LocalNodeError::Config(format!("dir entry in {}: {e}", dir.display())))?;
+            let meta = entry
+                .metadata()
+                .map_err(|e| LocalNodeError::Config(format!("metadata {}: {e}", entry.path().display())))?;
+
+            if meta.is_dir() {
+                stack.push(entry.path());
+            } else {
+                total += meta.len();
+            }
+        }
+    }
+
+    Ok(total)
+}
+
+/// Return available disk space in bytes for the filesystem containing `path`.
+#[cfg(unix)]
+fn available_disk_space(path: &Path) -> Result<u64, LocalNodeError> {
+    use std::ffi::CString;
+    use std::os::unix::ffi::OsStrExt;
+
+    let c_path = CString::new(path.as_os_str().as_bytes())
+        .map_err(|e| LocalNodeError::Config(format!("invalid path: {e}")))?;
+
+    let mut stat: libc::statvfs = unsafe { std::mem::zeroed() };
+    let rc = unsafe { libc::statvfs(c_path.as_ptr(), &mut stat) };
+    if rc != 0 {
+        return Err(LocalNodeError::Config(format!(
+            "statvfs {}: {}",
+            path.display(),
+            std::io::Error::last_os_error()
+        )));
+    }
+
+    Ok(u64::from(stat.f_bavail) * u64::from(stat.f_frsize))
+}
+
+#[cfg(not(unix))]
+fn available_disk_space(_path: &Path) -> Result<u64, LocalNodeError> {
+    Err(LocalNodeError::Config(
+        "disk space check not supported on this platform".to_string(),
+    ))
 }
 
 #[cfg(test)]

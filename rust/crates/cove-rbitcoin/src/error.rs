@@ -20,4 +20,10 @@ pub enum LocalNodeError {
 
     #[error("rbitcoin config error: {0}")]
     Config(String),
+
+    #[error("insufficient disk space: {0}")]
+    InsufficientDiskSpace(String),
+
+    #[error("failed to remove datadir: {0}")]
+    DatadirRemove(String),
 }

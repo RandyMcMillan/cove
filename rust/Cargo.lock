@@ -1617,6 +1617,7 @@ dependencies = [
  "cove-types",
  "cove-util",
  "eyre",
+ "libc",
  "rbitcoin-consensus",
  "rbitcoin-electrum",
  "rbitcoin-esplora",
