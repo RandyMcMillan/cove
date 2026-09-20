@@ -44,6 +44,24 @@ struct LocalNodeSettingsView: View {
         return nil
     }
 
+    private var filteredLogLines: [String] {
+        let selectedLevel = logLevelFor(logLevel)
+        return logLines.filter { line in
+            let lineLevel = logLevelFor(line)
+            return lineLevel <= selectedLevel
+        }
+    }
+
+    private func logLevelFor(_ source: String) -> Int {
+        let upper = source.uppercased()
+        if upper.hasPrefix("TRACE") { return 5 }
+        if upper.hasPrefix("DEBUG") { return 4 }
+        if upper.hasPrefix("INFO") { return 3 }
+        if upper.hasPrefix("WARN") { return 2 }
+        if upper.hasPrefix("ERROR") { return 1 }
+        return 3
+    }
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -70,7 +88,7 @@ struct LocalNodeSettingsView: View {
                     .padding(.top, 16)
 
                     LocalNodeLogSection(
-                        logLines: logLines,
+                        logLines: filteredLogLines,
                         logLevel: $logLevel,
                         onSetLogLevel: setLogLevel
                     )
@@ -113,8 +131,7 @@ struct LocalNodeSettingsView: View {
         .navigationTitle("Local Node")
         .onAppear {
             Task {
-                let ok = await localNodeSetLogLevel(level: logLevel)
-                if !ok { logLevel = "info" }
+                await localNodeSetLogLevel(level: "trace")
                 await refreshState()
             }
             startPolling()
