@@ -12,45 +12,102 @@ struct LocalNodeSettingsView: View {
     @State private var tipHeight: UInt32?
     @State private var isInIbd: Bool?
     @State private var datadirSize: UInt64?
+    @State private var peerCount: UInt32?
     @State private var errorMessage: String?
     @State private var showClearConfirm = false
     @State private var timer: Timer? = nil
     @State private var isNetworkConnected = true
+
+    // peers panel (macOS only)
+    @State private var showPeersPanel = false
+    @State private var peersPanelWidthRatio: CGFloat = 0.66
 
     // logging
     @State private var logLines: [String] = []
     @State private var logLevel: String = "info"
     let logLevels = ["error", "warn", "info", "debug", "trace"]
 
+    private var isMac: Bool {
+        ProcessInfo.processInfo.isMacCatalystApp
+    }
+
+    private var horizonFromLogs: UInt32? {
+        for line in logLines.reversed() {
+            if let range = line.range(of: "horizon=") {
+                let after = line[range.upperBound...]
+                let number = after.prefix(while: { $0.isNumber })
+                if let value = UInt32(number) {
+                    return value
+                }
+            }
+        }
+        return nil
+    }
+
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 0) {
-                LocalNodeStatusSection(
-                    isRunning: isRunning,
-                    tipHeight: tipHeight,
-                    isInIbd: isInIbd,
-                    datadirSize: datadirSize,
-                    isNetworkConnected: isNetworkConnected
-                )
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
+            ZStack {
+                VStack(spacing: 0) {
+                    LocalNodeStatusSection(
+                        isRunning: isRunning,
+                        tipHeight: tipHeight,
+                        isInIbd: isInIbd,
+                        datadirSize: datadirSize,
+                        peerCount: peerCount,
+                        horizon: horizonFromLogs,
+                        isNetworkConnected: isNetworkConnected
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
 
-                LocalNodeActionsSection(
-                    isRunning: isRunning,
-                    onStart: startNode,
-                    onStop: stopNode,
-                    onClear: { showClearConfirm = true }
-                )
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
+                    LocalNodeActionsSection(
+                        isRunning: isRunning,
+                        onStart: startNode,
+                        onStop: stopNode,
+                        onClear: { showClearConfirm = true }
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
 
-                LocalNodeLogSection(
-                    logLines: logLines,
-                    logLevel: $logLevel,
-                    onSetLogLevel: setLogLevel
-                )
-                .padding(.top, 16)
-                .frame(maxHeight: .infinity)
+                    LocalNodeLogSection(
+                        logLines: logLines,
+                        logLevel: $logLevel,
+                        onSetLogLevel: setLogLevel
+                    )
+                    .padding(.top, 16)
+                    .frame(maxHeight: .infinity)
+                }
+
+                if isMac && showPeersPanel {
+                    HStack(spacing: 0) {
+                        Spacer()
+
+                        PeersPanelView(peerCount: peerCount, isRunning: isRunning)
+                            .frame(width: geometry.size.width * peersPanelWidthRatio)
+                            .background(Color(.systemBackground))
+                            .overlay(
+                                HStack(spacing: 0) {
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(width: 4)
+                                        .contentShape(Rectangle())
+                                        .gesture(
+                                            DragGesture()
+                                                .onChanged { value in
+                                                    let delta = -value.translation.width
+                                                    let newWidth = (geometry.size.width * peersPanelWidthRatio) + delta
+                                                    let clamped = min(max(newWidth, geometry.size.width * 0.25), geometry.size.width * 0.85)
+                                                    peersPanelWidthRatio = clamped / geometry.size.width
+                                                }
+                                        )
+                                    Spacer()
+                                }
+                            )
+                            .shadow(radius: 4)
+                    }
+                    .transition(.move(edge: .trailing))
+                    .animation(.easeInOut(duration: 0.25), value: showPeersPanel)
+                }
             }
         }
         .navigationTitle("Local Node")
@@ -73,6 +130,12 @@ struct LocalNodeSettingsView: View {
             Button("Clear", role: .destructive) { clearDatadir() }
         } message: {
             Text("This will delete all local node data and require a full resync.")
+        }
+        .onKeyPress(.init("\\")) {
+            if isMac {
+                showPeersPanel.toggle()
+            }
+            return .handled
         }
     }
 
@@ -100,6 +163,7 @@ struct LocalNodeSettingsView: View {
             isRunning = await localNodeIsRunning()
             tipHeight = await localNodeTipHeight()
             isInIbd = await localNodeIsInIbd()
+            peerCount = await localNodePeerCount()
             datadirSize = try await localNodeDatadirSize()
             isNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
 
@@ -161,6 +225,8 @@ private struct LocalNodeStatusSection: View {
     let tipHeight: UInt32?
     let isInIbd: Bool?
     let datadirSize: UInt64?
+    let peerCount: UInt32?
+    let horizon: UInt32?
     let isNetworkConnected: Bool
 
     var body: some View {
@@ -176,9 +242,18 @@ private struct LocalNodeStatusSection: View {
                 Divider()
                 NetworkStatusRow(isConnected: isNetworkConnected)
 
+                if let peerCount {
+                    Divider()
+                    StatusRow(title: "Peers", value: "\(peerCount)")
+                }
+
                 if let tipHeight {
                     Divider()
-                    StatusRow(title: "Block Height", value: "\(tipHeight)")
+                    if let horizon {
+                        StatusRow(title: "Block Height", value: "\(tipHeight) / \(horizon)")
+                    } else {
+                        StatusRow(title: "Block Height", value: "\(tipHeight)")
+                    }
                 }
 
                 if let isInIbd {
@@ -390,6 +465,50 @@ private func formatBytes(_ bytes: UInt64) -> String {
     let formatter = ByteCountFormatter()
     formatter.countStyle = .file
     return formatter.string(fromByteCount: Int64(bytes))
+}
+
+private struct PeersPanelView: View {
+    let peerCount: UInt32?
+    let isRunning: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Peers")
+                    .font(.headline)
+                Spacer()
+                if let peerCount {
+                    Text("\(peerCount) connected")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding()
+
+            Divider()
+
+            if isRunning {
+                if let peerCount, peerCount > 0 {
+                    Text("Peer list will be populated here as connection details are exposed from rbitcoin.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                } else {
+                    Text("No peers connected yet.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                }
+            } else {
+                Text("Node is stopped.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding()
+            }
+
+            Spacer()
+        }
+    }
 }
 
 #Preview {
