@@ -16,14 +16,19 @@ extension View {
     /// this is a no-op to preserve layout.
     @ViewBuilder
     func applyGlassEffect() -> some View {
+        #if swift(>=6.1)
         if #available(iOS 26.0, *) {
             self.glassEffect()
         } else {
             self
         }
+        #else
+        self
+        #endif
     }
 
     /// Applies a glass effect with custom parameters when running on iOS 26+.
+    #if swift(>=6.1)
     @available(iOS 26.0, *)
     func applyGlassEffect(
         _ glass: Glass,
@@ -31,4 +36,5 @@ extension View {
     ) -> some View {
         self.glassEffect(glass, in: shape)
     }
+    #endif
 }

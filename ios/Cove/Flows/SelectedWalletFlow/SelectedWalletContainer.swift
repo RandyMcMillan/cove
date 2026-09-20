@@ -202,11 +202,15 @@ private struct SelectedWalletLoadingScrollBackground: View {
 
 private struct HiddenTopScrollEdgeModifier: ViewModifier {
     func body(content: Content) -> some View {
+        #if swift(>=6.1)
         if #available(iOS 26, *) {
             content.scrollEdgeEffectHidden(true, for: .top)
         } else {
             content
         }
+        #else
+        content
+        #endif
     }
 }
 

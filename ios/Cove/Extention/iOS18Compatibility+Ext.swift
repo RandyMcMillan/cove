@@ -138,11 +138,15 @@ struct ConditionalTintModifier: ViewModifier {
 /// applies soft scroll edge effect style on iOS 26+ for liquid glass cloud appearance
 struct SoftScrollEdgeModifier: ViewModifier {
     func body(content: Content) -> some View {
+        #if swift(>=6.1)
         if #available(iOS 26, *) {
             content.scrollEdgeEffectStyle(.soft, for: .top)
         } else {
             content
         }
+        #else
+        content
+        #endif
     }
 }
 
