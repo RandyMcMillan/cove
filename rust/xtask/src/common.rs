@@ -72,8 +72,8 @@ pub fn cargo_target_dir() -> Result<String> {
         color_eyre::eyre::bail!("cargo metadata failed");
     }
 
-    let metadata: serde_json::Value = serde_json::from_slice(&output.stdout)
-        .wrap_err("Failed to parse cargo metadata output")?;
+    let metadata: serde_json::Value =
+        serde_json::from_slice(&output.stdout).wrap_err("Failed to parse cargo metadata output")?;
 
     let target_dir = metadata["target_directory"]
         .as_str()

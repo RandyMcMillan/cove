@@ -246,7 +246,7 @@ android-preview-screenshots-validate:
 [group('test')]
 [script('bash')]
 ios-ui-background device="iPhone 17" test="CoveUITests/OnboardingFullLaunchUITests":
-    cd rust && cargo build --locked --package xtask -q && ./target/debug/xtask ios-ui --device "{{ device }}" --test "{{ test }}"
+    cd rust && cargo --locked xtask ios-ui --device "{{ device }}" --test "{{ test }}"
 
 alias iub := ios-ui-background
 
@@ -254,7 +254,7 @@ alias iub := ios-ui-background
 [group('test')]
 [script('bash')]
 ios-ui-foreground device="iPhone 17" test="CoveUITests/OnboardingFullLaunchUITests":
-    cd rust && cargo build --locked --package xtask -q && ./target/debug/xtask ios-ui --foreground --device "{{ device }}" --test "{{ test }}"
+    cd rust && cargo --locked xtask ios-ui --foreground --device "{{ device }}" --test "{{ test }}"
 
 alias iuf := ios-ui-foreground
 

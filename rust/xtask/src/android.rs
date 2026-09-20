@@ -257,7 +257,8 @@ pub fn build_android(
         })?;
 
         // verify the library was built
-        let dynamic_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, target, build_type, LIB_NAME);
+        let dynamic_lib_path =
+            format!("{}/{}/{}/{}", cargo_target_dir, target, build_type, LIB_NAME);
         if !sh.path_exists(&dynamic_lib_path) {
             print_error(&format!("Missing dynamic library at {}", dynamic_lib_path));
             color_eyre::eyre::bail!("Build failed: missing library at {}", dynamic_lib_path);
@@ -283,7 +284,8 @@ pub fn build_android(
     // generate UniFFI bindings
     println!("{}", "Generating Kotlin bindings...".blue().bold());
     let first_target = targets.first().context("Android build needs at least one Rust target")?;
-    let dynamic_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, first_target, build_type, LIB_NAME);
+    let dynamic_lib_path =
+        format!("{}/{}/{}/{}", cargo_target_dir, first_target, build_type, LIB_NAME);
 
     if !sh.path_exists(&dynamic_lib_path) {
         print_error(&format!("Missing dynamic library at {}", dynamic_lib_path));

@@ -477,7 +477,8 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
 
     // generate headers, modulemap, and swift sources using UniFFI
     println!("{}", "Generating Swift bindings...".blue().bold());
-    let static_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, targets[0], build_dir, IOS_LIB_NAME);
+    let static_lib_path =
+        format!("{}/{}/{}/{}", cargo_target_dir, targets[0], build_dir, IOS_LIB_NAME);
 
     sh.create_dir(BINDINGS_DIR).wrap_err("Failed to create bindings directory")?;
 
