@@ -98,9 +98,20 @@ private struct CloudRestoreOfferContent: View {
             .padding(.bottom, 26)
             .frame(maxWidth: .infinity)
         }
-        .defaultScrollAnchor(.center, for: .alignment)
+        .defaultScrollAnchorIfAvailable(.center)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onboardingRecoveryBackground()
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func defaultScrollAnchorIfAvailable(_ anchor: UnitPoint) -> some View {
+        if #available(iOS 18.0, *) {
+            self.defaultScrollAnchor(anchor)
+        } else {
+            self
+        }
     }
 }
 

@@ -15,7 +15,9 @@ struct TransactionDetailsView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.sizeCategory) var sizeCategory
 
+    #if swift(>=6.1)
     @State private var scrollPosition = ScrollPosition()
+    #endif
 
     @State private var initialOffset: Double? = nil
     @State private var currentOffset: Double = 0
@@ -101,29 +103,40 @@ struct TransactionDetailsView: View {
         }
     }
 
-    var body: some View {
+    @ViewBuilder
+    private var transactionDetailsBody: some View {
+        let content = TransactionDetailsContent(
+            sizeCategory: sizeCategory,
+            transactionDetails: transactionDetails,
+            manager: manager,
+            metadata: metadata,
+            numberOfConfirmations: numberOfConfirmations,
+            lockState: lockState,
+            isUpdatingLockState: isUpdatingLockState,
+            showLockStateUpdatingIndicator: showLockStateUpdatingIndicator,
+            lockStateLoadError: lockStateLoadError,
+            retryLockState: retryTransactionLockState,
+            requestUnlockLockedUtxos: beginUnlockTransactionOutputs,
+            toggleLockState: beginToggleTransactionLockState,
+            openExplorer: openTransactionExplorer,
+            toggleDetails: toggleDetails
+        )
+
+        #if swift(>=6.1)
         TransactionDetailsScrollView(
             scrollPosition: $scrollPosition,
             initialOffset: $initialOffset,
             currentOffset: $currentOffset,
-            content: TransactionDetailsContent(
-                sizeCategory: sizeCategory,
-                transactionDetails: transactionDetails,
-                manager: manager,
-                metadata: metadata,
-                numberOfConfirmations: numberOfConfirmations,
-                lockState: lockState,
-                isUpdatingLockState: isUpdatingLockState,
-                showLockStateUpdatingIndicator: showLockStateUpdatingIndicator,
-                lockStateLoadError: lockStateLoadError,
-                retryLockState: retryTransactionLockState,
-                requestUnlockLockedUtxos: beginUnlockTransactionOutputs,
-                toggleLockState: beginToggleTransactionLockState,
-                openExplorer: openTransactionExplorer,
-                toggleDetails: toggleDetails
-            )
+            content: content
         )
-        .refreshable {
+        #else
+        TransactionDetailsScrollViewIOS17(content: content)
+        #endif
+    }
+
+    var body: some View {
+        transactionDetailsBody
+            .refreshable {
             await refreshTransactionDetails()
             await refreshTransactionLockState()
         }
@@ -161,7 +174,9 @@ struct TransactionDetailsView: View {
 
     private func toggleDetails() {
         if detailsExpanded {
+            #if swift(>=6.1)
             withAnimation { scrollPosition.scrollTo(edge: .top) }
+            #endif
         }
 
         manager.dispatch(action: .toggleDetailsExpanded)
@@ -241,6 +256,7 @@ struct TransactionDetailsView: View {
     }
 }
 
+#if swift(>=6.1)
 private struct TransactionDetailsScrollView<Content: View>: View {
     @Binding var scrollPosition: ScrollPosition
     @Binding var initialOffset: Double?
@@ -273,6 +289,22 @@ private struct TransactionDetailsScrollView<Content: View>: View {
         currentOffset = initialOffset - newValue
     }
 }
+#else
+private struct TransactionDetailsScrollViewIOS17<Content: View>: View {
+    let content: Content
+
+    var body: some View {
+        GeometryReader { geometry in
+            ScrollView(.vertical) {
+                content
+                    .frame(minHeight: geometry.size.height)
+            }
+            .scrollIndicators(.never)
+            .frame(alignment: .top)
+        }
+    }
+}
+#endif
 
 private struct TransactionDetailsContent: View {
     let sizeCategory: ContentSizeCategory

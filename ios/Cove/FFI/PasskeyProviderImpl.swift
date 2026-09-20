@@ -69,9 +69,12 @@ final class PasskeyProviderImpl: PasskeyProvider, @unchecked Sendable {
         return "len=\(credentialId.count) fingerprint=\(fingerprint)"
     }
 
-    /// PRF is guaranteed on iOS 18.4+ (our minimum deployment target)
+    /// PRF requires iOS 18.0+ APIs.
     func isPrfSupported() -> Bool {
-        true
+        if #available(iOS 18.0, *) {
+            return true
+        }
+        return false
     }
 
     func createPasskey(rpId: String, challenge: Data, user: PasskeyRegistrationUser) throws -> PasskeyRegistrationResult {
@@ -217,7 +220,9 @@ final class PasskeyProviderImpl: PasskeyProvider, @unchecked Sendable {
             // keep registration and PRF assertions on the same verified-user policy
             request.userVerificationPreference = .required
             request.displayName = user.displayName
-            request.prf = .checkForSupport
+            if #available(iOS 18.0, *) {
+                request.prf = .checkForSupport
+            }
 
             let ctrl = ASAuthorizationController(authorizationRequests: [request])
             ctrl.delegate = delegate
@@ -244,6 +249,11 @@ final class PasskeyProviderImpl: PasskeyProvider, @unchecked Sendable {
     private func validateRegistrationPrfMetadata(
         _ registration: ASAuthorizationPlatformPublicKeyCredentialRegistration
     ) throws -> RegistrationPrfSupportState {
+        guard #available(iOS 18.0, *) else {
+            Log.warn("[PASSKEY] registration PRF metadata unavailable before iOS 18, deferring support check to assertion")
+            return .unknown
+        }
+
         guard let prfOutput = registration.prf else {
             Log.warn("[PASSKEY] registration PRF metadata is missing, deferring support check to assertion")
             return .unknown
@@ -321,7 +331,9 @@ final class PasskeyProviderImpl: PasskeyProvider, @unchecked Sendable {
 
             // PRF derives different secrets for verified and unverified requests
             request.userVerificationPreference = .required
-            request.prf = .inputValues(.init(saltInput1: prfSalt))
+            if #available(iOS 18.0, *) {
+                request.prf = .inputValues(.init(saltInput1: prfSalt))
+            }
 
             let ctrl = ASAuthorizationController(authorizationRequests: [request])
             ctrl.delegate = delegate
@@ -349,6 +361,10 @@ final class PasskeyProviderImpl: PasskeyProvider, @unchecked Sendable {
         from assertion: ASAuthorizationPlatformPublicKeyCredentialAssertion,
         context: PasskeyOperationContext
     ) throws -> Data {
+        guard #available(iOS 18.0, *) else {
+            throw PrfExtractionError.outputUnavailable
+        }
+
         if assertion.prf == nil {
             Log.error("[PASSKEY] \(context.logDescription) PRF output is missing")
         }

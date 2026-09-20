@@ -82,6 +82,37 @@ struct SelectedWalletTitleContent: View {
     }
 }
 
+private struct HeaderBottomPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func trackHeaderBottom(_ action: @escaping (CGFloat) -> Void) -> some View {
+        if #available(iOS 18.0, *) {
+            self.onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .global).maxY
+            } action: { _, headerBottom in
+                action(headerBottom)
+            }
+        } else {
+            self.background(
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(
+                            key: HeaderBottomPreferenceKey.self,
+                            value: geometry.frame(in: .global).maxY
+                        )
+                }
+            )
+            .onPreferenceChange(HeaderBottomPreferenceKey.self, perform: action)
+        }
+    }
+}
+
 struct SelectedWalletMainContent: View {
     let manager: WalletManager
     let screenHeight: CGFloat
@@ -100,11 +131,7 @@ struct SelectedWalletMainContent: View {
                 showReceiveSheet: showReceiveSheet
             )
             .clipped()
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.frame(in: .global).maxY
-            } action: { _, headerBottom in
-                headerBottomChanged(headerBottom)
-            }
+            .trackHeaderBottom(headerBottomChanged)
 
             if !cloudBackupIsConfigured {
                 VerifyReminder(

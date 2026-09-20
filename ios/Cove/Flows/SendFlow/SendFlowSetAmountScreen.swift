@@ -30,9 +30,11 @@ struct SendFlowSetAmountScreen: View {
     @State private var isLoading: Bool = true
     @State private var loadingOpacity: CGFloat = 1
 
+    #if swift(>=6.1)
     @State private var scrollPosition: ScrollPosition = .init(
         idType: SendFlowPresenter.FocusField.self
     )
+    #endif
 
     @State private var scannedCode: TaggedString? = .none
 
@@ -123,7 +125,9 @@ struct SendFlowSetAmountScreen: View {
         sendFlowManager.feeRateOptions
     }
 
-    var body: some View {
+    @ViewBuilder
+    private var sendFlowSetAmountBody: some View {
+        #if swift(>=6.1)
         SendFlowSetAmountContent(
             isLoading: isLoading,
             loadingOpacity: loadingOpacity,
@@ -132,8 +136,21 @@ struct SendFlowSetAmountScreen: View {
             dismissIfValid: dismissIfValid,
             showFeeSelection: showFeeSelection
         )
-        .padding(.top, 0)
-        .onChange(of: presenter.focusField, initial: true, focusFieldChanged)
+        #else
+        SendFlowSetAmountContent(
+            isLoading: isLoading,
+            loadingOpacity: loadingOpacity,
+            next: next,
+            dismissIfValid: dismissIfValid,
+            showFeeSelection: showFeeSelection
+        )
+        #endif
+    }
+
+    var body: some View {
+        sendFlowSetAmountBody
+            .padding(.top, 0)
+            .onChange(of: presenter.focusField, initial: true, focusFieldChanged)
         .onChange(of: scannedCode, initial: false, scannedCodeChanged)
         .onChange(of: metadata.selectedUnit, initial: false, selectedUnitChanged)
         .onChange(of: metadata.fiatOrBtc, initial: false, fiatOrBtcChanged)
@@ -269,7 +286,9 @@ struct SendFlowSetAmountScreen: View {
                 // if keyboard opening directly to amount, dont update scroll position
                 if newField == .amount, oldField == .none { return }
                 Log.debug("scrolling to \(String(describing: newField))")
+                #if swift(>=6.1)
                 scrollPosition.scrollTo(id: newField)
+                #endif
             }
         }
     }
@@ -314,7 +333,9 @@ private struct SendFlowSetAmountContent: View {
 
     let isLoading: Bool
     let loadingOpacity: CGFloat
+    #if swift(>=6.1)
     let scrollPosition: Binding<ScrollPosition>
+    #endif
     let next: () -> Void
     let dismissIfValid: () -> Void
     let showFeeSelection: () -> Void
@@ -375,7 +396,9 @@ private struct SendFlowSetAmountContent: View {
                 .frame(maxWidth: .infinity)
                 .background(colorScheme == .light ? .white : .black)
                 .scrollIndicators(.hidden)
+                #if swift(>=6.1)
                 .scrollPosition(scrollPosition, anchor: .top)
+                #endif
 
                 if isLoading {
                     SendFlowLoadingOverlay(opacity: loadingOpacity)
