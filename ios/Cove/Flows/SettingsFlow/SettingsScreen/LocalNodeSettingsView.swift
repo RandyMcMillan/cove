@@ -24,7 +24,7 @@ struct LocalNodeSettingsView: View {
 
     // logging
     @State private var logLines: [String] = []
-    @State private var logLevel: String = "info"
+    @State private var logLevel: String = "trace"
     let logLevels = ["error", "warn", "info", "debug", "trace"]
 
     private var isMac: Bool {
@@ -192,7 +192,7 @@ struct LocalNodeSettingsView: View {
                 await MainActor.run { restartPolling() }
             }
 
-            let logs = await localNodeLogs(limit: 100_000)
+            let logs = await localNodeLogs(limit: 0)
             await MainActor.run {
                 logLines = logs
             }
