@@ -181,6 +181,7 @@ pub fn build_android(
     let targets = resolve_targets(&sh, build_targets)?;
     let build_flag = profile.cargo_flag();
     let build_type = profile.target_dir_name();
+    let cargo_target_dir = crate::common::cargo_target_dir()?;
 
     // set Android min SDK version
     sh.set_var("CFLAGS", CFLAGS_VALUE);
@@ -256,7 +257,7 @@ pub fn build_android(
         })?;
 
         // verify the library was built
-        let dynamic_lib_path = format!("./target/{}/{}/{}", target, build_type, LIB_NAME);
+        let dynamic_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, target, build_type, LIB_NAME);
         if !sh.path_exists(&dynamic_lib_path) {
             print_error(&format!("Missing dynamic library at {}", dynamic_lib_path));
             color_eyre::eyre::bail!("Build failed: missing library at {}", dynamic_lib_path);
@@ -282,7 +283,7 @@ pub fn build_android(
     // generate UniFFI bindings
     println!("{}", "Generating Kotlin bindings...".blue().bold());
     let first_target = targets.first().context("Android build needs at least one Rust target")?;
-    let dynamic_lib_path = format!("./target/{}/{}/{}", first_target, build_type, LIB_NAME);
+    let dynamic_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, first_target, build_type, LIB_NAME);
 
     if !sh.path_exists(&dynamic_lib_path) {
         print_error(&format!("Missing dynamic library at {}", dynamic_lib_path));

@@ -1,4 +1,4 @@
-use color_eyre::Result;
+use color_eyre::{eyre::Context, Result};
 use colored::Colorize;
 use std::{fs, path::Path, process::Command};
 use xshell::Shell;
@@ -58,6 +58,28 @@ pub fn parse_build_flags(build_flag: &str) -> Vec<String> {
             _ => Vec::new(),
         }
     }
+}
+
+/// Get the cargo target directory for the current workspace.
+/// Respects `CARGO_TARGET_DIR` and `.cargo/config.toml` settings by querying cargo metadata.
+pub fn cargo_target_dir() -> Result<String> {
+    let output = Command::new("cargo")
+        .args(["metadata", "--format-version", "1", "--no-deps"])
+        .output()
+        .wrap_err("Failed to run cargo metadata")?;
+
+    if !output.status.success() {
+        color_eyre::eyre::bail!("cargo metadata failed");
+    }
+
+    let metadata: serde_json::Value = serde_json::from_slice(&output.stdout)
+        .wrap_err("Failed to parse cargo metadata output")?;
+
+    let target_dir = metadata["target_directory"]
+        .as_str()
+        .ok_or_else(|| color_eyre::eyre::eyre!("target_directory missing from cargo metadata"))?;
+
+    Ok(target_dir.to_string())
 }
 
 pub fn trim_generated_trailing_whitespace(dir: impl AsRef<Path>, extension: &str) -> Result<()> {

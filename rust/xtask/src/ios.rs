@@ -408,6 +408,7 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
 
     let build_flag = build_type.cargo_flag();
     let build_dir = build_type.target_dir_name();
+    let cargo_target_dir = crate::common::cargo_target_dir()?;
 
     println!("{}", format!("Building for targets: {:?}", targets).blue().bold());
 
@@ -459,7 +460,7 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
 
         build_result.wrap_err_with(|| format!("Failed to build for target {}", target))?;
 
-        let lib_path = format!("./target/{}/{}/{}", target, build_dir, IOS_LIB_NAME);
+        let lib_path = format!("{}/{}/{}/{}", cargo_target_dir, target, build_dir, IOS_LIB_NAME);
         if !sh.path_exists(&lib_path) {
             print_error(&format!("Missing static library at {}", lib_path));
             color_eyre::eyre::bail!("Build failed: missing library at {}", lib_path);
@@ -476,7 +477,7 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
 
     // generate headers, modulemap, and swift sources using UniFFI
     println!("{}", "Generating Swift bindings...".blue().bold());
-    let static_lib_path = format!("./target/{}/{}/{}", targets[0], build_dir, IOS_LIB_NAME);
+    let static_lib_path = format!("{}/{}/{}/{}", cargo_target_dir, targets[0], build_dir, IOS_LIB_NAME);
 
     sh.create_dir(BINDINGS_DIR).wrap_err("Failed to create bindings directory")?;
 
