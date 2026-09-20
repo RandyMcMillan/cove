@@ -113,6 +113,17 @@ impl LocalNode {
             return Ok(());
         }
 
+        // Clear any stale state from a previous run that exited without stop().
+        if self.shutdown.is_some()
+            || self.task_handle.is_some()
+            || self.tip_height.is_some()
+            || self.initial_block_download.is_some()
+            || self.connections.is_some()
+        {
+            warn!("local node has stale state — resetting before start");
+            self.reset();
+        }
+
         info!("starting local rbitcoin node for {}", self.network);
 
         let datadir = datadir_for_network(self.network);
@@ -204,6 +215,22 @@ impl LocalNode {
         self.urls = None;
         self.tip_height = None;
         self.initial_block_download = None;
+        self.connections = None;
+    }
+
+    /// Reset all runtime state. Called before a fresh start when a previous
+    /// run left fields populated but the task is no longer alive.
+    fn reset(&mut self) {
+        if let Some(shutdown) = self.shutdown.take() {
+            shutdown.request();
+        }
+        if let Some(handle) = self.task_handle.take() {
+            handle.abort();
+        }
+        self.urls = None;
+        self.tip_height = None;
+        self.initial_block_download = None;
+        self.connections = None;
     }
 
     /// Wait for the RPC listener to accept connections.
