@@ -112,7 +112,11 @@ struct LocalNodeSettingsView: View {
         }
         .navigationTitle("Local Node")
         .onAppear {
-            Task { await refreshState() }
+            Task {
+                let ok = await localNodeSetLogLevel(level: logLevel)
+                if !ok { logLevel = "info" }
+                await refreshState()
+            }
             startPolling()
         }
         .onDisappear {
@@ -171,7 +175,7 @@ struct LocalNodeSettingsView: View {
                 await MainActor.run { restartPolling() }
             }
 
-            let logs = await localNodeLogs(limit: 100)
+            let logs = await localNodeLogs(limit: 500)
             await MainActor.run {
                 logLines = logs
             }
