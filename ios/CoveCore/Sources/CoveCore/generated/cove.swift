@@ -46645,6 +46645,21 @@ public func localNodeLogs(limit: UInt32) -> [String]  {
     )
 })
 }
+public func localNodePeerCount()async  -> UInt32?  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_peer_count(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionUInt32.lift,
+            errorHandler: nil
+
+        )
+}
 /**
  * Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
  * Returns `true` if the level was recognized and applied.
@@ -47355,6 +47370,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_logs() != 40418) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_peer_count() != 48968) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_set_log_level() != 4106) {
