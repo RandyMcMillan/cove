@@ -23,11 +23,6 @@ struct MainSettingsGeneralSection: View {
                 symbol: "safari"
             )
             SettingsRow(title: "Currency", route: .fiatCurrency, symbol: "dollarsign.circle")
-            SettingsRow(
-                title: "Local Node",
-                route: .localNode,
-                symbol: "externaldrive.connected.to.line.below"
-            )
         }
     }
 }

@@ -135,7 +135,7 @@ private struct SettingsRouteContent: View {
         case .cloudBackup:
             AnyView(CloudBackupDetailScreen())
         case .localNode:
-            AnyView(LocalNodeSettingsView())
+            AnyView(NodeSelectionView())
         }
     }
 
