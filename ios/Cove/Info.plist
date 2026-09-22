@@ -25,6 +25,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleHelpBookFolder</key>
+	<string>CoveHelp</string>
+	<key>CFBundleHelpBookName</key>
+	<string>Cove Help</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
@@ -89,12 +93,6 @@
 			</dict>
 		</dict>
 	</array>
-	<key>CFBundleHelpBookName</key>
-	<string>Cove Help</string>
-	<key>CFBundleHelpBookFolder</key>
-	<string>CoveHelp</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2026 Bitcoin People. All rights reserved.</string>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
 		<string>D2760000850101</string>
