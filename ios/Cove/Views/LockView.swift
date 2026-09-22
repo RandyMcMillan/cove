@@ -50,7 +50,7 @@ struct LockView<Content: View>: View {
     var _backAction: (() -> Void)?
 
     /// View Properties
-    @State private var animateField: Bool
+    @State private var animateField: Bool = false
     @State private var screen: Screen = .biometric
 
     /// private consts
@@ -72,7 +72,6 @@ struct LockView<Content: View>: View {
     ) {
         self.lockType = lockType
 
-        innerLockState = .locked
         lockStateBinding = lockState
 
         self.isPinCorrect = isPinCorrect
@@ -92,7 +91,6 @@ struct LockView<Content: View>: View {
         _backAction = backAction
 
         // private
-        animateField = false
         pinLength = 6
     }
 
