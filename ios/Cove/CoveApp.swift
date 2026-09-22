@@ -293,6 +293,7 @@ extension CoveApplicationRoot {
         CloudBackupManager.shared.rust.startBackgroundInventoryDiscovery()
         self.bdkMigrationWarning = warning
         startInitData(appManager)
+        startLocalNodeIfOnMac(appManager)
 
         if appManager.needsOnboarding {
             Log.info("[STARTUP] entering onboarding flow")
@@ -319,6 +320,20 @@ extension CoveApplicationRoot {
         Task {
             await appManager.rust.initData()
             Log.info("[STARTUP] initData completed")
+        }
+    }
+
+    /// On macOS, start the local node automatically so it is ready when the user opens Node settings.
+    private func startLocalNodeIfOnMac(_ appManager: AppManager) {
+        guard ProcessInfo.processInfo.isMacCatalystApp else { return }
+
+        Task {
+            do {
+                try await localNodeStart(network: appManager.selectedNetwork)
+                Log.info("[STARTUP] local node auto-started on macOS")
+            } catch {
+                Log.error("[STARTUP] local node auto-start failed on macOS: \(error)")
+            }
         }
     }
 
