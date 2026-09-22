@@ -271,6 +271,16 @@ private struct AutocompleteField: View {
                     .onChange(of: focusField, validateText)
                     .introspect(.textField, on: .iOS(.v18, .v26), customize: setUpReturnHandler)
                     .onChange(of: text, initial: true, handleTextChange)
+                    .onKeyPress(phases: .down) { press in
+                        guard press.key == .tab else { return .ignored }
+
+                        if press.modifiers.contains(.shift) {
+                            focusPreviousField()
+                        } else {
+                            focusNextField()
+                        }
+                        return .handled
+                    }
                     .offset(y: state == .typing ? -4 : 0)
             }
         }
@@ -421,6 +431,27 @@ private struct AutocompleteField: View {
                 tabIndex = Int(nextFieldNumber / groupsOf)
             }
         }
+    }
+
+    private func focusNextField() {
+        let current = focusField?.fieldNumber ?? 1
+        let last = numberOfWords.toWordCount()
+
+        guard current < last else { return }
+
+        let next = current + 1
+        focusField = ImportFieldNumber(next)
+        tabIndex = (next - 1) / groupsOf
+    }
+
+    private func focusPreviousField() {
+        let current = focusField?.fieldNumber ?? 1
+
+        guard current > 1 else { return }
+
+        let previous = current - 1
+        focusField = ImportFieldNumber(previous)
+        tabIndex = (previous - 1) / groupsOf
     }
 }
 
