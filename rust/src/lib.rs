@@ -182,10 +182,7 @@ impl From<cove_rbitcoin::LocalNodeError> for LocalNodeStartError {
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_start(network: Network) -> Result<(), LocalNodeStartError> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .start(network)
-        .await
-        .map_err(LocalNodeStartError::from)
+    local_node_manager::LOCAL_NODE_MANAGER.start(network).await.map_err(LocalNodeStartError::from)
 }
 
 #[uniffi::export(async_runtime = "tokio")]
@@ -210,18 +207,12 @@ async fn local_node_peer_count() -> Option<u32> {
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_datadir_size() -> Result<u64, LocalNodeStartError> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .datadir_size()
-        .await
-        .map_err(LocalNodeStartError::from)
+    local_node_manager::LOCAL_NODE_MANAGER.datadir_size().await.map_err(LocalNodeStartError::from)
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_clear_datadir() -> Result<(), LocalNodeStartError> {
-    local_node_manager::LOCAL_NODE_MANAGER
-        .clear_datadir()
-        .await
-        .map_err(LocalNodeStartError::from)
+    local_node_manager::LOCAL_NODE_MANAGER.clear_datadir().await.map_err(LocalNodeStartError::from)
 }
 
 /// Stop the local node when the app is backgrounded.

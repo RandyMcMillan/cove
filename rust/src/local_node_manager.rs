@@ -85,12 +85,7 @@ impl LocalNodeManager {
     }
 
     pub async fn running_network(&self) -> Option<Network> {
-        self.node
-            .read()
-            .await
-            .as_ref()
-            .filter(|n| n.is_running())
-            .map(LocalNode::network)
+        self.node.read().await.as_ref().filter(|n| n.is_running()).map(LocalNode::network)
     }
 
     /// Start the local node for `network` if it is not already running.

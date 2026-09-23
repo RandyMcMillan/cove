@@ -61,9 +61,7 @@ impl LocalNode {
     }
 
     pub fn is_running(&self) -> bool {
-        self.running
-            .as_ref()
-            .is_some_and(|r| r.load(Ordering::SeqCst))
+        self.running.as_ref().is_some_and(|r| r.load(Ordering::SeqCst))
     }
 
     pub fn urls(&self) -> Option<&LocalNodeUrls> {
