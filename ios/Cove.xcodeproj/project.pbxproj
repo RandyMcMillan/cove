@@ -245,7 +245,7 @@
 /* Begin PBXLegacyTarget section */
 		C0A000102EF0000000000001 /* Build Rust */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--verbose --force";
+			buildArgumentsString = "--verbose";
 			buildConfigurationList = C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */;
 			buildPhases = (
 			);
