@@ -166,8 +166,8 @@ alias bi := build-ios
 
 # [long] Build iOS release for device
 [group('build')]
-build-ios-release:
-    just xtask build-ios release-speed --device && just say "done ios release"
+build-ios-release *flags="":
+    just xtask build-ios release-speed --device {{ flags }} && just say "done ios release"
 
 alias bir := build-ios-release
 
@@ -180,8 +180,8 @@ testflight:
 
 # [long] Build iOS debug for device
 [group('build')]
-build-ios-debug-device:
-    just xtask build-ios debug --device && just say "done ios device"
+build-ios-debug-device *flags="":
+    just xtask build-ios debug --device {{ flags }} && just say "done ios device"
 
 alias bidd := build-ios-debug-device
 
