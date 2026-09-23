@@ -47,6 +47,13 @@
 			remoteGlobalIDString = D0245F4B2C0F7B4E0042B447;
 			remoteInfo = Cove;
 		};
+		C0A000152EF0000000000005 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0245F442C0F7B4E0042B447 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0A000102EF0000000000001;
+			remoteInfo = "Build Rust";
+		};
 		C0B0000B2F00000000000001 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D0245F442C0F7B4E0042B447 /* Project object */;
@@ -60,14 +67,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C0D0000D2F20000000000001;
 			remoteInfo = CoveCloudBackupUITestHost;
-		};
-
-		C0A000152EF0000000000005 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D0245F442C0F7B4E0042B447 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C0A000102EF0000000000001;
-			remoteInfo = "Build Rust";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -243,6 +242,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		C0A000102EF0000000000001 /* Build Rust */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--verbose --force";
+			buildConfigurationList = C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/build-rust.sh";
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = "Build Rust";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build Rust";
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		C0A000052EF0000000000001 /* CoveUITests */ = {
 			isa = PBXNativeTarget;
@@ -357,23 +373,6 @@
 		};
 /* End PBXNativeTarget section */
 
-
-/* Begin PBXLegacyTarget section */
-		C0A000102EF0000000000001 /* Build Rust */ = {
-			isa = PBXLegacyTarget;
-			buildConfigurationList = C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */;
-			buildPhases = (
-			);
-			buildToolPath = "$(SRCROOT)/build-rust.sh";
-			dependencies = (
-			);
-			name = "Build Rust";
-			passBuildSettingsInEnvironment = 1;
-			productName = "Build Rust";
-		};
-/* End PBXLegacyTarget section */
-
-
 /* Begin PBXProject section */
 		D0245F442C0F7B4E0042B447 /* Project object */ = {
 			isa = PBXProject;
@@ -470,7 +469,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-
 /* Begin PBXSourcesBuildPhase section */
 		C0A000082EF0000000000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -536,6 +534,11 @@
 			target = D0245F4B2C0F7B4E0042B447 /* Cove */;
 			targetProxy = C0A000062EF0000000000001 /* PBXContainerItemProxy */;
 		};
+		C0A000142EF0000000000004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0A000102EF0000000000001 /* Build Rust */;
+			targetProxy = C0A000152EF0000000000005 /* PBXContainerItemProxy */;
+		};
 		C0B0000C2F00000000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D0245F4B2C0F7B4E0042B447 /* Cove */;
@@ -545,12 +548,6 @@
 			isa = PBXTargetDependency;
 			target = C0D0000D2F20000000000001 /* CoveCloudBackupUITestHost */;
 			targetProxy = C0E000032F20000000000001 /* PBXContainerItemProxy */;
-		};
-
-		C0A000142EF0000000000004 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C0A000102EF0000000000001 /* Build Rust */;
-			targetProxy = C0A000152EF0000000000005 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -600,6 +597,26 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = Cove;
+			};
+			name = Release;
+		};
+		C0A000122EF0000000000002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Build Rust";
+			};
+			name = Debug;
+		};
+		C0A000132EF0000000000003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				PRODUCT_NAME = "Build Rust";
 			};
 			name = Release;
 		};
@@ -1017,29 +1034,7 @@
 			};
 			name = Release;
 		};
-		C0A000122EF0000000000002 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				DEBUGGING_SYMBOLS = YES;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "Build Rust";
-			};
-			name = Debug;
-		};
-
-		C0A000132EF0000000000003 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				PRODUCT_NAME = "Build Rust";
-			};
-			name = Release;
-		};
-
-	/* End XCBuildConfiguration section */
+/* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		C0A0000A2EF0000000000001 /* Build configuration list for PBXNativeTarget "CoveUITests" */ = {
@@ -1047,6 +1042,15 @@
 			buildConfigurations = (
 				C0A0000B2EF0000000000001 /* Debug */,
 				C0A0000C2EF0000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0A000122EF0000000000002 /* Debug */,
+				C0A000132EF0000000000003 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1092,15 +1096,6 @@
 			buildConfigurations = (
 				D0245F5B2C0F7B500042B447 /* Debug */,
 				D0245F5C2C0F7B500042B447 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C0A000122EF0000000000002 /* Debug */,
-				C0A000132EF0000000000003 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
