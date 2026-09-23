@@ -271,8 +271,12 @@ async fn local_node_app_foregrounded() {
 
 /// Return the most recent `limit` log lines from the local node.
 /// Lines are formatted as `"LEVEL message"`.
-#[uniffi::export]
-fn local_node_logs(limit: u32) -> Vec<String> {
+///
+/// This is exported as an async function so the mobile UI can fetch logs
+/// without blocking the main thread; the log buffer can grow large during
+/// IBD, and a synchronous call would delay status updates.
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_logs(limit: u32) -> Vec<String> {
     rbitcoin_log::global_logs_recent(limit as usize)
         .into_iter()
         .map(|(level, msg)| format!("{} {}", level.as_str(), msg))
@@ -281,8 +285,8 @@ fn local_node_logs(limit: u32) -> Vec<String> {
 
 /// Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
 /// Returns `true` if the level was recognized and applied.
-#[uniffi::export]
-fn local_node_set_log_level(level: String) -> bool {
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_set_log_level(level: String) -> bool {
     match rbitcoin_log::Level::parse(&level) {
         Some(level) => {
             rbitcoin_log::init(level);
