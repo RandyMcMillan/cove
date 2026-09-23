@@ -420,10 +420,17 @@ pub fn build_ios(build_type: IosBuildType, device: bool, _sign: bool, verbose: b
             format!("Building for target: {} with build type: {}", target, build_dir).blue().bold()
         );
 
-        // add target
-        cmd!(sh, "rustup target add {target}")
-            .run()
-            .wrap_err_with(|| format!("Failed to add target {}", target))?;
+        // add target if not already installed. `rustup target add` is otherwise
+        // idempotent, but on some machines/networks it can hang for seconds even
+        // when the target is present, so we avoid calling it unnecessarily.
+        let installed_targets = cmd!(sh, "rustup target list --installed")
+            .read()
+            .wrap_err_with(|| format!("Failed to list installed targets for {}", target))?;
+        if !installed_targets.lines().any(|line| line.trim() == *target) {
+            cmd!(sh, "rustup target add {target}")
+                .run()
+                .wrap_err_with(|| format!("Failed to add target {}", target))?;
+        }
 
         // build with cargo
         let flags = crate::common::parse_build_flags(&build_flag);
