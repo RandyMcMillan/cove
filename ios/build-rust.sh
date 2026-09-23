@@ -7,6 +7,20 @@
 
 set -euo pipefail
 
+# Ensure cargo and just are discoverable. Do not hardcode $HOME/.cargo/bin;
+# prefer the caller's PATH and fall back to common install locations.
+ensure_on_path() {
+    if command -v cargo >/dev/null 2>&1 && command -v just >/dev/null 2>&1; then
+        return
+    fi
+    for dir in "$HOME/.cargo/bin" "/usr/local/bin" "/opt/homebrew/bin" "/opt/local/bin"; do
+        if [ -d "$dir" ]; then
+            export PATH="$dir:$PATH"
+        fi
+    done
+}
+ensure_on_path
+
 FORCE=false
 for arg in "$@"; do
     case "$arg" in
