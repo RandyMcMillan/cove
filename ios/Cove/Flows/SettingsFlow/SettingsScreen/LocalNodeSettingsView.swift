@@ -161,7 +161,7 @@ struct LocalNodeSettingsView: View {
     }
 
     private func startPolling() {
-        let interval = (isRunning && isInIbd == true) ? 0.5 : 2.0
+        let interval = (isRunning && isInIbd == true) ? 0.5 : 1.0
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             Task { await refreshState() }
         }
@@ -179,25 +179,39 @@ struct LocalNodeSettingsView: View {
 
     private func refreshState() async {
         do {
-            let wasRunning = isRunning
-            let wasIbd = isInIbd
-            isRunning = await localNodeIsRunning()
-            tipHeight = await localNodeTipHeight()
-            isInIbd = await localNodeIsInIbd()
-            peerCount = await localNodePeerCount()
-            datadirSize = try await localNodeDatadirSize()
-            isNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
+            async let running = localNodeIsRunning()
+            async let tip = localNodeTipHeight()
+            async let ibd = localNodeIsInIbd()
+            async let peers = localNodePeerCount()
+            async let size = localNodeDatadirSize()
+            async let logs = localNodeLogs(limit: 0)
 
-            if wasRunning != isRunning || wasIbd != isInIbd {
-                await MainActor.run { restartPolling() }
-            }
+            let newRunning = await running
+            let newTip = await tip
+            let newIbd = await ibd
+            let newPeers = await peers
+            let newSize = try await size
+            let newLogs = await logs
+            let newNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
 
-            let logs = await localNodeLogs(limit: 0)
             await MainActor.run {
-                logLines = logs
+                let wasRunning = isRunning
+                let wasIbd = isInIbd
+
+                isRunning = newRunning
+                tipHeight = newTip
+                isInIbd = newIbd
+                peerCount = newPeers
+                datadirSize = newSize
+                isNetworkConnected = newNetworkConnected
+                logLines = newLogs
+
+                if wasRunning != isRunning || wasIbd != isIbd {
+                    restartPolling()
+                }
             }
         } catch {
-            datadirSize = nil
+            await MainActor.run { datadirSize = nil }
         }
     }
 
