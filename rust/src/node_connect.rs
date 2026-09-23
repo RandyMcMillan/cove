@@ -159,8 +159,7 @@ impl NodeSelector {
                 return;
             }
 
-            let result =
-                crate::local_node_manager::LOCAL_NODE_MANAGER.lock().await.start(network).await;
+            let result = crate::local_node_manager::LOCAL_NODE_MANAGER.start(network).await;
 
             match result {
                 Ok(()) => info!("local node eager-started after selection"),

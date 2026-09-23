@@ -10,7 +10,7 @@ use tracing::{debug, error, info, warn};
 
 use cove_types::network::Network;
 
-use crate::config::{LocalNodeUrls, build_config, build_config_with_options, datadir_for_network};
+use crate::config::{LocalNodeUrls, build_config_with_options, datadir_for_network};
 use crate::error::LocalNodeError;
 
 /// Minimum free disk space required to start a local node (1 GB).
@@ -40,6 +40,10 @@ pub struct LocalNode {
     tip_height: Option<Arc<AtomicU32>>,
     initial_block_download: Option<Arc<AtomicBool>>,
     connections: Option<Arc<AtomicUsize>>,
+    /// Set to `true` as soon as startup begins and `false` once the P2P task
+    /// exits or `stop()` is called. This lets callers observe "running" before
+    /// the long-running initialization inside `start()` has completed.
+    running: Option<Arc<AtomicBool>>,
 }
 
 impl LocalNode {
@@ -52,11 +56,14 @@ impl LocalNode {
             tip_height: None,
             initial_block_download: None,
             connections: None,
+            running: None,
         }
     }
 
     pub fn is_running(&self) -> bool {
-        self.task_handle.as_ref().is_some_and(|h| !h.is_finished())
+        self.running
+            .as_ref()
+            .is_some_and(|r| r.load(Ordering::SeqCst))
     }
 
     pub fn urls(&self) -> Option<&LocalNodeUrls> {
@@ -126,65 +133,86 @@ impl LocalNode {
 
         info!("starting local rbitcoin node for {}", self.network);
 
-        let datadir = datadir_for_network(self.network);
-        std::fs::create_dir_all(&datadir).map_err(|e| {
-            LocalNodeError::Config(format!("create datadir {}: {}", datadir.display(), e))
-        })?;
+        // Mark the node as running immediately so that status observers can see
+        // "Running" while the store open, port binding, and initial block
+        // download are still in progress.
+        let running = Arc::new(AtomicBool::new(true));
+        self.running = Some(Arc::clone(&running));
 
-        let free = available_disk_space(&datadir)?;
-        if free < MIN_FREE_SPACE_BYTES {
-            return Err(LocalNodeError::InsufficientDiskSpace(format!(
-                "{} free ({} required)",
-                format_bytes(free),
-                format_bytes(MIN_FREE_SPACE_BYTES)
-            )));
-        }
+        let start_result = async {
+            let datadir = datadir_for_network(self.network);
+            std::fs::create_dir_all(&datadir).map_err(|e| {
+                LocalNodeError::Config(format!("create datadir {}: {}", datadir.display(), e))
+            })?;
 
-        let electrum_addr = find_free_port().await?;
-        let esplora_addr = find_free_port().await?;
-
-        debug!("local node will bind electrum={} esplora={}", electrum_addr, esplora_addr);
-
-        let mut config = build_config_with_options(self.network, config_override)?;
-        config.listen.electrum = Some(electrum_addr);
-        config.listen.esplora = Some(esplora_addr);
-
-        self.urls = Some(LocalNodeUrls {
-            electrum: format!("ssl://{}", electrum_addr),
-            esplora: format!("http://{}", esplora_addr),
-        });
-
-        let node_handle = run_node(config).map_err(|e| LocalNodeError::StoreOpen(e.to_string()))?;
-        let tip_height = Arc::clone(&node_handle.tip_height);
-        let initial_block_download = Arc::clone(&node_handle.initial_block_download);
-        let connections = Arc::clone(&node_handle.connections);
-
-        let shutdown = Shutdown::new();
-        let shutdown_for_task = Arc::clone(&shutdown);
-
-        let task = tokio::spawn(async move {
-            let result = run_p2p_with_handle(node_handle, shutdown_for_task).await;
-            if let Err(ref e) = result {
-                error!("rbitcoin run_p2p exited with error: {e}");
+            let free = available_disk_space(&datadir)?;
+            if free < MIN_FREE_SPACE_BYTES {
+                return Err(LocalNodeError::InsufficientDiskSpace(format!(
+                    "{} free ({} required)",
+                    format_bytes(free),
+                    format_bytes(MIN_FREE_SPACE_BYTES)
+                )));
             }
-            result
-        });
 
-        self.task_handle = Some(task);
-        self.shutdown = Some(shutdown);
-        self.tip_height = Some(tip_height);
-        self.initial_block_download = Some(initial_block_download);
-        self.connections = Some(connections);
+            let electrum_addr = find_free_port().await?;
+            let esplora_addr = find_free_port().await?;
 
-        // Give the node a moment to open the store and bind listeners.
-        tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+            debug!("local node will bind electrum={} esplora={}", electrum_addr, esplora_addr);
 
-        if !self.is_running() {
-            return Err(LocalNodeError::P2PStart("run_p2p task exited immediately".to_string()));
+            let mut config = build_config_with_options(self.network, config_override)?;
+            config.listen.electrum = Some(electrum_addr);
+            config.listen.esplora = Some(esplora_addr);
+
+            self.urls = Some(LocalNodeUrls {
+                electrum: format!("ssl://{}", electrum_addr),
+                esplora: format!("http://{}", esplora_addr),
+            });
+
+            let node_handle =
+                run_node(config).map_err(|e| LocalNodeError::StoreOpen(e.to_string()))?;
+            let tip_height = Arc::clone(&node_handle.tip_height);
+            let initial_block_download = Arc::clone(&node_handle.initial_block_download);
+            let connections = Arc::clone(&node_handle.connections);
+
+            let shutdown = Shutdown::new();
+            let shutdown_for_task = Arc::clone(&shutdown);
+
+            let task = tokio::spawn(async move {
+                let result = run_p2p_with_handle(node_handle, shutdown_for_task).await;
+                running.store(false, Ordering::SeqCst);
+                if let Err(ref e) = result {
+                    error!("rbitcoin run_p2p exited with error: {e}");
+                }
+                result
+            });
+
+            self.task_handle = Some(task);
+            self.shutdown = Some(shutdown);
+            self.tip_height = Some(tip_height);
+            self.initial_block_download = Some(initial_block_download);
+            self.connections = Some(connections);
+
+            // Give the node a moment to open the store and bind listeners.
+            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+            if !self.is_running() {
+                return Err(LocalNodeError::P2PStart(
+                    "run_p2p task exited immediately".to_string(),
+                ));
+            }
+
+            info!("local rbitcoin node started");
+            Ok(())
+        }
+        .await;
+
+        if start_result.is_err() {
+            if let Some(running) = self.running.take() {
+                running.store(false, Ordering::SeqCst);
+            }
         }
 
-        info!("local rbitcoin node started");
-        Ok(())
+        start_result
     }
 
     /// Stop the local node by requesting cooperative shutdown and awaiting the task.
@@ -194,6 +222,10 @@ impl LocalNode {
         }
 
         info!("stopping local rbitcoin node (cooperative shutdown)");
+
+        if let Some(running) = self.running.take() {
+            running.store(false, Ordering::SeqCst);
+        }
 
         if let Some(shutdown) = self.shutdown.take() {
             shutdown.request();
@@ -216,6 +248,7 @@ impl LocalNode {
         self.tip_height = None;
         self.initial_block_download = None;
         self.connections = None;
+        self.running = None;
     }
 
     /// Reset all runtime state. Called before a fresh start when a previous
@@ -231,6 +264,7 @@ impl LocalNode {
         self.tip_height = None;
         self.initial_block_download = None;
         self.connections = None;
+        self.running = None;
     }
 
     /// Wait for the RPC listener to accept connections.

@@ -119,17 +119,17 @@ use crate::network::Network;
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_is_running() -> bool {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.is_running()
+    local_node_manager::LOCAL_NODE_MANAGER.is_running().await
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_esplora_url() -> Option<String> {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.urls().map(|u| u.esplora.clone())
+    local_node_manager::LOCAL_NODE_MANAGER.urls().await.map(|u| u.esplora)
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_electrum_url() -> Option<String> {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.urls().map(|u| u.electrum.clone())
+    local_node_manager::LOCAL_NODE_MANAGER.urls().await.map(|u| u.electrum)
 }
 
 #[derive(Debug, Clone, thiserror::Error, uniffi::Error)]
@@ -183,8 +183,6 @@ impl From<cove_rbitcoin::LocalNodeError> for LocalNodeStartError {
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_start(network: Network) -> Result<(), LocalNodeStartError> {
     local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
         .start(network)
         .await
         .map_err(LocalNodeStartError::from)
@@ -192,38 +190,35 @@ async fn local_node_start(network: Network) -> Result<(), LocalNodeStartError> {
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_stop() {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.stop().await;
+    local_node_manager::LOCAL_NODE_MANAGER.stop().await;
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_tip_height() -> Option<u32> {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.tip_height()
+    local_node_manager::LOCAL_NODE_MANAGER.tip_height().await
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_is_in_ibd() -> Option<bool> {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.is_in_ibd()
+    local_node_manager::LOCAL_NODE_MANAGER.is_in_ibd().await
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_peer_count() -> Option<u32> {
-    local_node_manager::LOCAL_NODE_MANAGER.lock().await.peer_count()
+    local_node_manager::LOCAL_NODE_MANAGER.peer_count().await
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_datadir_size() -> Result<u64, LocalNodeStartError> {
     local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
         .datadir_size()
+        .await
         .map_err(LocalNodeStartError::from)
 }
 
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_clear_datadir() -> Result<(), LocalNodeStartError> {
     local_node_manager::LOCAL_NODE_MANAGER
-        .lock()
-        .await
         .clear_datadir()
         .await
         .map_err(LocalNodeStartError::from)
@@ -235,8 +230,8 @@ async fn local_node_clear_datadir() -> Result<(), LocalNodeStartError> {
 /// This triggers cooperative shutdown to avoid the OS killing the process.
 #[uniffi::export(async_runtime = "tokio")]
 async fn local_node_app_backgrounded() {
-    let mut manager = local_node_manager::LOCAL_NODE_MANAGER.lock().await;
-    if manager.is_running() {
+    let manager = &local_node_manager::LOCAL_NODE_MANAGER;
+    if manager.is_running().await {
         tracing::info!("app backgrounded — stopping local node");
         manager.stop().await;
     }
@@ -254,10 +249,10 @@ async fn local_node_app_foregrounded() {
     }
 
     let network = global_config.selected_network();
-    let mut manager = local_node_manager::LOCAL_NODE_MANAGER.lock().await;
+    let manager = &local_node_manager::LOCAL_NODE_MANAGER;
 
-    if manager.is_running() {
-        if manager.running_network() == Some(network) {
+    if manager.is_running().await {
+        if manager.running_network().await == Some(network) {
             return;
         }
         manager.stop().await;

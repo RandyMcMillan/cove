@@ -25,10 +25,8 @@ const FEE_URL: &str = "https://mempool.space/api/v1/fees/recommended";
 
 /// Return the local node's Esplora fee endpoint if the local node is running,
 /// otherwise fall back to the default mempool.space URL.
-fn fee_url() -> String {
-    if let Ok(manager) = crate::local_node_manager::LOCAL_NODE_MANAGER.try_lock()
-        && let Some(urls) = manager.urls()
-    {
+async fn fee_url() -> String {
+    if let Some(urls) = crate::local_node_manager::LOCAL_NODE_MANAGER.urls().await {
         return format!("{}/api/v1/fees/recommended", urls.esplora);
     }
     FEE_URL.to_string()
@@ -189,7 +187,7 @@ impl FeeClient {
 
     /// Always gets new fees from the server
     async fn get_new_fees(&self) -> Result<ValidatedFeeResponse, FeeClientError> {
-        let url = fee_url();
+        let url = fee_url().await;
         let response = self.client()?.get(&url).send().await?.error_for_status()?;
         let fees: FeeResponse = response.json().await?;
         Ok(fees.try_into()?)
