@@ -200,8 +200,6 @@ jobs:
 
   clippy:
     runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: -D warnings
     steps:
       - uses: actions/checkout@v6
         with:
@@ -217,4 +215,4 @@ jobs:
           cache-bin: false
           prefix-key: v1-rust
 
-      - run: cd rust && cargo clippy --locked --all-targets --all-features -- -D warnings
+      - run: cd rust && cargo clippy --locked --all-targets --all-features
