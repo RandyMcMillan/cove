@@ -16,6 +16,7 @@ struct LocalNodeSettingsView: View {
     @State private var errorMessage: String?
     @State private var showClearConfirm = false
     @State private var timer: Timer? = nil
+    @State private var logTimer: Timer? = nil
     @State private var isNetworkConnected = true
 
     // peers panel (macOS only)
@@ -132,7 +133,8 @@ struct LocalNodeSettingsView: View {
         .onAppear {
             Task {
                 await localNodeSetLogLevel(level: "trace")
-                await refreshState()
+                await refreshStatus()
+                await refreshLogs()
             }
             startPolling()
         }
@@ -163,13 +165,19 @@ struct LocalNodeSettingsView: View {
     private func startPolling() {
         let interval = (isRunning && isInIbd == true) ? 0.5 : 1.0
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
-            Task { await refreshState() }
+            Task { await refreshStatus() }
+        }
+
+        logTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
+            Task { await refreshLogs() }
         }
     }
 
     private func stopPolling() {
         timer?.invalidate()
         timer = nil
+        logTimer?.invalidate()
+        logTimer = nil
     }
 
     private func restartPolling() {
@@ -177,14 +185,13 @@ struct LocalNodeSettingsView: View {
         startPolling()
     }
 
-    private func refreshState() async {
+    private func refreshStatus() async {
         do {
             let newRunning = await localNodeIsRunning()
             let newTip = await localNodeTipHeight()
             let newIbd = await localNodeIsInIbd()
             let newPeers = await localNodePeerCount()
             let newSize = try await localNodeDatadirSize()
-            let newLogs = await localNodeLogs(limit: 0)
             let newNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
 
             await MainActor.run {
@@ -197,7 +204,6 @@ struct LocalNodeSettingsView: View {
                 peerCount = newPeers
                 datadirSize = newSize
                 isNetworkConnected = newNetworkConnected
-                logLines = newLogs
 
                 if wasRunning != isRunning || wasIbd != isInIbd {
                     restartPolling()
@@ -208,11 +214,17 @@ struct LocalNodeSettingsView: View {
         }
     }
 
+    private func refreshLogs() async {
+        let logs = await localNodeLogs(limit: 0)
+        await MainActor.run { logLines = logs }
+    }
+
     private func startNode() {
         Task {
             do {
                 try await localNodeStart(network: app.selectedNetwork)
-                await refreshState()
+                await refreshStatus()
+                await refreshLogs()
             } catch {
                 await MainActor.run { errorMessage = error.localizedDescription }
             }
@@ -222,7 +234,8 @@ struct LocalNodeSettingsView: View {
     private func stopNode() {
         Task {
             await localNodeStop()
-            await refreshState()
+            await refreshStatus()
+            await refreshLogs()
         }
     }
 
@@ -230,7 +243,8 @@ struct LocalNodeSettingsView: View {
         Task {
             do {
                 try await localNodeClearDatadir()
-                await refreshState()
+                await refreshStatus()
+                await refreshLogs()
             } catch {
                 await MainActor.run { errorMessage = error.localizedDescription }
             }
