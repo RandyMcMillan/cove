@@ -259,6 +259,8 @@ mod tests {
 
     #[test]
     fn manual_backup_allows_missing_descriptor_mirrors() {
+        let _guard = crate::test_support::global_state_test_lock().blocking_lock();
+        crate::database::test_support::init_test_database();
         crate::test_support::init_test_keychain();
         let metadata = crate::wallet::metadata::WalletMetadata::preview_new();
 
