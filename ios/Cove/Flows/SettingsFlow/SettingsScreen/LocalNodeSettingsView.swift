@@ -97,7 +97,7 @@ struct LocalNodeSettingsView: View {
                     .frame(maxHeight: .infinity)
                 }
 
-                if isMac && showPeersPanel {
+                if isMac, showPeersPanel {
                     HStack(spacing: 0) {
                         Spacer()
 

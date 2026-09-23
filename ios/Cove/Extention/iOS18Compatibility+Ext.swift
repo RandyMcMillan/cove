@@ -139,13 +139,13 @@ struct ConditionalTintModifier: ViewModifier {
 struct SoftScrollEdgeModifier: ViewModifier {
     func body(content: Content) -> some View {
         #if swift(>=6.1)
-        if #available(iOS 26, *) {
-            content.scrollEdgeEffectStyle(.soft, for: .top)
-        } else {
-            content
-        }
+            if #available(iOS 26, *) {
+                content.scrollEdgeEffectStyle(.soft, for: .top)
+            } else {
+                content
+            }
         #else
-        content
+            content
         #endif
     }
 }

@@ -17,24 +17,24 @@ extension View {
     @ViewBuilder
     func applyGlassEffect() -> some View {
         #if swift(>=6.1)
-        if #available(iOS 26.0, *) {
-            self.glassEffect()
-        } else {
-            self
-        }
+            if #available(iOS 26.0, *) {
+                self.glassEffect()
+            } else {
+                self
+            }
         #else
-        self
+            self
         #endif
     }
 
-    /// Applies a glass effect with custom parameters when running on iOS 26+.
+    // Applies a glass effect with custom parameters when running on iOS 26+.
     #if swift(>=6.1)
-    @available(iOS 26.0, *)
-    func applyGlassEffect(
-        _ glass: Glass,
-        in shape: some Shape = DefaultGlassEffectShape()
-    ) -> some View {
-        self.glassEffect(glass, in: shape)
-    }
+        @available(iOS 26.0, *)
+        func applyGlassEffect(
+            _ glass: Glass,
+            in shape: some Shape = DefaultGlassEffectShape()
+        ) -> some View {
+            self.glassEffect(glass, in: shape)
+        }
     #endif
 }
