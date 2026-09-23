@@ -46636,14 +46636,25 @@ public func localNodeIsRunning()async  -> Bool  {
 /**
  * Return the most recent `limit` log lines from the local node.
  * Lines are formatted as `"LEVEL message"`.
+ *
+ * This is exported as an async function so the mobile UI can fetch logs
+ * without blocking the main thread; the log buffer can grow large during
+ * IBD, and a synchronous call would delay status updates.
  */
-public func localNodeLogs(limit: UInt32) -> [String]  {
-    return try!  FfiConverterSequenceString.lift(try! rustCall() {
-        uniffiCallStatus in
-    uniffi_cove_fn_func_local_node_logs(
-        FfiConverterUInt32.lower(limit),uniffiCallStatus
-    )
-})
+public func localNodeLogs(limit: UInt32)async  -> [String]  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_logs(FfiConverterUInt32.lower(limit)
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_rust_buffer,
+            completeFunc: ffi_cove_rust_future_complete_rust_buffer,
+            freeFunc: ffi_cove_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterSequenceString.lift,
+            errorHandler: nil
+
+        )
 }
 public func localNodePeerCount()async  -> UInt32?  {
     return
@@ -46664,13 +46675,20 @@ public func localNodePeerCount()async  -> UInt32?  {
  * Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
  * Returns `true` if the level was recognized and applied.
  */
-public func localNodeSetLogLevel(level: String) -> Bool  {
-    return try!  FfiConverterBool.lift(try! rustCall() {
-        uniffiCallStatus in
-    uniffi_cove_fn_func_local_node_set_log_level(
-        FfiConverterString.lower(level),uniffiCallStatus
-    )
-})
+public func localNodeSetLogLevel(level: String)async  -> Bool  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_set_log_level(FfiConverterString.lower(level)
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_i8,
+            completeFunc: ffi_cove_rust_future_complete_i8,
+            freeFunc: ffi_cove_rust_future_free_i8,
+            liftFunc: FfiConverterBool.lift,
+            errorHandler: nil
+
+        )
 }
 public func localNodeStart(network: Network)async throws   {
     return
@@ -47369,13 +47387,13 @@ private let initializationResult: InitializationResult = {
     if (uniffi_cove_checksum_func_local_node_is_running() != 5029) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_func_local_node_logs() != 40418) {
+    if (uniffi_cove_checksum_func_local_node_logs() != 5047) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_peer_count() != 48968) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_func_local_node_set_log_level() != 4106) {
+    if (uniffi_cove_checksum_func_local_node_set_log_level() != 33503) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_start() != 20017) {
