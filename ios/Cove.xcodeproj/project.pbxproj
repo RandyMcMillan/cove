@@ -1026,6 +1026,9 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Build Rust";
 			};
+			name = Debug;
+		};
+
 		C0A000132EF0000000000003 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1033,7 +1036,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				PRODUCT_NAME = "Build Rust";
 			};
-/* End XCBuildConfiguration section */
+			name = Release;
+		};
+
+	/* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		C0A0000A2EF0000000000001 /* Build configuration list for PBXNativeTarget "CoveUITests" */ = {
