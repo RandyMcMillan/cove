@@ -179,19 +179,12 @@ struct LocalNodeSettingsView: View {
 
     private func refreshState() async {
         do {
-            async let running = localNodeIsRunning()
-            async let tip = localNodeTipHeight()
-            async let ibd = localNodeIsInIbd()
-            async let peers = localNodePeerCount()
-            async let size = localNodeDatadirSize()
-            async let logs = localNodeLogs(limit: 0)
-
-            let newRunning = await running
-            let newTip = await tip
-            let newIbd = await ibd
-            let newPeers = await peers
-            let newSize = try await size
-            let newLogs = await logs
+            let newRunning = await localNodeIsRunning()
+            let newTip = await localNodeTipHeight()
+            let newIbd = await localNodeIsInIbd()
+            let newPeers = await localNodePeerCount()
+            let newSize = try await localNodeDatadirSize()
+            let newLogs = await localNodeLogs(limit: 0)
             let newNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
 
             await MainActor.run {
@@ -206,7 +199,7 @@ struct LocalNodeSettingsView: View {
                 isNetworkConnected = newNetworkConnected
                 logLines = newLogs
 
-                if wasRunning != isRunning || wasIbd != isIbd {
+                if wasRunning != isRunning || wasIbd != isInIbd {
                     restartPolling()
                 }
             }
