@@ -453,6 +453,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/build-rust.sh",
 			);
 			name = "Build Rust Library";
 			outputFileListPaths = (
@@ -461,7 +462,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -euo pipefail\n\n# Delegate to the shared Rust build script so there is a single source of truth.\nexport PATH=\"$HOME/.cargo/bin:$PATH\"\n\nset -x\n\n\"${SRCROOT}/build-rust.sh\"\n";		};
+			shellScript = "set -euo pipefail\n\n# Delegate to the shared Rust build script so there is a single source of truth.\n\nset -x\n\n\"${SRCROOT}/build-rust.sh\"\n";	};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
