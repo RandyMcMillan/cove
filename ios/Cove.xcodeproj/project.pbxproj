@@ -1017,6 +1017,22 @@
 			};
 			name = Release;
 		};
+		C0A000122EF0000000000002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Build Rust";
+			};
+		C0A000132EF0000000000003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				PRODUCT_NAME = "Build Rust";
+			};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1074,8 +1090,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-/* End XCConfigurationList section */
-
 		C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1085,26 +1099,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C0A000122EF0000000000002 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				DEBUGGING_SYMBOLS = YES;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "Build Rust";
-			};
-			name = Debug;
-		};
-		C0A000132EF0000000000003 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				PRODUCT_NAME = "Build Rust";
-			};
-			name = Release;
-		};
+/* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
 		ACD0053A2DB5309A003DC493 /* XCLocalSwiftPackageReference "CoveCore" */ = {
