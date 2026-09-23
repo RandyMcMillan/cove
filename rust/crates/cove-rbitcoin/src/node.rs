@@ -404,6 +404,7 @@ fn available_disk_space(_path: &Path) -> Result<u64, LocalNodeError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::config::build_config;
 
     #[tokio::test]
     async fn find_free_port_returns_valid_localhost() {
