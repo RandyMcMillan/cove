@@ -245,12 +245,12 @@
 /* Begin PBXLegacyTarget section */
 		C0A000102EF0000000000001 /* Build Rust */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--verbose";
+			buildArgumentsString = "$(SRCROOT)/build-rust.sh";
 			buildConfigurationList = C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */;
 			buildPhases = (
 			);
-			buildToolPath = "$(SRCROOT)/build-rust.sh";
-			buildWorkingDirectory = "";
+			buildToolPath = "/bin/bash";
+			buildWorkingDirectory = "$(SRCROOT)";
 			dependencies = (
 			);
 			name = "Build Rust";
