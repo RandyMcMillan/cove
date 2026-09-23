@@ -43,13 +43,21 @@ fi
 
 cd "$RUST_DIR"
 
+# Use all available CPU cores for Cargo builds. `nproc` is Linux-only; on macOS
+# `sysctl -n hw.ncpu` gives the logical core count.
+if command -v nproc >/dev/null 2>&1; then
+    export CARGO_BUILD_JOBS=$(nproc)
+elif command -v sysctl >/dev/null 2>&1; then
+    export CARGO_BUILD_JOBS=$(sysctl -n hw.ncpu)
+fi
+
 # Build both device and simulator slices
 # Use debug for Debug builds, release for Release builds
 if [ "${CONFIGURATION:-Debug}" == "Release" ]; then
-    echo "Building Rust library (release)..."
+    echo "Building Rust library (release) with ${CARGO_BUILD_JOBS:-default} jobs..."
     just build-ios-release
 else
-    echo "Building Rust library (debug)..."
+    echo "Building Rust library (debug) with ${CARGO_BUILD_JOBS:-default} jobs..."
     just build-ios-debug-device
 fi
 
