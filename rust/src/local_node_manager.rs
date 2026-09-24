@@ -141,6 +141,16 @@ impl LocalNodeManager {
         let node = guard.as_ref().ok_or_else(|| LocalNodeError::NotRunning)?;
         node.wait_for_ready(timeout_secs).await.map(|urls| urls.clone())
     }
+
+    /// Return true if both electrum and esplora ports are currently accepting
+    /// connections.
+    pub async fn are_endpoints_ready(&self) -> bool {
+        let guard = self.node.read().await;
+        match guard.as_ref() {
+            Some(node) => node.are_endpoints_ready().await,
+            None => false,
+        }
+    }
 }
 
 /// Resolve the currently selected node, starting the local node if necessary.
@@ -171,10 +181,6 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
     if !manager.is_running().await {
         manager.start(network).await?;
     }
-
-    // Ensure the RPC endpoint is actually accepting connections before handing
-    // the URL to wallet sync code.
-    manager.wait_for_ready(30).await?;
 
     let urls = manager.urls().await.ok_or_else(|| LocalNodeError::NotRunning)?;
 

@@ -7,6 +7,7 @@ import SwiftUI
 
 struct LocalNodeSettingsBody: View {
     let isRunning: Bool
+    let endpointsReady: Bool
     let tipHeight: UInt32?
     let isInIbd: Bool?
     let datadirSize: UInt64?
@@ -38,6 +39,7 @@ struct LocalNodeSettingsBody: View {
         GeometryReader { geometry in
             LocalNodeMainContent(
                 isRunning: isRunning,
+                endpointsReady: endpointsReady,
                 tipHeight: tipHeight,
                 isInIbd: isInIbd,
                 datadirSize: datadirSize,

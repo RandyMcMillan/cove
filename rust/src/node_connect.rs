@@ -171,14 +171,21 @@ impl NodeSelector {
     }
 
     #[uniffi::method]
+    /// Verify a preset node is reachable before selecting it.
+    ///
+    /// For the local node preset this only verifies the node process is running
+    /// — the RPC endpoints may still be initializing, so the live probe is
+    /// skipped to avoid blocking the UI.
     pub async fn check_selected_node(&self, node: Node) -> Result<(), Error> {
-        let node = if node.name == LOCAL_NODE_NAME {
-            crate::local_node_manager::resolve_selected_node()
-                .await
-                .map_err(|e| Error::NodeAccessError(e.to_string()))?
-        } else {
-            node
-        };
+        if node.name == LOCAL_NODE_NAME {
+            if !crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
+                return Err(Error::NodeAccessError(
+                    "Local node is not running. Start it in Settings > Local Node first."
+                        .to_string(),
+                ));
+            }
+            return Ok(());
+        }
 
         node.check_url().await.map_err_debug(Error::NodeAccessError)?;
 
@@ -223,24 +230,31 @@ impl NodeSelector {
     }
 
     #[uniffi::method]
-    /// Check the node url and set it as selected node if it is valid
+    /// Check the node url and set it as selected node if it is valid.
+    ///
+    /// For remote nodes this probes the URL before saving. For URLs that match
+    /// the local node, it only verifies the node process is running — the RPC
+    /// endpoints may still be initializing and should not block the UI.
     pub async fn check_and_save_node(&self, node: Node) -> Result<(), Error> {
-        // If the URL matches the local node, ensure the RPC endpoint is ready
-        // before probing it — the local node may be running but still
-        // initializing its electrum/esplora listener.
-        if let Some(urls) = crate::local_node_manager::LOCAL_NODE_MANAGER.urls().await {
-            if node.url == urls.electrum || node.url == urls.esplora {
-                crate::local_node_manager::LOCAL_NODE_MANAGER
-                    .wait_for_ready(30)
-                    .await
-                    .map_err(|e| Error::NodeAccessError(e.to_string()))?;
-            }
-        }
+        let is_local_url = crate::local_node_manager::LOCAL_NODE_MANAGER
+            .urls()
+            .await
+            .is_some_and(|urls| node.url == urls.electrum || node.url == urls.esplora);
 
-        node.check_url().await.map_err(|error| {
-            tracing::warn!("error checking node: {error:?}");
-            Error::NodeAccessError(error.to_string())
-        })?;
+        if is_local_url {
+            if !crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
+                return Err(Error::NodeAccessError(
+                    "Local node is not running. Start it in Settings > Local Node first.".to_string(),
+                ));
+            }
+            // Skip the live URL probe — the local node's electrum/esplora
+            // listeners start after IBD and may not be ready yet.
+        } else {
+            node.check_url().await.map_err(|error| {
+                tracing::warn!("error checking node: {error:?}");
+                Error::NodeAccessError(error.to_string())
+            })?;
+        }
 
         Database::global()
             .global_config

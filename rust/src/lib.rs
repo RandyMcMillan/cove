@@ -132,6 +132,11 @@ async fn local_node_electrum_url() -> Option<String> {
     local_node_manager::LOCAL_NODE_MANAGER.urls().await.map(|u| u.electrum)
 }
 
+#[uniffi::export(async_runtime = "tokio")]
+async fn local_node_endpoints_ready() -> bool {
+    local_node_manager::LOCAL_NODE_MANAGER.are_endpoints_ready().await
+}
+
 #[derive(Debug, Clone, thiserror::Error, uniffi::Error)]
 pub enum LocalNodeStartError {
     #[error("failed to open rbitcoin store: {0}")]

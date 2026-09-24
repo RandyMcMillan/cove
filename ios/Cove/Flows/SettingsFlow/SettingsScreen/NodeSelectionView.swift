@@ -167,13 +167,17 @@ struct NodeSelectionView: View {
             let matchesApiType =
                 savedSelectedNode.apiType == .electrum && selectedNodeName.contains("Electrum")
                     || savedSelectedNode.apiType == .esplora && selectedNodeName.contains("Esplora")
-            guard matchesApiType else { return }
-
-            customUrl = savedSelectedNode.url
-            customNodeName = savedSelectedNode.name
-            return
+            if matchesApiType {
+                customUrl = savedSelectedNode.url
+                customNodeName = savedSelectedNode.name
+                return
+            }
         }
 
+        // No saved custom node matches the selected type — populate from the
+        // local node if it is running, otherwise clear the field.
+        customUrl = ""
+        customNodeName = ""
         Task {
             if selectedNodeName.contains("Electrum"), let url = await localNodeElectrumUrl() {
                 await MainActor.run {
@@ -275,7 +279,9 @@ private struct NodeSelectionCustomFields: View {
             Section(selectedNodeName) {
                 NodeSelectionTextField(
                     title: "URL",
-                    placeholder: "Enter URL",
+                    placeholder: selectedNodeName.contains("Electrum")
+                        ? "tcp://host:port or ssl://host:port"
+                        : "http://host:port or https://host:port",
                     text: $customUrl,
                     isUrl: true
                 )

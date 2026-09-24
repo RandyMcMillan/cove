@@ -7,6 +7,7 @@ import SwiftUI
 
 struct LocalNodeMainContent: View {
     let isRunning: Bool
+    let endpointsReady: Bool
     let tipHeight: UInt32?
     let isInIbd: Bool?
     let datadirSize: UInt64?
@@ -31,6 +32,7 @@ struct LocalNodeMainContent: View {
             VStack(spacing: 0) {
                 LocalNodeStatusSection(
                     isRunning: isRunning,
+                    endpointsReady: endpointsReady,
                     tipHeight: tipHeight,
                     isInIbd: isInIbd,
                     datadirSize: datadirSize,

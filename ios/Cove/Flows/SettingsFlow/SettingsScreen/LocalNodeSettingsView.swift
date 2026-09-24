@@ -9,6 +9,7 @@ struct LocalNodeSettingsView: View {
     @Environment(AppManager.self) private var app
 
     @State private var isRunning = false
+    @State private var endpointsReady = false
     @State private var tipHeight: UInt32?
     @State private var isInIbd: Bool?
     @State private var datadirSize: UInt64?
@@ -68,6 +69,7 @@ struct LocalNodeSettingsView: View {
     var body: some View {
         LocalNodeSettingsBody(
             isRunning: isRunning,
+            endpointsReady: endpointsReady,
             tipHeight: tipHeight,
             isInIbd: isInIbd,
             datadirSize: datadirSize,
@@ -134,19 +136,21 @@ struct LocalNodeSettingsView: View {
     private func refreshStatus() async {
         do {
             let newRunning = await localNodeIsRunning()
+            let newEndpointsReady = await localNodeEndpointsReady()
             let newTip = await localNodeTipHeight()
             let newIbd = await localNodeIsInIbd()
             let newPeers = await localNodePeerCount()
             let newSize = try await localNodeDatadirSize()
             let newNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
-            let newElectrumUrl = await localNodeElectrumUrl()
-            let newEsploraUrl = await localNodeEsploraUrl()
+            let newElectrumUrl = newEndpointsReady ? await localNodeElectrumUrl() : nil
+            let newEsploraUrl = newEndpointsReady ? await localNodeEsploraUrl() : nil
 
             await MainActor.run {
                 let wasRunning = isRunning
                 let wasIbd = isInIbd
 
                 isRunning = newRunning
+                endpointsReady = newEndpointsReady
                 tipHeight = newTip
                 isInIbd = newIbd
                 peerCount = newPeers
@@ -214,6 +218,7 @@ struct LocalNodeSettingsView: View {
 
 struct LocalNodeStatusSection: View {
     let isRunning: Bool
+    let endpointsReady: Bool
     let tipHeight: UInt32?
     let isInIbd: Bool?
     let datadirSize: UInt64?
@@ -231,7 +236,11 @@ struct LocalNodeStatusSection: View {
                 .foregroundStyle(.secondary)
 
             VStack(spacing: 0) {
-                StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
+                if isRunning && !endpointsReady {
+                    StatusRow(title: "State", value: "Starting…")
+                } else {
+                    StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
+                }
 
                 Divider()
                 NetworkStatusRow(isConnected: isNetworkConnected)
@@ -480,6 +489,14 @@ struct LocalNodeHelpView: View {
         electrumUrl?.replacingOccurrences(of: "tcp://", with: "") ?? "127.0.0.1:<port>"
     }
 
+    private var electrumHost: String {
+        electrumHostPort.components(separatedBy: ":").first ?? "127.0.0.1"
+    }
+
+    private var electrumPort: String {
+        electrumHostPort.components(separatedBy: ":").last ?? "<port>"
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -525,24 +542,25 @@ struct LocalNodeHelpView: View {
 
                         CodeBlock(
                             title: "Server version",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHostPort)"
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHost) \(electrumPort)"
                         )
                         CodeBlock(
                             title: "Block headers",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\\n' | nc \(electrumHostPort)"
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\\n' | nc \(electrumHost) \(electrumPort)"
                         )
                         CodeBlock(
                             title: "Scripthash balance",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_balance\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHostPort)"
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_balance\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
                         )
                         CodeBlock(
                             title: "Scripthash history",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_history\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHostPort)"
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_history\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
                         )
                     }
 
                     helpSection("Notes") {
                         VStack(alignment: .leading, spacing: 8) {
+                            Label("Endpoints appear only after IBD and index materialization complete — the Status section shows 'Starting…' until then.", systemImage: "info.circle")
                             Label("Ports change on every restart — check the Status section for current URLs.", systemImage: "info.circle")
                             Label("The node only listens on 127.0.0.1 (localhost).", systemImage: "lock.shield")
                             Label("Queries may return stale data while Initial Block Download is in progress.", systemImage: "exclamationmark.triangle")

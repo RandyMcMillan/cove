@@ -306,6 +306,28 @@ impl LocalNode {
             tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
         }
     }
+
+    /// Return true if both electrum and esplora ports are currently accepting
+    /// connections. This is a single-shot check — it does not wait.
+    pub async fn are_endpoints_ready(&self) -> bool {
+        let Some(ref urls) = self.urls else {
+            return false;
+        };
+
+        let electrum_addr = match parse_addr(&urls.electrum) {
+            Ok(addr) => addr,
+            Err(_) => return false,
+        };
+        let esplora_addr = match parse_addr(&urls.esplora) {
+            Ok(addr) => addr,
+            Err(_) => return false,
+        };
+
+        let electrum_ready = TcpStream::connect(electrum_addr).await.is_ok();
+        let esplora_ready = TcpStream::connect(esplora_addr).await.is_ok();
+
+        electrum_ready && esplora_ready
+    }
 }
 
 impl Drop for LocalNode {
@@ -483,5 +505,54 @@ mod tests {
 
         assert_eq!(config.listen.max_outbound, 4);
         assert!(!config.mempool.blocksonly);
+    }
+
+    #[tokio::test]
+    async fn are_endpoints_ready_false_when_not_running() {
+        let node = LocalNode::new(Network::Signet);
+        assert!(!node.are_endpoints_ready().await);
+    }
+
+    #[tokio::test]
+    async fn are_endpoints_ready_false_when_urls_not_set() {
+        let mut node = LocalNode::new(Network::Signet);
+        // Simulate a running node without URLs set
+        node.running = Some(Arc::new(AtomicBool::new(true)));
+        assert!(!node.are_endpoints_ready().await);
+    }
+
+    #[tokio::test]
+    async fn are_endpoints_ready_false_when_no_listener() {
+        let mut node = LocalNode::new(Network::Signet);
+        node.running = Some(Arc::new(AtomicBool::new(true)));
+        node.urls = Some(LocalNodeUrls {
+            electrum: "tcp://127.0.0.1:59999".to_string(),
+            esplora: "http://127.0.0.1:59998".to_string(),
+        });
+        // Ports 59999/59998 are assumed free — no listener bound
+        assert!(!node.are_endpoints_ready().await);
+    }
+
+    #[tokio::test]
+    async fn are_endpoints_ready_true_when_listeners_bound() {
+        let mut node = LocalNode::new(Network::Signet);
+        node.running = Some(Arc::new(AtomicBool::new(true)));
+
+        // Bind actual listeners on ephemeral ports
+        let electrum_listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let esplora_listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let electrum_addr = electrum_listener.local_addr().unwrap();
+        let esplora_addr = esplora_listener.local_addr().unwrap();
+
+        node.urls = Some(LocalNodeUrls {
+            electrum: format!("tcp://{}", electrum_addr),
+            esplora: format!("http://{}", esplora_addr),
+        });
+
+        assert!(node.are_endpoints_ready().await);
+
+        // Explicit drop to avoid unused warnings and ensure cleanup
+        drop(electrum_listener);
+        drop(esplora_listener);
     }
 }

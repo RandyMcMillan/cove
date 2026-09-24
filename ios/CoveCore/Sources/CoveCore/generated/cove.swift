@@ -6881,10 +6881,21 @@ public func FfiConverterTypeMnemonic_lower(_ value: Mnemonic) -> UInt64 {
 public protocol NodeSelectorProtocol: AnyObject, Sendable {
 
     /**
-     * Check the node url and set it as selected node if it is valid
+     * Check the node url and set it as selected node if it is valid.
+     *
+     * For remote nodes this probes the URL before saving. For URLs that match
+     * the local node, it only verifies the node process is running — the RPC
+     * endpoints may still be initializing and should not block the UI.
      */
     func checkAndSaveNode(node: Node) async throws
 
+    /**
+     * Verify a preset node is reachable before selecting it.
+     *
+     * For the local node preset this only verifies the node process is running
+     * — the RPC endpoints may still be initializing, so the live probe is
+     * skipped to avoid blocking the UI.
+     */
     func checkSelectedNode(node: Node) async throws
 
     func nodeList()  -> [NodeSelection]
@@ -6963,7 +6974,11 @@ public convenience init() {
 
 
     /**
-     * Check the node url and set it as selected node if it is valid
+     * Check the node url and set it as selected node if it is valid.
+     *
+     * For remote nodes this probes the URL before saving. For URLs that match
+     * the local node, it only verifies the node process is running — the RPC
+     * endpoints may still be initializing and should not block the UI.
      */
 open func checkAndSaveNode(node: Node)async throws   {
     return
@@ -6982,6 +6997,13 @@ open func checkAndSaveNode(node: Node)async throws   {
         )
 }
 
+    /**
+     * Verify a preset node is reachable before selecting it.
+     *
+     * For the local node preset this only verifies the node process is running
+     * — the RPC endpoints may still be initializing, so the live probe is
+     * skipped to avoid blocking the UI.
+     */
 open func checkSelectedNode(node: Node)async throws   {
     return
         try  await uniffiRustCallAsync(
@@ -46588,6 +46610,21 @@ public func localNodeElectrumUrl()async  -> String?  {
 
         )
 }
+public func localNodeEndpointsReady()async  -> Bool  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_cove_fn_func_local_node_endpoints_ready(
+                )
+            },
+            pollFunc: ffi_cove_rust_future_poll_i8,
+            completeFunc: ffi_cove_rust_future_complete_i8,
+            freeFunc: ffi_cove_rust_future_free_i8,
+            liftFunc: FfiConverterBool.lift,
+            errorHandler: nil
+
+        )
+}
 public func localNodeEsploraUrl()async  -> String?  {
     return
         try!  await uniffiRustCallAsync(
@@ -47376,6 +47413,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_electrum_url() != 10327) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_cove_checksum_func_local_node_endpoints_ready() != 15065) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_func_local_node_esplora_url() != 39101) {
@@ -48488,10 +48528,10 @@ private let initializationResult: InitializationResult = {
     if (uniffi_cove_checksum_method_mnemonic_words() != 8009) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_method_nodeselector_check_and_save_node() != 42980) {
+    if (uniffi_cove_checksum_method_nodeselector_check_and_save_node() != 13339) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_method_nodeselector_check_selected_node() != 34244) {
+    if (uniffi_cove_checksum_method_nodeselector_check_selected_node() != 41878) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_nodeselector_node_list() != 26686) {

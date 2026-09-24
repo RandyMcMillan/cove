@@ -76,16 +76,14 @@ The Electrum endpoint speaks the [Electrum protocol](https://electrumx.readthedo
 Send a JSON-RPC request line and read the response:
 
 ```bash
-printf '{"jsonrpc":"2.0","id":1,"method":"server.version","params":["cove","1.4"]}
-' \
+printf '{"jsonrpc":"2.0","id":1,"method":"server.version","params":["cove","1.4"]}\n' \
   | nc 127.0.0.1 51234
 ```
 
 Pretty-print with `jq`:
 
 ```bash
-printf '{"jsonrpc":"2.0","id":1,"method":"server.version","params":["cove","1.4"]}
-' \
+printf '{"jsonrpc":"2.0","id":1,"method":"server.version","params":["cove","1.4"]}\n' \
   | nc 127.0.0.1 51234 | jq .
 ```
 
@@ -93,16 +91,16 @@ Other useful methods:
 
 ```bash
 # Current block height
-printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.headers.subscribe","params":[]}
-' | nc 127.0.0.1 51234 | jq .
+printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.headers.subscribe","params":[]}\n' \
+  | nc 127.0.0.1 51234 | jq .
 
 # Get balance for a script hash
-printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.scripthash.get_balance","params":["<scripthash>"]}
-' | nc 127.0.0.1 51234 | jq .
+printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.scripthash.get_balance","params":["<scripthash>"]}\n' \
+  | nc 127.0.0.1 51234 | jq .
 
 # Get history for a script hash
-printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.scripthash.get_history","params":["<scripthash>"]}
-' | nc 127.0.0.1 51234 | jq .
+printf '{"jsonrpc":"2.0","id":1,"method":"blockchain.scripthash.get_history","params":["<scripthash>"]}\n' \
+  | nc 127.0.0.1 51234 | jq .
 ```
 
 ### Using `jsonrpc-cli` or `electrum-client`
@@ -123,4 +121,5 @@ print(s.recv(4096).decode())
 
 - Ports change every time the node restarts. Always check **Settings > Local Node** for the current session's URLs.
 - The node only accepts connections from `127.0.0.1` (localhost). It is not reachable from other devices on the network.
-- If the node is in Initial Block Download (IBD), some Esplora/Electrum queries may return stale data until sync completes.
+- The Electrum and Esplora listeners do not start until after Initial Block Download (IBD) and scripthash index materialization are complete. The UI shows "Starting…" until the endpoints are ready.
+- If the node is in IBD, some Esplora/Electrum queries may return stale data until sync completes.
