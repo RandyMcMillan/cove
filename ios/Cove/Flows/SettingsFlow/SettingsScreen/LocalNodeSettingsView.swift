@@ -235,53 +235,81 @@ struct LocalNodeStatusSection: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
 
-            VStack(spacing: 0) {
-                if isRunning, !endpointsReady {
-                    StatusRow(title: "State", value: "Starting…")
-                } else {
-                    StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
-                }
-
-                Divider()
-                NetworkStatusRow(isConnected: isNetworkConnected)
-
-                if let peerCount {
-                    Divider()
-                    StatusRow(title: "Peers", value: "\(peerCount)")
-                }
-
-                if let tipHeight {
-                    Divider()
-                    if let horizon {
-                        StatusRow(title: "Block Height", value: "\(tipHeight) / \(horizon)")
-                    } else {
-                        StatusRow(title: "Block Height", value: "\(tipHeight)")
-                    }
-                }
-
-                if let isInIbd {
-                    Divider()
-                    StatusRow(title: "Initial Block Download", value: isInIbd ? "Yes" : "No")
-                }
-
-                if let datadirSize {
-                    Divider()
-                    StatusRow(title: "Data Directory", value: formatBytes(datadirSize))
-                }
-
-                if let electrumUrl {
-                    Divider()
-                    StatusRow(title: "Electrum", value: electrumUrl)
-                }
-
-                if let esploraUrl {
-                    Divider()
-                    StatusRow(title: "Esplora", value: esploraUrl)
-                }
-            }
+            StatusRows(
+                isRunning: isRunning,
+                endpointsReady: endpointsReady,
+                tipHeight: tipHeight,
+                isInIbd: isInIbd,
+                datadirSize: datadirSize,
+                peerCount: peerCount,
+                electrumUrl: electrumUrl,
+                esploraUrl: esploraUrl,
+                horizon: horizon,
+                isNetworkConnected: isNetworkConnected
+            )
             .padding(.vertical, 4)
             .background(Color(.secondarySystemGroupedBackground))
             .cornerRadius(10)
+        }
+    }
+}
+
+private struct StatusRows: View {
+    let isRunning: Bool
+    let endpointsReady: Bool
+    let tipHeight: UInt32?
+    let isInIbd: Bool?
+    let datadirSize: UInt64?
+    let peerCount: UInt32?
+    let electrumUrl: String?
+    let esploraUrl: String?
+    let horizon: UInt32?
+    let isNetworkConnected: Bool
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if isRunning, !endpointsReady {
+                StatusRow(title: "State", value: "Starting…")
+            } else {
+                StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
+            }
+
+            Divider()
+            NetworkStatusRow(isConnected: isNetworkConnected)
+
+            if let peerCount {
+                Divider()
+                StatusRow(title: "Peers", value: "\(peerCount)")
+            }
+
+            if let tipHeight {
+                Divider()
+                if let horizon {
+                    StatusRow(title: "Block Height", value: "\(tipHeight) / \(horizon)")
+                } else {
+                    StatusRow(title: "Block Height", value: "\(tipHeight)")
+                }
+            }
+
+            if let isInIbd {
+                Divider()
+                StatusRow(title: "Initial Block Download", value: isInIbd ? "Yes" : "No")
+            }
+
+            if let datadirSize {
+                Divider()
+                StatusRow(title: "Data Directory", value: formatBytes(datadirSize))
+            }
+
+            if let electrumUrl {
+                Divider()
+                StatusRow(title: "Electrum", value: electrumUrl)
+            }
+
+            if let esploraUrl {
+                Divider()
+                StatusRow(title: "Esplora", value: esploraUrl)
+            }
         }
     }
 }
@@ -566,72 +594,9 @@ struct LocalNodeHelpView: View {
                     Text("The local node exposes an Electrum (TCP) and an Esplora (HTTP) endpoint on localhost. Ports change every time the node restarts.")
                         .font(.body)
 
-                    helpSection("Esplora (HTTP)") {
-                        Text("The Esplora endpoint speaks plain HTTP and can be queried with curl, wget, or any HTTP client.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
-                        CodeBlock(
-                            title: "Block height",
-                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/blocks/tip/height"
-                        )
-                        CodeBlock(
-                            title: "Address info",
-                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>"
-                        )
-                        CodeBlock(
-                            title: "Address transactions",
-                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/txs"
-                        )
-                        CodeBlock(
-                            title: "Address UTXOs",
-                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/utxo"
-                        )
-                        CodeBlock(
-                            title: "Transaction by ID",
-                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/tx/<txid>"
-                        )
-                        CodeBlock(
-                            title: "Broadcast raw transaction",
-                            code: "curl -X POST -H \"Content-Type: text/plain\" --data-binary \"<hex-encoded-tx>\" \(esploraUrl ?? "http://127.0.0.1:<port>")/tx"
-                        )
-                    }
-
-                    helpSection("Electrum (TCP)") {
-                        Text("The Electrum endpoint speaks the Electrum protocol over plain TCP. Use nc (netcat) or a dedicated client.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
-                        CodeBlock(
-                            title: "Server version",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHost) \(electrumPort)"
-                        )
-                        CodeBlock(
-                            title: "Block headers",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\\n' | nc \(electrumHost) \(electrumPort)"
-                        )
-                        CodeBlock(
-                            title: "Scripthash balance",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_balance\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
-                        )
-                        CodeBlock(
-                            title: "Scripthash history",
-                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_history\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
-                        )
-                    }
-
-                    helpSection("Notes") {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Endpoints appear only after IBD and index materialization complete — the Status section shows 'Starting…' until then.", systemImage: "info.circle")
-                            Label("Ports change on every restart — check the Status section for current URLs.", systemImage: "info.circle")
-                            Label("The node only listens on 127.0.0.1 (localhost).", systemImage: "lock.shield")
-                            Label("Queries may return stale data while Initial Block Download is in progress.", systemImage: "exclamationmark.triangle")
-                            Label("If running in the iOS Simulator, run these commands from inside the simulator (xcrun simctl spawn <UDID> curl ...).", systemImage: "exclamationmark.triangle")
-                                .foregroundStyle(.orange)
-                        }
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    }
+                    EsploraHelpSection(esploraUrl: esploraUrl)
+                    ElectrumHelpSection(electrumHost: electrumHost, electrumPort: electrumPort)
+                    HelpNotesSection()
                 }
                 .padding()
             }
@@ -650,6 +615,108 @@ struct LocalNodeHelpView: View {
             Text(title)
                 .font(.headline)
             content()
+        }
+    }
+}
+
+private struct EsploraHelpSection: View {
+    let esploraUrl: String?
+
+    var body: some View {
+        HelpSection("Esplora (HTTP)") {
+            Text("The Esplora endpoint speaks plain HTTP and can be queried with curl, wget, or any HTTP client.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            CodeBlock(
+                title: "Block height",
+                code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/blocks/tip/height"
+            )
+            CodeBlock(
+                title: "Address info",
+                code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>"
+            )
+            CodeBlock(
+                title: "Address transactions",
+                code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/txs"
+            )
+            CodeBlock(
+                title: "Address UTXOs",
+                code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/utxo"
+            )
+            CodeBlock(
+                title: "Transaction by ID",
+                code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/tx/<txid>"
+            )
+            CodeBlock(
+                title: "Broadcast raw transaction",
+                code: "curl -X POST -H \"Content-Type: text/plain\" --data-binary \"<hex-encoded-tx>\" \(esploraUrl ?? "http://127.0.0.1:<port>")/tx"
+            )
+        }
+    }
+}
+
+private struct ElectrumHelpSection: View {
+    let electrumHost: String
+    let electrumPort: String
+
+    var body: some View {
+        HelpSection("Electrum (TCP)") {
+            Text("The Electrum endpoint speaks the Electrum protocol over plain TCP. Use nc (netcat) or a dedicated client.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            CodeBlock(
+                title: "Server version",
+                code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHost) \(electrumPort)"
+            )
+            CodeBlock(
+                title: "Block headers",
+                code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\\n' | nc \(electrumHost) \(electrumPort)"
+            )
+            CodeBlock(
+                title: "Scripthash balance",
+                code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_balance\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
+            )
+            CodeBlock(
+                title: "Scripthash history",
+                code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_history\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHost) \(electrumPort)"
+            )
+        }
+    }
+}
+
+private struct HelpNotesSection: View {
+    var body: some View {
+        HelpSection("Notes") {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Endpoints appear only after IBD and index materialization complete — the Status section shows 'Starting…' until then.", systemImage: "info.circle")
+                Label("Ports change on every restart — check the Status section for current URLs.", systemImage: "info.circle")
+                Label("The node only listens on 127.0.0.1 (localhost).", systemImage: "lock.shield")
+                Label("Queries may return stale data while Initial Block Download is in progress.", systemImage: "exclamationmark.triangle")
+                Label("If running in the iOS Simulator, run these commands from inside the simulator (xcrun simctl spawn <UDID> curl ...).", systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct HelpSection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+
+    init(_ title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+            content
         }
     }
 }
