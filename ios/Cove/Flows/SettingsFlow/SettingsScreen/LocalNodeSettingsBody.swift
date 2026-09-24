@@ -1,0 +1,74 @@
+//
+//  LocalNodeSettingsBody.swift
+//  Cove
+//
+
+import SwiftUI
+
+struct LocalNodeSettingsBody: View {
+    let isRunning: Bool
+    let tipHeight: UInt32?
+    let isInIbd: Bool?
+    let datadirSize: UInt64?
+    let peerCount: UInt32?
+    let horizonFromLogs: UInt32?
+    let isNetworkConnected: Bool
+    @Binding var showClearConfirm: Bool
+    let logLines: [String]
+    @Binding var logLevel: String
+    let onSetLogLevel: (String) -> Void
+    let startNode: () -> Void
+    let stopNode: () -> Void
+    @Binding var showPeersPanel: Bool
+    @Binding var peersPanelWidthRatio: CGFloat
+    @Binding var errorMessage: String?
+    let isMac: Bool
+    let startPolling: () -> Void
+    let stopPolling: () -> Void
+    let clearDatadir: () -> Void
+    let localNodeSetLogLevel: (String) async -> Bool
+    let refreshStatus: () async -> Void
+    let refreshLogs: () async -> Void
+
+    var body: some View {
+        GeometryReader { geometry in
+            LocalNodeMainContent(
+                isRunning: isRunning,
+                tipHeight: tipHeight,
+                isInIbd: isInIbd,
+                datadirSize: datadirSize,
+                peerCount: peerCount,
+                horizonFromLogs: horizonFromLogs,
+                isNetworkConnected: isNetworkConnected,
+                showClearConfirm: $showClearConfirm,
+                logLines: logLines,
+                logLevel: $logLevel,
+                onSetLogLevel: onSetLogLevel,
+                startNode: startNode,
+                stopNode: stopNode,
+                showPeersPanel: showPeersPanel,
+                peersPanelWidthRatio: $peersPanelWidthRatio,
+                geometryWidth: geometry.size.width,
+                isMac: isMac
+            )
+        }
+        .navigationTitle("Local Node")
+        .onAppear {
+            Task {
+                await localNodeSetLogLevel("trace")
+                await refreshStatus()
+                await refreshLogs()
+            }
+            startPolling()
+        }
+        .onDisappear {
+            stopPolling()
+        }
+        .onKeyPress(.init("\\")) {
+            if isMac {
+                showPeersPanel.toggle()
+            }
+            return .handled
+        }
+    }
+}

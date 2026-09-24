@@ -249,7 +249,7 @@
 			buildConfigurationList = C0A000112EF0000000000001 /* Build configuration list for PBXLegacyTarget "Build Rust" */;
 			buildPhases = (
 			);
-			buildToolPath = "/bin/bash";
+			buildToolPath = /bin/bash;
 			buildWorkingDirectory = "$(SRCROOT)";
 			dependencies = (
 			);

@@ -64,62 +64,31 @@ struct LocalNodeSettingsView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                VStack(spacing: 0) {
-                    LocalNodeStatusSection(
-                        isRunning: isRunning,
-                        tipHeight: tipHeight,
-                        isInIbd: isInIbd,
-                        datadirSize: datadirSize,
-                        peerCount: peerCount,
-                        horizon: horizonFromLogs,
-                        isNetworkConnected: isNetworkConnected
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-
-                    LocalNodeActionsSection(
-                        isRunning: isRunning,
-                        onStart: startNode,
-                        onStop: stopNode,
-                        onClear: { showClearConfirm = true }
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-
-                    LocalNodeLogSection(
-                        logLines: filteredLogLines,
-                        logLevel: $logLevel,
-                        onSetLogLevel: setLogLevel
-                    )
-                    .padding(.top, 16)
-                    .frame(maxHeight: .infinity)
-                }
-
-                if isMac, showPeersPanel {
-                    PeersPanelOverlay(
-                        peerCount: peerCount,
-                        isRunning: isRunning,
-                        geometryWidth: geometry.size.width,
-                        peersPanelWidthRatio: $peersPanelWidthRatio,
-                        showPeersPanel: showPeersPanel
-                    )
-                }
-            }
-        }
-        .navigationTitle("Local Node")
-        .onAppear {
-            Task {
-                await localNodeSetLogLevel(level: "trace")
-                await refreshStatus()
-                await refreshLogs()
-            }
-            startPolling()
-        }
-        .onDisappear {
-            stopPolling()
-        }
+        LocalNodeSettingsBody(
+            isRunning: isRunning,
+            tipHeight: tipHeight,
+            isInIbd: isInIbd,
+            datadirSize: datadirSize,
+            peerCount: peerCount,
+            horizonFromLogs: horizonFromLogs,
+            isNetworkConnected: isNetworkConnected,
+            showClearConfirm: $showClearConfirm,
+            logLines: filteredLogLines,
+            logLevel: $logLevel,
+            onSetLogLevel: setLogLevel,
+            startNode: startNode,
+            stopNode: stopNode,
+            showPeersPanel: $showPeersPanel,
+            peersPanelWidthRatio: $peersPanelWidthRatio,
+            errorMessage: $errorMessage,
+            isMac: isMac,
+            startPolling: startPolling,
+            stopPolling: stopPolling,
+            clearDatadir: clearDatadir,
+            localNodeSetLogLevel: localNodeSetLogLevel,
+            refreshStatus: refreshStatus,
+            refreshLogs: refreshLogs
+        )
         .alert("Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
         } message: {
@@ -132,12 +101,6 @@ struct LocalNodeSettingsView: View {
             Button("Clear", role: .destructive) { clearDatadir() }
         } message: {
             Text("This will delete all local node data and require a full resync.")
-        }
-        .onKeyPress(.init("\\")) {
-            if isMac {
-                showPeersPanel.toggle()
-            }
-            return .handled
         }
     }
 
@@ -241,7 +204,7 @@ struct LocalNodeSettingsView: View {
     }
 }
 
-private struct LocalNodeStatusSection: View {
+struct LocalNodeStatusSection: View {
     let isRunning: Bool
     let tipHeight: UInt32?
     let isInIbd: Bool?
@@ -332,7 +295,7 @@ private struct NetworkStatusRow: View {
     }
 }
 
-private struct LocalNodeActionsSection: View {
+struct LocalNodeActionsSection: View {
     let isRunning: Bool
     let onStart: () -> Void
     let onStop: () -> Void
@@ -372,7 +335,7 @@ private struct LocalNodeActionsSection: View {
     }
 }
 
-private struct LocalNodeLogSection: View {
+struct LocalNodeLogSection: View {
     let logLines: [String]
     @Binding var logLevel: String
     let onSetLogLevel: (String) -> Void
@@ -488,7 +451,7 @@ private func formatBytes(_ bytes: UInt64) -> String {
     return formatter.string(fromByteCount: Int64(bytes))
 }
 
-private struct PeersPanelView: View {
+struct PeersPanelView: View {
     let peerCount: UInt32?
     let isRunning: Bool
 
@@ -529,45 +492,6 @@ private struct PeersPanelView: View {
 
             Spacer()
         }
-    }
-}
-
-private struct PeersPanelOverlay: View {
-    let peerCount: UInt32?
-    let isRunning: Bool
-    let geometryWidth: CGFloat
-    @Binding var peersPanelWidthRatio: CGFloat
-    let showPeersPanel: Bool
-
-    var body: some View {
-        HStack(spacing: 0) {
-            Spacer()
-
-            PeersPanelView(peerCount: peerCount, isRunning: isRunning)
-                .frame(width: geometryWidth * peersPanelWidthRatio)
-                .background(Color(.systemBackground))
-                .overlay(
-                    HStack(spacing: 0) {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 4)
-                            .contentShape(Rectangle())
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        let delta = -value.translation.width
-                                        let newWidth = (geometryWidth * peersPanelWidthRatio) + delta
-                                        let clamped = min(max(newWidth, geometryWidth * 0.25), geometryWidth * 0.85)
-                                        peersPanelWidthRatio = clamped / geometryWidth
-                                    }
-                            )
-                        Spacer()
-                    }
-                )
-                .shadow(radius: 4)
-        }
-        .transition(.move(edge: .trailing))
-        .animation(.easeInOut(duration: 0.25), value: showPeersPanel)
     }
 }
 
