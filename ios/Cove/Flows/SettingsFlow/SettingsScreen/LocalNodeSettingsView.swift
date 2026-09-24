@@ -13,6 +13,8 @@ struct LocalNodeSettingsView: View {
     @State private var isInIbd: Bool?
     @State private var datadirSize: UInt64?
     @State private var peerCount: UInt32?
+    @State private var electrumUrl: String?
+    @State private var esploraUrl: String?
     @State private var errorMessage: String?
     @State private var showClearConfirm = false
     @State private var timer: Timer? = nil
@@ -70,6 +72,8 @@ struct LocalNodeSettingsView: View {
             isInIbd: isInIbd,
             datadirSize: datadirSize,
             peerCount: peerCount,
+            electrumUrl: electrumUrl,
+            esploraUrl: esploraUrl,
             horizonFromLogs: horizonFromLogs,
             isNetworkConnected: isNetworkConnected,
             showClearConfirm: $showClearConfirm,
@@ -135,6 +139,8 @@ struct LocalNodeSettingsView: View {
             let newPeers = await localNodePeerCount()
             let newSize = try await localNodeDatadirSize()
             let newNetworkConnected = CloudConnectivityMonitor.shared.isConnected()
+            let newElectrumUrl = await localNodeElectrumUrl()
+            let newEsploraUrl = await localNodeEsploraUrl()
 
             await MainActor.run {
                 let wasRunning = isRunning
@@ -145,6 +151,8 @@ struct LocalNodeSettingsView: View {
                 isInIbd = newIbd
                 peerCount = newPeers
                 datadirSize = newSize
+                electrumUrl = newElectrumUrl
+                esploraUrl = newEsploraUrl
                 isNetworkConnected = newNetworkConnected
 
                 if wasRunning != isRunning || wasIbd != isInIbd {
@@ -210,6 +218,8 @@ struct LocalNodeStatusSection: View {
     let isInIbd: Bool?
     let datadirSize: UInt64?
     let peerCount: UInt32?
+    let electrumUrl: String?
+    let esploraUrl: String?
     let horizon: UInt32?
     let isNetworkConnected: Bool
 
@@ -248,6 +258,16 @@ struct LocalNodeStatusSection: View {
                 if let datadirSize {
                     Divider()
                     StatusRow(title: "Data Directory", value: formatBytes(datadirSize))
+                }
+
+                if let electrumUrl {
+                    Divider()
+                    StatusRow(title: "Electrum", value: electrumUrl)
+                }
+
+                if let esploraUrl {
+                    Divider()
+                    StatusRow(title: "Esplora", value: esploraUrl)
                 }
             }
             .padding(.vertical, 4)

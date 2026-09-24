@@ -56,6 +56,8 @@ import org.bitcoinppl.cove_core.ApiType
 import org.bitcoinppl.cove_core.NodeSelection
 import org.bitcoinppl.cove_core.NodeSelector
 import org.bitcoinppl.cove_core.NodeSelectorException
+import org.bitcoinppl.cove_core.localNodeElectrumUrl
+import org.bitcoinppl.cove_core.localNodeEsploraUrl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,7 +110,7 @@ fun NodeSettingsScreen(
         selectedNodeName = selectedNodeSelection.toNode().name
     }
 
-    // pre-fill custom fields if a custom node was previously saved
+    // pre-fill custom fields if a custom node was previously saved or local node is selected
     LaunchedEffect(showCustomFields, selectedNodeSelection) {
         if (showCustomFields && customUrl.isEmpty()) {
             val savedNode = selectedNodeSelection
@@ -123,6 +125,16 @@ fun NodeSettingsScreen(
                 if (matchesType) {
                     customUrl = node.url
                     customNodeName = node.name
+                }
+            } else if (savedNode is NodeSelection.Local) {
+                val url = when (selectedNodeName) {
+                    customElectrum -> withContext(Dispatchers.IO) { localNodeElectrumUrl() }
+                    customEsplora -> withContext(Dispatchers.IO) { localNodeEsploraUrl() }
+                    else -> null
+                }
+                if (url != null) {
+                    customUrl = url
+                    customNodeName = "Local Node"
                 }
             }
         }

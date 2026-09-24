@@ -163,15 +163,30 @@ struct NodeSelectionView: View {
     }
 
     private func restoreCustomNodeFields(for selectedNodeName: String) {
-        guard case let .custom(savedSelectedNode) = nodeSelector.selectedNode() else { return }
+        if case let .custom(savedSelectedNode) = nodeSelector.selectedNode() {
+            let matchesApiType =
+                savedSelectedNode.apiType == .electrum && selectedNodeName.contains("Electrum")
+                    || savedSelectedNode.apiType == .esplora && selectedNodeName.contains("Esplora")
+            guard matchesApiType else { return }
 
-        let matchesApiType =
-            savedSelectedNode.apiType == .electrum && selectedNodeName.contains("Electrum")
-                || savedSelectedNode.apiType == .esplora && selectedNodeName.contains("Esplora")
-        guard matchesApiType else { return }
+            customUrl = savedSelectedNode.url
+            customNodeName = savedSelectedNode.name
+            return
+        }
 
-        customUrl = savedSelectedNode.url
-        customNodeName = savedSelectedNode.name
+        Task {
+            if selectedNodeName.contains("Electrum"), let url = await localNodeElectrumUrl() {
+                await MainActor.run {
+                    customUrl = url
+                    customNodeName = "Local Node"
+                }
+            } else if selectedNodeName.contains("Esplora"), let url = await localNodeEsploraUrl() {
+                await MainActor.run {
+                    customUrl = url
+                    customNodeName = "Local Node"
+                }
+            }
+        }
     }
 }
 

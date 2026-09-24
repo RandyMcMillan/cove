@@ -11,6 +11,8 @@ struct LocalNodeSettingsBody: View {
     let isInIbd: Bool?
     let datadirSize: UInt64?
     let peerCount: UInt32?
+    let electrumUrl: String?
+    let esploraUrl: String?
     let horizonFromLogs: UInt32?
     let isNetworkConnected: Bool
     @Binding var showClearConfirm: Bool
@@ -38,6 +40,8 @@ struct LocalNodeSettingsBody: View {
                 isInIbd: isInIbd,
                 datadirSize: datadirSize,
                 peerCount: peerCount,
+                electrumUrl: electrumUrl,
+                esploraUrl: esploraUrl,
                 horizonFromLogs: horizonFromLogs,
                 isNetworkConnected: isNetworkConnected,
                 showClearConfirm: $showClearConfirm,
