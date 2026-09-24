@@ -10,6 +10,7 @@ import SwiftUI
 struct SendFlowSelectFeeRateView: View {
     let manager: WalletManager
 
+    @Environment(AppManager.self) private var app
     @Binding var feeOptions: FeeRateOptionsWithTotalFee
     @Binding var selectedOption: FeeRateOptionWithTotalFee
     @Binding var selectedPresentationDetent: PresentationDetent
@@ -76,6 +77,7 @@ struct SendFlowSelectFeeRateView: View {
                     selectedPresentationDetent: $selectedPresentationDetent
                 )
                 .presentationDetents([.height(350)])
+                .environment(app)
             }
     }
 }

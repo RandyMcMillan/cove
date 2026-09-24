@@ -146,6 +146,7 @@ struct SendFlowSetAmountScreen: View {
                 scannedCode: $scannedCode,
                 selectedPresentationDetent: $selectedPresentationDetent
             )
+            .environment(app)
         }
         .presentingAlert(
             presenter.alertStateBinding,

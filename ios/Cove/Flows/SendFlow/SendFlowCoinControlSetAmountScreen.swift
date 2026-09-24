@@ -117,6 +117,7 @@ struct SendFlowCoinControlSetAmountScreen: View {
                 scannedCode: $scannedCode,
                 selectedPresentationDetent: $selectedPresentationDetent
             )
+            .environment(app)
         }
         .sheet(isPresented: $customAmountSheetIsPresented) {
             SendFlowUtxoCustomAmountSheetView(utxos: utxos)
