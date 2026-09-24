@@ -224,6 +224,18 @@ impl NodeSelector {
     #[uniffi::method]
     /// Check the node url and set it as selected node if it is valid
     pub async fn check_and_save_node(&self, node: Node) -> Result<(), Error> {
+        // If the URL matches the local node, ensure the RPC endpoint is ready
+        // before probing it — the local node may be running but still
+        // initializing its electrum/esplora listener.
+        if let Some(urls) = crate::local_node_manager::LOCAL_NODE_MANAGER.urls().await {
+            if node.url == urls.electrum || node.url == urls.esplora {
+                crate::local_node_manager::LOCAL_NODE_MANAGER
+                    .wait_for_ready(30)
+                    .await
+                    .map_err(|e| Error::NodeAccessError(e.to_string()))?;
+            }
+        }
+
         node.check_url().await.map_err(|error| {
             tracing::warn!("error checking node: {error:?}");
             Error::NodeAccessError(error.to_string())
