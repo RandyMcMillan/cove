@@ -22,6 +22,7 @@ struct NodeSelectionView: View {
     @State private var parseUrlMessage = ""
 
     @State private var checkUrlTask: Task<Void, Never>?
+    @State private var restoreTask: Task<Void, Never>?
 
     init() {
         selectedNodeName = nodeSelector.selectedNode().name
@@ -163,6 +164,8 @@ struct NodeSelectionView: View {
     }
 
     private func restoreCustomNodeFields(for selectedNodeName: String) {
+        restoreTask?.cancel()
+
         if case let .custom(savedSelectedNode) = nodeSelector.selectedNode() {
             let matchesApiType =
                 savedSelectedNode.apiType == .electrum && selectedNodeName.contains("Electrum")
@@ -174,21 +177,24 @@ struct NodeSelectionView: View {
             }
         }
 
-        // No saved custom node matches the selected type — populate from the
-        // local node if it is running, otherwise clear the field.
-        customUrl = ""
-        customNodeName = ""
-        Task {
-            if selectedNodeName.contains("Electrum"), let url = await localNodeElectrumUrl() {
-                await MainActor.run {
-                    customUrl = url
-                    customNodeName = "Local Node"
-                }
-            } else if selectedNodeName.contains("Esplora"), let url = await localNodeEsploraUrl() {
-                await MainActor.run {
-                    customUrl = url
-                    customNodeName = "Local Node"
-                }
+        restoreTask = Task { @MainActor in
+            let url: String?
+            if selectedNodeName.contains("Electrum") {
+                url = await localNodeElectrumUrl()
+            } else if selectedNodeName.contains("Esplora") {
+                url = await localNodeEsploraUrl()
+            } else {
+                url = nil
+            }
+
+            guard !Task.isCancelled else { return }
+
+            if let url {
+                customUrl = url
+                customNodeName = "Local Node"
+            } else {
+                customUrl = ""
+                customNodeName = ""
             }
         }
     }

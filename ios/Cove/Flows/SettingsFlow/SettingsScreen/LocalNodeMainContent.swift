@@ -54,6 +54,15 @@ struct LocalNodeMainContent: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
 
+                if endpointsReady, electrumUrl != nil || esploraUrl != nil {
+                    LocalNodeConnectionSection(
+                        electrumUrl: electrumUrl,
+                        esploraUrl: esploraUrl
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                }
+
                 LocalNodeLogSection(
                     logLines: logLines,
                     logLevel: $logLevel,

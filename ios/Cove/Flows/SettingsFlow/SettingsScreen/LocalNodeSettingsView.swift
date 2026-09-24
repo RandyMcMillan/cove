@@ -364,6 +364,68 @@ struct LocalNodeActionsSection: View {
     }
 }
 
+struct LocalNodeConnectionSection: View {
+    let electrumUrl: String?
+    let esploraUrl: String?
+
+    private var electrumHostPort: String {
+        electrumUrl?.replacingOccurrences(of: "tcp://", with: "") ?? "127.0.0.1:<port>"
+    }
+
+    private var electrumHost: String {
+        electrumHostPort.components(separatedBy: ":").first ?? "127.0.0.1"
+    }
+
+    private var electrumPort: String {
+        electrumHostPort.components(separatedBy: ":").last ?? "<port>"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Connect")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 12) {
+                if let esploraUrl {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Esplora (HTTP)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        CodeBlock(
+                            title: "Block height",
+                            code: "curl \(esploraUrl)/blocks/tip/height"
+                        )
+                        CodeBlock(
+                            title: "Address info",
+                            code: "curl \(esploraUrl)/address/<address>"
+                        )
+                    }
+                }
+
+                if let electrumUrl {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Electrum (TCP)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        CodeBlock(
+                            title: "Server version",
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHost) \(electrumPort)"
+                        )
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(10)
+        }
+    }
+}
+
 struct LocalNodeLogSection: View {
     let logLines: [String]
     @Binding var logLevel: String

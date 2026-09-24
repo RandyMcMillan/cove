@@ -4,7 +4,7 @@ use url::Url;
 use crate::{database::Database, network::Network, node::Node};
 use cove_macros::impl_default_for;
 use cove_util::result_ext::ResultExt as _;
-use eyre::{Context, eyre};
+use eyre::eyre;
 
 pub const BITCOIN_ESPLORA: [(&str, &str); 1] =
     [("blockstream.info", "https://blockstream.info/api/")];
@@ -353,33 +353,24 @@ fn parse_node_url(url: &str, is_electrum: bool) -> eyre::Result<Url> {
     let mut url = if url.contains("://") {
         Url::parse(&url)?
     } else {
-        let url_str = format!("none://{url}/");
+        // Pick the default scheme up front so we never have to mutate it later.
+        let scheme = match (url.split(':').nth(1).and_then(|p| p.parse::<u16>().ok()), is_electrum) {
+            (Some(50002), _) => "ssl",
+            (Some(50001), true) => "tcp",
+            (_, true) => "tcp",
+            (_, false) => "http",
+        };
+        let url_str = format!("{scheme}://{url}/");
         Url::parse(&url_str)?
     };
-
-    // set the scheme properly, use the port as a hint
-    match (url.scheme(), url.port()) {
-        ("none", Some(50002)) => url
-            .set_scheme("ssl")
-            .map_err(|()| eyre!("can't set scheme to ssl"))
-            .context("original: none, port is 50002")?,
-        ("none", Some(50001)) => url
-            .set_scheme("tcp")
-            .map_err(|()| eyre!("can't set scheme to tcp"))
-            .context("original: none, port is 50001")?,
-        ("none", port) => {
-            url.set_scheme("tcp")
-                .map_err(|()| eyre!("can't set scheme to tcp"))
-                .wrap_err_with(|| format!("original: none, port is {port:?}"))?;
-        }
-        _ => {}
-    }
 
     // set the port to if not set, default to 50002 for ssl and 50001 for tcp
     match (url.port(), url.scheme()) {
         (Some(_), _) => {}
         (None, "ssl") => url.set_port(Some(50002)).map_err(|()| eyre!("can't set port"))?,
         (None, "tcp") => url.set_port(Some(50001)).map_err(|()| eyre!("can't set port"))?,
+        (None, "http") => url.set_port(Some(80)).map_err(|()| eyre!("can't set port"))?,
+        (None, "https") => url.set_port(Some(443)).map_err(|()| eyre!("can't set port"))?,
         (None, _) => {
             url.set_port(Some(50002)).map_err(|()| eyre!("can't set port"))?;
         }
@@ -392,5 +383,86 @@ fn parse_node_url(url: &str, is_electrum: bool) -> eyre::Result<Url> {
 impl NodeSelection {
     fn to_node(&self) -> Node {
         self.clone().into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_node_url;
+
+    #[test]
+    fn parse_node_url_esplora_http_preserved() {
+        let url = parse_node_url("http://127.0.0.1:3000", false).unwrap();
+        assert_eq!(url.as_str(), "http://127.0.0.1:3000/");
+    }
+
+    #[test]
+    fn parse_node_url_esplora_https_preserved() {
+        let url = parse_node_url("https://example.com/api/", false).unwrap();
+        assert_eq!(url.as_str(), "https://example.com/api/");
+    }
+
+    #[test]
+    fn parse_node_url_esplora_no_scheme_defaults_to_http() {
+        let url = parse_node_url("127.0.0.1:3000", false).unwrap();
+        assert_eq!(url.scheme(), "http");
+        assert_eq!(url.host_str(), Some("127.0.0.1"));
+        assert_eq!(url.port(), Some(3000));
+    }
+
+    #[test]
+    fn parse_node_url_esplora_port_80_defaults_to_http() {
+        let url = parse_node_url("example.com:80", false).unwrap();
+        assert_eq!(url.scheme(), "http");
+    }
+
+    #[test]
+    fn parse_node_url_esplora_port_8080_defaults_to_http() {
+        let url = parse_node_url("127.0.0.1:8080", false).unwrap();
+        assert_eq!(url.scheme(), "http");
+        assert_eq!(url.port(), Some(8080));
+    }
+
+    #[test]
+    fn parse_node_url_electrum_no_scheme_defaults_to_tcp() {
+        let url = parse_node_url("127.0.0.1:50001", true).unwrap();
+        assert_eq!(url.scheme(), "tcp");
+        assert_eq!(url.port(), Some(50001));
+    }
+
+    #[test]
+    fn parse_node_url_electrum_http_replaced_with_tcp() {
+        let url = parse_node_url("http://127.0.0.1:50001", true).unwrap();
+        assert_eq!(url.scheme(), "tcp");
+    }
+
+    #[test]
+    fn parse_node_url_electrum_ssl_preserved() {
+        let url = parse_node_url("ssl://example.com:50002", true).unwrap();
+        assert_eq!(url.scheme(), "ssl");
+        assert_eq!(url.port(), Some(50002));
+    }
+
+    #[test]
+    fn parse_node_url_electrum_no_port_defaults_50001() {
+        let url = parse_node_url("example.com", true).unwrap();
+        assert_eq!(url.scheme(), "tcp");
+        assert_eq!(url.port(), Some(50001));
+    }
+
+    #[test]
+    fn parse_node_url_esplora_no_port_defaults_80() {
+        let url = parse_node_url("example.com", false).unwrap();
+        assert_eq!(url.scheme(), "http");
+        // Default port is implicit (None) for http
+        assert_eq!(url.port(), None);
+        assert_eq!(url.host_str(), Some("example.com"));
+    }
+
+    #[test]
+    fn parse_node_url_esplora_no_scheme_unknown_port_defaults_http() {
+        let url = parse_node_url("127.0.0.1:50521", false).unwrap();
+        assert_eq!(url.scheme(), "http");
+        assert_eq!(url.port(), Some(50521));
     }
 }
