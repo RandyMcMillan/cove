@@ -2,6 +2,10 @@ import CoveCore
 import Foundation
 
 final class ScriptedKeychainAccess: KeychainAccess, @unchecked Sendable {
+    func deleteAllWalletItems() throws {
+        lock.withLock { values.removeAll() }
+    }
+    
     private let lock = NSLock()
     private var values: [String: String] = [:]
 
