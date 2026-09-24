@@ -546,7 +546,7 @@ struct LocalNodeHelpView: View {
                             Label("Ports change on every restart — check the Status section for current URLs.", systemImage: "info.circle")
                             Label("The node only listens on 127.0.0.1 (localhost).", systemImage: "lock.shield")
                             Label("Queries may return stale data while Initial Block Download is in progress.", systemImage: "exclamationmark.triangle")
-                            Label("If running in the iOS Simulator, these commands must be run from inside the simulator (e.g. via xcrun simctl spawn), not from your Mac terminal.", systemImage: "exclamationmark.triangle")
+                            Label("If running in the iOS Simulator, run these commands from inside the simulator (xcrun simctl spawn <UDID> curl ...).", systemImage: "exclamationmark.triangle")
                                 .foregroundStyle(.orange)
                         }
                         .font(.subheadline)
