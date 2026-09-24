@@ -194,8 +194,9 @@ impl NodeSelector {
         entered_name: String,
     ) -> Result<Node, Error> {
         let node_type = name.to_ascii_lowercase();
+        let is_electrum = node_type.contains("electrum");
 
-        let url = parse_node_url(&url).map_err_str(Error::ParseNodeUrlError)?;
+        let url = parse_node_url(&url, is_electrum).map_err_str(Error::ParseNodeUrlError)?;
 
         if !url.domain().unwrap_or_default().contains('.') {
             return Err(Error::ParseNodeUrlError("invalid url, no domain".to_string()));
@@ -209,7 +210,7 @@ impl NodeSelector {
             entered_name
         };
 
-        let node = if node_type.contains("electrum") {
+        let node = if is_electrum {
             Node::new_electrum(name, url_string, self.network)
         } else if node_type.contains("esplora") {
             Node::new_esplora(name, url_string, self.network)
@@ -327,9 +328,12 @@ fn preset_nodes(network: Network) -> Vec<Node> {
     }
 }
 
-fn parse_node_url(url: &str) -> eyre::Result<Url> {
-    let url = url.replace("http://", "tcp://");
-    let url = url.replace("https://", "ssl://");
+fn parse_node_url(url: &str, is_electrum: bool) -> eyre::Result<Url> {
+    let url = if is_electrum {
+        url.replace("http://", "tcp://").replace("https://", "ssl://")
+    } else {
+        url.to_string()
+    };
 
     let mut url = if url.contains("://") {
         Url::parse(&url)?
