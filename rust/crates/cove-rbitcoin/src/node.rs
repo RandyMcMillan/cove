@@ -162,7 +162,7 @@ impl LocalNode {
             config.listen.esplora = Some(esplora_addr);
 
             self.urls = Some(LocalNodeUrls {
-                electrum: format!("ssl://{}", electrum_addr),
+                electrum: format!("tcp://{}", electrum_addr),
                 esplora: format!("http://{}", esplora_addr),
             });
 
