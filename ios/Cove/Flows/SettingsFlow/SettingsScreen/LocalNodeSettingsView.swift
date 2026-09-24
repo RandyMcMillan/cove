@@ -236,7 +236,7 @@ struct LocalNodeStatusSection: View {
                 .foregroundStyle(.secondary)
 
             VStack(spacing: 0) {
-                if isRunning && !endpointsReady {
+                if isRunning, !endpointsReady {
                     StatusRow(title: "State", value: "Starting…")
                 } else {
                     StatusRow(title: "State", value: isRunning ? "Running" : "Stopped")
@@ -583,7 +583,6 @@ struct LocalNodeHelpView: View {
         }
     }
 
-    @ViewBuilder
     private func helpSection(_ title: String, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)

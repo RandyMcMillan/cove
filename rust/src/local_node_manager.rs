@@ -136,6 +136,7 @@ impl LocalNodeManager {
     }
 
     /// Wait for the RPC endpoint to accept connections and return the URLs.
+    #[allow(dead_code)]
     pub async fn wait_for_ready(&self, timeout_secs: u64) -> Result<LocalNodeUrls, LocalNodeError> {
         let guard = self.node.read().await;
         let node = guard.as_ref().ok_or_else(|| LocalNodeError::NotRunning)?;
