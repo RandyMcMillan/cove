@@ -1091,6 +1091,12 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_cove_checksum_func_local_node_is_running(
     ): Short
+    external fun uniffi_cove_checksum_func_local_node_logs(
+    ): Short
+    external fun uniffi_cove_checksum_func_local_node_peer_count(
+    ): Short
+    external fun uniffi_cove_checksum_func_local_node_set_log_level(
+    ): Short
     external fun uniffi_cove_checksum_func_local_node_start(
     ): Short
     external fun uniffi_cove_checksum_func_local_node_stop(
@@ -3679,6 +3685,12 @@ internal object UniffiLib {
     ): Long
     external fun uniffi_cove_fn_func_local_node_is_running(
     ): Long
+    external fun uniffi_cove_fn_func_local_node_logs(`limit`: Int,
+    ): Long
+    external fun uniffi_cove_fn_func_local_node_peer_count(
+    ): Long
+    external fun uniffi_cove_fn_func_local_node_set_log_level(`level`: RustBuffer.ByValue,
+    ): Long
     external fun uniffi_cove_fn_func_local_node_start(`network`: RustBufferNetwork.ByValue,
     ): Long
     external fun uniffi_cove_fn_func_local_node_stop(
@@ -3954,6 +3966,15 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_cove_checksum_func_local_node_is_running() != 5029.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_cove_checksum_func_local_node_logs() != 5047.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_cove_checksum_func_local_node_peer_count() != 48968.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_cove_checksum_func_local_node_set_log_level() != 33503.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_cove_checksum_func_local_node_start() != 20017.toShort()) {
@@ -58363,6 +58384,9 @@ sealed class SettingsRoute {
     object CloudBackup : SettingsRoute()
 
 
+    object LocalNode : SettingsRoute()
+
+
 
 
 
@@ -58392,6 +58416,7 @@ public object FfiConverterTypeSettingsRoute : FfiConverterRustBuffer<SettingsRou
             8 -> SettingsRoute.AllWallets
             9 -> SettingsRoute.About
             10 -> SettingsRoute.CloudBackup
+            11 -> SettingsRoute.LocalNode
             else -> throw RuntimeException("invalid enum value, something is very wrong!!")
         }
     }
@@ -58459,6 +58484,12 @@ public object FfiConverterTypeSettingsRoute : FfiConverterRustBuffer<SettingsRou
                 4UL
             )
         }
+        is SettingsRoute.LocalNode -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+            )
+        }
     }
 
     override fun write(value: SettingsRoute, buf: ByteBuffer) {
@@ -58503,6 +58534,10 @@ public object FfiConverterTypeSettingsRoute : FfiConverterRustBuffer<SettingsRou
             }
             is SettingsRoute.CloudBackup -> {
                 buf.putInt(10)
+                Unit
+            }
+            is SettingsRoute.LocalNode -> {
+                buf.putInt(11)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
@@ -69349,6 +69384,62 @@ object UrExceptionExternalErrorHandler : UniffiRustCallStatusErrorHandler<UrExce
      suspend fun `localNodeIsRunning`() : kotlin.Boolean {
         return uniffiRustCallAsync(
         UniffiLib.uniffi_cove_fn_func_local_node_is_running(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_i8(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_i8(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_i8(future) },
+        // lift function
+        { FfiConverterBoolean.lift(it) },
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+        /**
+         * Return the most recent `limit` log lines from the local node.
+         * Lines are formatted as `"LEVEL message"`.
+         *
+         * This is exported as an async function so the mobile UI can fetch logs
+         * without blocking the main thread; the log buffer can grow large during
+         * IBD, and a synchronous call would delay status updates.
+         */
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeLogs`(`limit`: kotlin.UInt) : List<kotlin.String> {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_logs(
+        FfiConverterUInt.lower(`limit`),),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_rust_buffer(future) },
+        // lift function
+        { FfiConverterSequenceString.lift(it) },
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodePeerCount`() : kotlin.UInt? {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_peer_count(),
+        { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_cove_rust_future_free_rust_buffer(future) },
+        // lift function
+        { FfiConverterOptionalUInt.lift(it) },
+        // Error FFI converter
+        UniffiNullRustCallStatusErrorHandler,
+    )
+    }
+
+        /**
+         * Set the local node log level. Accepted values: error, warn, info, debug, trace, off.
+         * Returns `true` if the level was recognized and applied.
+         */
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+     suspend fun `localNodeSetLogLevel`(`level`: kotlin.String) : kotlin.Boolean {
+        return uniffiRustCallAsync(
+        UniffiLib.uniffi_cove_fn_func_local_node_set_log_level(
+        FfiConverterString.lower(`level`),),
         { future, callback, continuation -> UniffiLib.ffi_cove_rust_future_poll_i8(future, callback, continuation) },
         { future, continuation -> UniffiLib.ffi_cove_rust_future_complete_i8(future, continuation) },
         { future -> UniffiLib.ffi_cove_rust_future_free_i8(future) },
