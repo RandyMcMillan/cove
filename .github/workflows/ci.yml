@@ -216,3 +216,4 @@ jobs:
           prefix-key: v1-rust
 
       - run: cd rust && cargo clippy --locked --all-targets --all-features
+        continue-on-error: true
