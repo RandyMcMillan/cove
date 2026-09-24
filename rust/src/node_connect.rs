@@ -354,7 +354,8 @@ fn parse_node_url(url: &str, is_electrum: bool) -> eyre::Result<Url> {
         Url::parse(&url)?
     } else {
         // Pick the default scheme up front so we never have to mutate it later.
-        let scheme = match (url.split(':').nth(1).and_then(|p| p.parse::<u16>().ok()), is_electrum) {
+        let scheme = match (url.split(':').nth(1).and_then(|p| p.parse::<u16>().ok()), is_electrum)
+        {
             (Some(50002), _) => "ssl",
             (Some(50001), true) => "tcp",
             (_, true) => "tcp",
