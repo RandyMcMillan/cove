@@ -577,19 +577,36 @@ private struct CodeBlock: View {
     let title: String
     let code: String
 
+    @State private var didCopy = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text(code)
-                .font(.system(size: 12, design: .monospaced))
-                .padding(10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .textSelection(.enabled)
+            HStack(spacing: 8) {
+                Text(code)
+                    .font(.system(size: 12, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+
+                Button {
+                    UIPasteboard.general.string = code
+                    didCopy = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        didCopy = false
+                    }
+                } label: {
+                    Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(10)
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
         }
     }
 }
