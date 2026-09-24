@@ -67,6 +67,7 @@ jobs:
           else
             echo "Committing changes..."
             git commit -m "chore: regenerate Android (Kotlin) UniFFI bindings"
+            git pull --rebase origin ${{ github.ref_name }}
             git push origin HEAD:${{ github.ref_name }}
           fi
 
@@ -124,5 +125,6 @@ jobs:
           else
             echo "Committing changes..."
             git commit -m "chore: regenerate iOS (Swift) UniFFI bindings"
+            git pull --rebase origin ${{ github.ref_name }}
             git push origin HEAD:${{ github.ref_name }}
           fi
