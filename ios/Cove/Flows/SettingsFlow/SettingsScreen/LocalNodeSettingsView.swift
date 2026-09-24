@@ -471,6 +471,129 @@ private func formatBytes(_ bytes: UInt64) -> String {
     return formatter.string(fromByteCount: Int64(bytes))
 }
 
+struct LocalNodeHelpView: View {
+    let electrumUrl: String?
+    let esploraUrl: String?
+    @Environment(\.dismiss) private var dismiss
+
+    private var electrumHostPort: String {
+        electrumUrl?.replacingOccurrences(of: "tcp://", with: "") ?? "127.0.0.1:<port>"
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("The local node exposes an Electrum (TCP) and an Esplora (HTTP) endpoint on localhost. Ports change every time the node restarts.")
+                        .font(.body)
+
+                    helpSection("Esplora (HTTP)") {
+                        Text("The Esplora endpoint speaks plain HTTP and can be queried with curl, wget, or any HTTP client.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        CodeBlock(
+                            title: "Block height",
+                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/blocks/tip/height"
+                        )
+                        CodeBlock(
+                            title: "Address info",
+                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>"
+                        )
+                        CodeBlock(
+                            title: "Address transactions",
+                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/txs"
+                        )
+                        CodeBlock(
+                            title: "Address UTXOs",
+                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/address/<address>/utxo"
+                        )
+                        CodeBlock(
+                            title: "Transaction by ID",
+                            code: "curl \(esploraUrl ?? "http://127.0.0.1:<port>")/tx/<txid>"
+                        )
+                        CodeBlock(
+                            title: "Broadcast raw transaction",
+                            code: "curl -X POST -H \"Content-Type: text/plain\" --data-binary \"<hex-encoded-tx>\" \(esploraUrl ?? "http://127.0.0.1:<port>")/tx"
+                        )
+                    }
+
+                    helpSection("Electrum (TCP)") {
+                        Text("The Electrum endpoint speaks the Electrum protocol over plain TCP. Use nc (netcat) or a dedicated client.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        CodeBlock(
+                            title: "Server version",
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"server.version\",\"params\":[\"cove\",\"1.4\"]}\\n' | nc \(electrumHostPort)"
+                        )
+                        CodeBlock(
+                            title: "Block headers",
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\\n' | nc \(electrumHostPort)"
+                        )
+                        CodeBlock(
+                            title: "Scripthash balance",
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_balance\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHostPort)"
+                        )
+                        CodeBlock(
+                            title: "Scripthash history",
+                            code: "printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"blockchain.scripthash.get_history\",\"params\":[\"<scripthash>\"]}\\n' | nc \(electrumHostPort)"
+                        )
+                    }
+
+                    helpSection("Notes") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Ports change on every restart — check the Status section for current URLs.", systemImage: "info.circle")
+                            Label("The node only listens on 127.0.0.1 (localhost).", systemImage: "lock.shield")
+                            Label("Queries may return stale data while Initial Block Download is in progress.", systemImage: "exclamationmark.triangle")
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Local Node Help")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func helpSection(_ title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+            content()
+        }
+    }
+}
+
+private struct CodeBlock: View {
+    let title: String
+    let code: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text(code)
+                .font(.system(size: 12, design: .monospaced))
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .textSelection(.enabled)
+        }
+    }
+}
+
 struct PeersPanelView: View {
     let peerCount: UInt32?
     let isRunning: Bool

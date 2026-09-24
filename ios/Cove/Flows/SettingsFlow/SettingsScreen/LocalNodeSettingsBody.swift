@@ -32,6 +32,8 @@ struct LocalNodeSettingsBody: View {
     let refreshStatus: () async -> Void
     let refreshLogs: () async -> Void
 
+    @State private var showHelp = false
+
     var body: some View {
         GeometryReader { geometry in
             LocalNodeMainContent(
@@ -57,6 +59,18 @@ struct LocalNodeSettingsBody: View {
             )
         }
         .navigationTitle("Local Node")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showHelp = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                }
+            }
+        }
+        .sheet(isPresented: $showHelp) {
+            LocalNodeHelpView(electrumUrl: electrumUrl, esploraUrl: esploraUrl)
+        }
         .onAppear {
             Task {
                 await localNodeSetLogLevel("trace")
