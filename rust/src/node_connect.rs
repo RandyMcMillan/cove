@@ -244,7 +244,8 @@ impl NodeSelector {
         if is_local_url {
             if !crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
                 return Err(Error::NodeAccessError(
-                    "Local node is not running. Start it in Settings > Local Node first.".to_string(),
+                    "Local node is not running. Start it in Settings > Local Node first."
+                        .to_string(),
                 ));
             }
             // Skip the live URL probe — the local node's electrum/esplora
