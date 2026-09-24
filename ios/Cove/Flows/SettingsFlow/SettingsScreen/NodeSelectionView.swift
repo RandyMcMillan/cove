@@ -178,13 +178,12 @@ struct NodeSelectionView: View {
         }
 
         restoreTask = Task { @MainActor in
-            let url: String?
-            if selectedNodeName.contains("Electrum") {
-                url = await localNodeElectrumUrl()
+            let url: String? = if selectedNodeName.contains("Electrum") {
+                await localNodeElectrumUrl()
             } else if selectedNodeName.contains("Esplora") {
-                url = await localNodeEsploraUrl()
+                await localNodeEsploraUrl()
             } else {
-                url = nil
+                nil
             }
 
             guard !Task.isCancelled else { return }
