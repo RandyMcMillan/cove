@@ -265,11 +265,10 @@ impl LocalNode {
         self.running = None;
     }
 
-    /// Wait for the RPC listener to accept connections.
+    /// Wait for the RPC listeners to accept connections.
     ///
-    /// Polls the electrum and esplora ports with a short timeout until one
-    /// responds or the overall deadline expires. Returns the URL that became
-    /// ready first.
+    /// Polls the electrum and esplora ports with a short timeout until both
+    /// respond or the overall deadline expires.
     pub async fn wait_for_ready(
         &self,
         timeout_secs: u64,
@@ -280,6 +279,9 @@ impl LocalNode {
         let electrum_addr = parse_addr(&urls.electrum)?;
         let esplora_addr = parse_addr(&urls.esplora)?;
 
+        let mut electrum_ready = false;
+        let mut esplora_ready = false;
+
         loop {
             if tokio::time::Instant::now() >= deadline {
                 return Err(LocalNodeError::P2PStart(format!(
@@ -287,13 +289,17 @@ impl LocalNode {
                 )));
             }
 
-            if TcpStream::connect(electrum_addr).await.is_ok() {
+            if !electrum_ready && TcpStream::connect(electrum_addr).await.is_ok() {
                 debug!("electrum port {electrum_addr} is ready");
-                return Ok(urls);
+                electrum_ready = true;
             }
 
-            if TcpStream::connect(esplora_addr).await.is_ok() {
+            if !esplora_ready && TcpStream::connect(esplora_addr).await.is_ok() {
                 debug!("esplora port {esplora_addr} is ready");
+                esplora_ready = true;
+            }
+
+            if electrum_ready && esplora_ready {
                 return Ok(urls);
             }
 
