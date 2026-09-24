@@ -19,6 +19,7 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 1
+          submodules: recursive
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -81,6 +82,7 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 1
+          submodules: recursive
 
       - name: Pull latest (includes Android binding commit)
         run: git pull --rebase origin ${{ github.ref_name }}
