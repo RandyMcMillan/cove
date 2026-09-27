@@ -6884,7 +6884,7 @@ public protocol NodeSelectorProtocol: AnyObject, Sendable {
      * Check the node url and set it as selected node if it is valid.
      *
      * For remote nodes this probes the URL before saving. For URLs that match
-     * the local node, it only verifies the node process is running — the RPC
+     * the local node, it waits for the node process to come up — the RPC
      * endpoints may still be initializing and should not block the UI.
      */
     func checkAndSaveNode(node: Node) async throws
@@ -6892,7 +6892,8 @@ public protocol NodeSelectorProtocol: AnyObject, Sendable {
     /**
      * Verify a preset node is reachable before selecting it.
      *
-     * For the local node preset this only verifies the node process is running
+     * For the local node preset this waits for the node process to come up
+     * (it may have been eager-started in the background by `select_local_node`)
      * — the RPC endpoints may still be initializing, so the live probe is
      * skipped to avoid blocking the UI.
      */
@@ -6977,7 +6978,7 @@ public convenience init() {
      * Check the node url and set it as selected node if it is valid.
      *
      * For remote nodes this probes the URL before saving. For URLs that match
-     * the local node, it only verifies the node process is running — the RPC
+     * the local node, it waits for the node process to come up — the RPC
      * endpoints may still be initializing and should not block the UI.
      */
 open func checkAndSaveNode(node: Node)async throws   {
@@ -7000,7 +7001,8 @@ open func checkAndSaveNode(node: Node)async throws   {
     /**
      * Verify a preset node is reachable before selecting it.
      *
-     * For the local node preset this only verifies the node process is running
+     * For the local node preset this waits for the node process to come up
+     * (it may have been eager-started in the background by `select_local_node`)
      * — the RPC endpoints may still be initializing, so the live probe is
      * skipped to avoid blocking the UI.
      */
@@ -48528,10 +48530,10 @@ private let initializationResult: InitializationResult = {
     if (uniffi_cove_checksum_method_mnemonic_words() != 8009) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_method_nodeselector_check_and_save_node() != 13339) {
+    if (uniffi_cove_checksum_method_nodeselector_check_and_save_node() != 43907) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_cove_checksum_method_nodeselector_check_selected_node() != 41878) {
+    if (uniffi_cove_checksum_method_nodeselector_check_selected_node() != 9143) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_cove_checksum_method_nodeselector_node_list() != 26686) {
