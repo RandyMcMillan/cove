@@ -14,7 +14,7 @@ set -euo pipefail
 exec 1>&2
 
 echo "[build-rust.sh] Starting Rust build check..."
-echo "[build-rust.sh] CONFIGURATION=${CONFIGURATION:-Debug} PLATFORM_NAME=${PLATFORM_NAME:-unknown}"
+echo "[build-rust.sh] CONFIGURATION=${CONFIGURATION:-Debug} PLATFORM_NAME=${PLATFORM_NAME:-unknown} SDK_NAME=${SDK_NAME:-unknown}"
 
 # Ensure cargo and just are discoverable. Do not hardcode $HOME/.cargo/bin;
 # prefer the caller's PATH and fall back to common install locations.
@@ -54,6 +54,28 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUST_DIR="${SCRIPT_DIR}/../rust"
 XCFRAMEWORK_PATH="${SCRIPT_DIR}/CoveCore/Sources/cove_core_ffi.xcframework"
 
+# Map Xcode PLATFORM_NAME to the xcframework slice directory we need.
+# Valid PLATFORM_NAME values from Xcode: iphoneos, iphonesimulator, maccatalyst
+platform_slice() {
+    case "${1:-}" in
+        iphoneos)     echo "ios-arm64" ;;
+        iphonesimulator) echo "ios-arm64-simulator" ;;
+        maccatalyst)  echo "ios-arm64-maccatalyst" ;;
+        *)            echo "" ;;
+    esac
+}
+
+REQUIRED_SLICE=$(platform_slice "${PLATFORM_NAME:-}")
+ALL_SLICES=("ios-arm64" "ios-arm64-simulator" "ios-arm64-maccatalyst")
+
+# Check which slices are actually present
+missing_slices=""
+for slice in "${ALL_SLICES[@]}"; do
+    if [ ! -d "${XCFRAMEWORK_PATH}/${slice}" ]; then
+        missing_slices="${missing_slices} ${slice}"
+    fi
+done
+
 NEEDS_REBUILD=false
 if [ "$FORCE" == "true" ]; then
     echo "[build-rust.sh] --force set — rebuilding unconditionally"
@@ -62,12 +84,14 @@ else
     # Check if we need to rebuild: compare newest Rust source against xcframework
     NEWEST_RUST=$(find "${RUST_DIR}/src" "${RUST_DIR}/crates" -name '*.rs' -newer "${XCFRAMEWORK_PATH}/Info.plist" 2>/dev/null | head -1 || true)
 
-    # Also rebuild if the xcframework is missing a required slice
     if [ -n "$NEWEST_RUST" ]; then
         echo "[build-rust.sh] Rust sources newer than xcframework — rebuilding"
         NEEDS_REBUILD=true
-    elif [ ! -d "${XCFRAMEWORK_PATH}/ios-arm64" ] || [ ! -d "${XCFRAMEWORK_PATH}/ios-arm64-simulator" ]; then
-        echo "[build-rust.sh] xcframework missing required slices — rebuilding"
+    elif [ -n "$missing_slices" ]; then
+        echo "[build-rust.sh] xcframework missing slices:${missing_slices} — rebuilding"
+        NEEDS_REBUILD=true
+    elif [ -n "$REQUIRED_SLICE" ] && [ ! -d "${XCFRAMEWORK_PATH}/${REQUIRED_SLICE}" ]; then
+        echo "[build-rust.sh] xcframework missing slice for PLATFORM_NAME=${PLATFORM_NAME} (${REQUIRED_SLICE}) — rebuilding"
         NEEDS_REBUILD=true
     fi
 fi
@@ -104,6 +128,12 @@ else
     echo "[build-rust.sh] Building Rust library (debug) with ${CARGO_BUILD_JOBS:-default} jobs..."
     echo "[build-rust.sh] $ just build-ios-debug-device ${XTASK_FLAGS}"
     just build-ios-debug-device ${XTASK_FLAGS}
+fi
+
+# Verify the slice we need actually exists after the build
+if [ -n "$REQUIRED_SLICE" ] && [ ! -d "${XCFRAMEWORK_PATH}/${REQUIRED_SLICE}" ]; then
+    echo "[build-rust.sh] ERROR: Build completed but required slice ${REQUIRED_SLICE} is still missing!"
+    exit 1
 fi
 
 echo "[build-rust.sh] Rust library build complete"
