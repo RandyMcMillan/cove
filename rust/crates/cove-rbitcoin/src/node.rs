@@ -61,7 +61,20 @@ impl LocalNode {
     }
 
     pub fn is_running(&self) -> bool {
-        self.running.as_ref().is_some_and(|r| r.load(Ordering::SeqCst))
+        let running = self.running.as_ref().is_some_and(|r| r.load(Ordering::SeqCst));
+        if !running {
+            return false;
+        }
+
+        // If the task handle has finished (completed or panicked), the node
+        // is no longer actually running even if the atomic flag is still set.
+        if let Some(ref handle) = self.task_handle {
+            if handle.is_finished() {
+                return false;
+            }
+        }
+
+        true
     }
 
     pub fn urls(&self) -> Option<&LocalNodeUrls> {

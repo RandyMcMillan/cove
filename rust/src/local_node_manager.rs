@@ -207,10 +207,10 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
     }
 
     // Wait for RPC endpoints to be ready before returning. The node process
-    // may have started but electrum/esplora listeners can take a few seconds
-    // to bind and accept connections.
-    tracing::info!("resolve_selected_node: waiting up to 30s for RPC endpoints");
-    let urls = match manager.wait_for_ready(30).await {
+    // may have started but electrum/esplora listeners only bind after IBD
+    // completes, which can take minutes on first sync.
+    tracing::info!("resolve_selected_node: waiting up to 300s for RPC endpoints");
+    let urls = match manager.wait_for_ready(300).await {
         Ok(urls) => {
             tracing::info!(
                 "resolve_selected_node: RPC endpoints ready — electrum={}, esplora={}",
@@ -220,10 +220,8 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
             urls
         }
         Err(e) => {
-            tracing::warn!(
-                "resolve_selected_node: wait_for_ready failed: {e}, falling back to cached urls"
-            );
-            manager.urls().await.ok_or(LocalNodeError::NotRunning)?
+            tracing::error!("resolve_selected_node: wait_for_ready timed out: {e}");
+            return Err(e);
         }
     };
 

@@ -117,6 +117,80 @@ print(s.recv(4096).decode())
 "
 ```
 
+## Transaction Broadcast Path
+
+When you tap "Send" in Cove, the transaction flows through the following layers to reach the local rbitcoin node:
+
+### 1. Swift — `WalletManager.broadcastTransaction()`
+`ios/Cove/WalletManager.swift:469`
+
+Calls the Rust FFI wrapper via UniFFI.
+
+### 2. Rust FFI Wrapper — `WalletManager::broadcast_transaction()`
+`rust/src/manager/wallet_manager.rs:798`
+
+Sends an async message to the `WalletActor`.
+
+### 3. WalletActor — `broadcast_transaction()` → `start_broadcast_transaction()`
+`rust/src/manager/wallet_manager/actor/transactions.rs:629`
+
+Does two things in order:
+1. `deferred_node_connection()` — obtains a `NodeClient`
+2. `broadcast_to_node_with_connection()` — sends the tx
+
+### 4. Node Connection — `start_node_connection()`
+`rust/src/manager/wallet_manager/actor/node.rs:200`
+
+Calls `resolve_selected_node()` which:
+- Starts the local node if not running (`LOCAL_NODE_MANAGER.start(network)`)
+- Waits up to 300s for RPC endpoints to bind (`wait_for_ready(300)`)
+- Returns the resolved `Node` with the dynamic URL
+
+Then `checked_node_client()` creates a fresh `NodeClient`:
+- Probes the URL with `check_node_connection_inner()`
+- Calls `NodeClient::new(node)` which opens a TCP/HTTP connection
+
+### 5. Broadcast Execution — `broadcast_to_node_with_connection()`
+`rust/src/manager/wallet_manager/actor/transactions.rs:1242`
+
+1. Awaits the node connection setup
+2. Gets the cached `node_client`
+3. Calls `node_client.broadcast_transaction(transaction)`
+
+### 6. Backend Client
+
+**Bitcoin / Testnet (Electrum):**
+`rust/src/node/client/electrum.rs:321`
+```rust
+client.inner.transaction_broadcast(&txn)
+```
+Sends Electrum JSON-RPC `blockchain.transaction.broadcast` over TCP to rbitcoin.
+
+**Signet (Esplora):**
+`rust/src/node/client/esplora.rs:136`
+```rust
+self.client.broadcast(&txn).await
+```
+Sends HTTP POST to `/tx` with the raw hex transaction.
+
+### 7. rbitcoin Receives It
+
+**Electrum path:** `rbitcoin/crates/rbitcoin-electrum` listens on TCP, parses the JSON-RPC, and injects the tx into the mempool.
+
+**Esplora path:** `rbitcoin/crates/rbitcoin-esplora` listens on HTTP, routes the POST to the mempool broadcast handler.
+
+Both paths then gossip the transaction to P2P peers.
+
+---
+
+### Common Failure: "Connection refused (os error 61)"
+
+This error occurs at **step 4** when `NodeClient::new()` tries to open a TCP connection to the rbitcoin electrum port, but nothing is listening.
+
+**Why:** rbitcoin's Electrum and Esplora listeners only start after IBD (Initial Block Download) completes. During sync, the P2P node is running but the RPC ports are **closed**.
+
+**Fix:** Wait for the Local Node Status to show **Endpoints Ready** before broadcasting. On first launch with an empty datadir, Signet sync takes 1–3 minutes.
+
 ## Notes
 
 - Ports change every time the node restarts. Always check **Settings > Local Node** for the current session's URLs.
