@@ -3,3 +3,25 @@ set -euo pipefail
 
 echo "Running cargo fmt..."
 cd rust && cargo fmt
+cd ..
+
+echo "Running swiftformat..."
+if command -v swiftformat >/dev/null 2>&1; then
+    swiftformat --lint ios --swiftversion 6
+else
+    echo "swiftformat not installed, skipping"
+fi
+
+echo "Running swiftlint..."
+if command -v swiftlint >/dev/null 2>&1; then
+    swiftlint lint --config .swiftlint.yml
+else
+    echo "swiftlint not installed, skipping"
+fi
+
+echo "Running Cove Swift lint..."
+if [ -f tools/cove-swift-lint/.build/debug/cove-swift-lint ]; then
+    tools/cove-swift-lint/.build/debug/cove-swift-lint ios --config .swift-ast-lint.yml
+else
+    swift run --package-path tools/cove-swift-lint cove-swift-lint ios --config .swift-ast-lint.yml
+fi
