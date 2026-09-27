@@ -136,7 +136,6 @@ impl LocalNodeManager {
     }
 
     /// Wait for the RPC endpoint to accept connections and return the URLs.
-    #[allow(dead_code)]
     pub async fn wait_for_ready(&self, timeout_secs: u64) -> Result<LocalNodeUrls, LocalNodeError> {
         let guard = self.node.read().await;
         let node = guard.as_ref().ok_or_else(|| LocalNodeError::NotRunning)?;
@@ -183,7 +182,13 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
         manager.start(network).await?;
     }
 
-    let urls = manager.urls().await.ok_or_else(|| LocalNodeError::NotRunning)?;
+    // Wait for RPC endpoints to be ready before returning. The node process
+    // may have started but electrum/esplora listeners can take a few seconds
+    // to bind and accept connections.
+    let urls = match manager.wait_for_ready(30).await {
+        Ok(urls) => urls,
+        Err(_) => manager.urls().await.ok_or(LocalNodeError::NotRunning)?,
+    };
 
     let (api_type, url) = match network {
         Network::Bitcoin | Network::Testnet => (ApiType::Electrum, urls.electrum),

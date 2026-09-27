@@ -137,6 +137,24 @@ pub async fn bootstrap() -> Result<Option<String>, AppInitError> {
     if let Err(error) = &result {
         diagnostics::record_bootstrap_failure(error);
         migration::set_active_migration(None);
+        return result;
+    }
+
+    // Eager-start the local node in the background if it is the selected node.
+    // This must happen after storage bootstrap so the database is readable.
+    if cove_tokio::is_tokio_initialized() {
+        let global_config = &crate::database::Database::global().global_config;
+        let network = global_config.selected_network();
+        let is_local = global_config.selected_node_is_local();
+
+        if should_auto_start_local_node(network, is_local) {
+            cove_tokio::task::spawn(async move {
+                match crate::local_node_manager::LOCAL_NODE_MANAGER.start(network).await {
+                    Ok(()) => info!("local node auto-started on bootstrap"),
+                    Err(e) => warn!("local node auto-start on bootstrap failed: {e}"),
+                }
+            });
+        }
     }
 
     result
@@ -415,6 +433,10 @@ fn map_database_key_verification_error(
     }
 }
 
+fn should_auto_start_local_node(network: crate::network::Network, is_local: bool) -> bool {
+    is_local && network != crate::network::Network::Testnet4
+}
+
 fn set_step(step: BootstrapStep) {
     let mut current = BOOTSTRAP_STEP.lock();
 
@@ -478,5 +500,22 @@ pub(crate) mod tests {
         ensure_rustls_provider_installed();
 
         assert!(rustls::crypto::CryptoProvider::get_default().is_some());
+    }
+
+    #[test]
+    fn should_auto_start_when_local_selected_and_supported_network() {
+        use crate::network::Network;
+        assert!(should_auto_start_local_node(Network::Bitcoin, true));
+        assert!(should_auto_start_local_node(Network::Testnet, true));
+        assert!(should_auto_start_local_node(Network::Signet, true));
+    }
+
+    #[test]
+    fn should_not_auto_start_when_not_local_or_unsupported_network() {
+        use crate::network::Network;
+        assert!(!should_auto_start_local_node(Network::Bitcoin, false));
+        assert!(!should_auto_start_local_node(Network::Testnet, false));
+        assert!(!should_auto_start_local_node(Network::Testnet4, true));
+        assert!(!should_auto_start_local_node(Network::Testnet4, false));
     }
 }

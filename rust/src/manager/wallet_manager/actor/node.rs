@@ -19,6 +19,7 @@ use crate::{
         actor::{WalletActor, WalletScanGeneration},
     },
     node::{Node, NodeConnectionIdentity, client::NodeClient},
+    node_connect::LOCAL_NODE_NAME,
     wallet::metadata::BlockSizeLast,
 };
 
@@ -462,9 +463,20 @@ async fn node_client_or_new(
         return Ok(node_client);
     }
 
-    NodeClient::new(node)
-        .await
-        .map_err_prefix("failed to create node client", Error::NodeConnectionFailed)
+    let is_local = node.name == LOCAL_NODE_NAME;
+    let max_attempts = if is_local { 10 } else { 1 };
+    let retry_delay = Duration::from_millis(500);
+
+    for attempt in 1..=max_attempts {
+        let result = NodeClient::new(node).await;
+        if result.is_ok() || attempt == max_attempts {
+            return result
+                .map_err_prefix("failed to create node client", Error::NodeConnectionFailed);
+        }
+        tokio::time::sleep(retry_delay).await;
+    }
+
+    unreachable!()
 }
 
 async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
@@ -476,16 +488,34 @@ async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
     //
     // todo: consider reusing the cached client when using esplora, since esplora
     // uses HTTP and does not have electrum's persistent TCP concurrency limits
-    let node_client = NodeClient::new(node)
-        .await
-        .map_err(|_| "unable to create a connection to the node".to_string())?;
 
-    node_client
-        .check_url()
-        .with_timeout(Duration::from_secs(5))
-        .await
-        .map_err(|_| "unable to connect to node, timeout".to_string())?
-        .map_err(|err| err.to_string())?;
+    let is_local = node.name == LOCAL_NODE_NAME;
+    let max_attempts = if is_local { 10 } else { 1 };
+    let retry_delay = Duration::from_millis(500);
 
-    Ok(())
+    for attempt in 1..=max_attempts {
+        let result = async {
+            let node_client = NodeClient::new(node)
+                .await
+                .map_err(|_| "unable to create a connection to the node".to_string())?;
+
+            node_client
+                .check_url()
+                .with_timeout(Duration::from_secs(5))
+                .await
+                .map_err(|_| "unable to connect to node, timeout".to_string())?
+                .map_err(|err| err.to_string())?;
+
+            Ok(())
+        }
+        .await;
+
+        if result.is_ok() || attempt == max_attempts {
+            return result;
+        }
+
+        tokio::time::sleep(retry_delay).await;
+    }
+
+    unreachable!()
 }
