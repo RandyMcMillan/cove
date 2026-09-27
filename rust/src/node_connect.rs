@@ -173,18 +173,13 @@ impl NodeSelector {
     #[uniffi::method]
     /// Verify a preset node is reachable before selecting it.
     ///
-    /// For the local node preset this only verifies the node process is running
+    /// For the local node preset this waits for the node process to come up
+    /// (it may have been eager-started in the background by `select_local_node`)
     /// — the RPC endpoints may still be initializing, so the live probe is
     /// skipped to avoid blocking the UI.
     pub async fn check_selected_node(&self, node: Node) -> Result<(), Error> {
         if node.name == LOCAL_NODE_NAME {
-            if !crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
-                return Err(Error::NodeAccessError(
-                    "Local node is not running. Start it in Settings > Local Node first."
-                        .to_string(),
-                ));
-            }
-            return Ok(());
+            return wait_for_local_node_running().await;
         }
 
         node.check_url().await.map_err_debug(Error::NodeAccessError)?;
@@ -233,7 +228,7 @@ impl NodeSelector {
     /// Check the node url and set it as selected node if it is valid.
     ///
     /// For remote nodes this probes the URL before saving. For URLs that match
-    /// the local node, it only verifies the node process is running — the RPC
+    /// the local node, it waits for the node process to come up — the RPC
     /// endpoints may still be initializing and should not block the UI.
     pub async fn check_and_save_node(&self, node: Node) -> Result<(), Error> {
         let is_local_url = crate::local_node_manager::LOCAL_NODE_MANAGER
@@ -242,12 +237,7 @@ impl NodeSelector {
             .is_some_and(|urls| node.url == urls.electrum || node.url == urls.esplora);
 
         if is_local_url {
-            if !crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
-                return Err(Error::NodeAccessError(
-                    "Local node is not running. Start it in Settings > Local Node first."
-                        .to_string(),
-                ));
-            }
+            wait_for_local_node_running().await?;
             // Skip the live URL probe — the local node's electrum/esplora
             // listeners start after IBD and may not be ready yet.
         } else {
@@ -269,6 +259,23 @@ impl NodeSelector {
 
         Ok(())
     }
+}
+
+/// Poll the local node manager until the node process is running.
+/// Waits up to 10 seconds with 200 ms intervals before giving up.
+async fn wait_for_local_node_running() -> Result<(), Error> {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+
+    while std::time::Instant::now() < deadline {
+        if crate::local_node_manager::LOCAL_NODE_MANAGER.is_running().await {
+            return Ok(());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+    }
+
+    Err(Error::NodeAccessError(
+        "Local node is not running. Start it in Settings > Local Node first.".to_string(),
+    ))
 }
 
 fn build_node_selection_list(network: Network) -> Vec<NodeSelection> {
