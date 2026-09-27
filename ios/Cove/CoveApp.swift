@@ -285,9 +285,26 @@ extension CoveApplicationRoot {
 
         // unconditional initialization — everything ready before any user interaction
         initializeApp()
+
         Self.excludeDataDirFromBackup(logFailure: true)
         let appManager = AppManager.shared
         appManager.asyncRuntimeReady = true
+
+        // Auto-start the local node in the background if it is the selected node.
+        // This mirrors the Rust bootstrap auto-start but runs from Swift where
+        // NodeSelector has the authoritative view of the current selection.
+        let nodeSelector = NodeSelector()
+        if case .local = nodeSelector.selectedNode() {
+            Log.info("[STARTUP] local node is selected, auto-starting")
+            Task {
+                do {
+                    try await localNodeStart(network: appManager.selectedNetwork)
+                    Log.info("[STARTUP] local node auto-started successfully")
+                } catch {
+                    Log.error("[STARTUP] local node auto-start failed: \(error)")
+                }
+            }
+        }
         CloudConnectivityMonitor.shared.start()
         CloudBackupManager.shared.rust.syncPersistedState()
         CloudBackupManager.shared.rust.startBackgroundInventoryDiscovery()

@@ -140,8 +140,8 @@ pub async fn bootstrap() -> Result<Option<String>, AppInitError> {
         return result;
     }
 
-    // DIAGNOSTIC: unconditionally start the local node on every app launch
-    // to prove it can start on this platform. Remove this once confirmed.
+    // Eager-start the local node in the background if it is the selected node.
+    // This must happen after storage bootstrap so the database is readable.
     if cove_tokio::is_tokio_initialized() {
         let global_config = &crate::database::Database::global().global_config;
         let network = global_config.selected_network();
@@ -149,16 +149,19 @@ pub async fn bootstrap() -> Result<Option<String>, AppInitError> {
 
         info!("bootstrap: local node check — network={network}, is_local={is_local}");
 
-        // ALWAYS start the local node for diagnostic purposes
-        info!("bootstrap: DIAGNOSTIC — unconditionally spawning local node start for {network}");
-        cove_tokio::task::spawn(async move {
-            match crate::local_node_manager::LOCAL_NODE_MANAGER.start(network).await {
-                Ok(()) => info!("bootstrap: local node start completed for {network}"),
-                Err(e) => warn!("bootstrap: local node start failed for {network}: {e}"),
-            }
-        });
+        if should_auto_start_local_node(network, is_local) {
+            info!("bootstrap: spawning local node auto-start task for {network}");
+            cove_tokio::task::spawn(async move {
+                match crate::local_node_manager::LOCAL_NODE_MANAGER.start(network).await {
+                    Ok(()) => info!("bootstrap: local node auto-start completed for {network}"),
+                    Err(e) => warn!("bootstrap: local node auto-start failed for {network}: {e}"),
+                }
+            });
+        } else {
+            info!("bootstrap: skipping local node auto-start — not selected or unsupported network");
+        }
     } else {
-        warn!("bootstrap: tokio not initialized, cannot start local node");
+        warn!("bootstrap: tokio not initialized, cannot auto-start local node");
     }
 
     result

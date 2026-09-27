@@ -164,7 +164,11 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
 
     if !global_config.selected_node_is_local() {
         let node = global_config.selected_node();
-        tracing::info!("resolve_selected_node: returning remote node {} at {}", node.name, node.url);
+        tracing::info!(
+            "resolve_selected_node: returning remote node {} at {}",
+            node.name,
+            node.url
+        );
         return Ok(node);
     }
 
@@ -216,7 +220,9 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
             urls
         }
         Err(e) => {
-            tracing::warn!("resolve_selected_node: wait_for_ready failed: {e}, falling back to cached urls");
+            tracing::warn!(
+                "resolve_selected_node: wait_for_ready failed: {e}, falling back to cached urls"
+            );
             manager.urls().await.ok_or(LocalNodeError::NotRunning)?
         }
     };

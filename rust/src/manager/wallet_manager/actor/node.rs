@@ -94,7 +94,9 @@ impl WalletActor {
                 Ok(resolved) => {
                     tracing::info!(
                         "wallet_actor: resolved node — name={}, url={}, api_type={:?}",
-                        resolved.name, resolved.url, resolved.api_type
+                        resolved.name,
+                        resolved.url,
+                        resolved.api_type
                     );
                     check_node_connection_inner(&resolved).await
                 }
@@ -567,7 +569,10 @@ async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
 
         tracing::info!(
             "check_node_connection_inner: retrying {}/{} for {} in {:?}",
-            attempt, max_attempts, node.url, retry_delay
+            attempt,
+            max_attempts,
+            node.url,
+            retry_delay
         );
         tokio::time::sleep(retry_delay).await;
     }
