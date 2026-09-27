@@ -158,7 +158,9 @@ pub async fn bootstrap() -> Result<Option<String>, AppInitError> {
                 }
             });
         } else {
-            info!("bootstrap: skipping local node auto-start — not selected or unsupported network");
+            info!(
+                "bootstrap: skipping local node auto-start — not selected or unsupported network"
+            );
         }
     } else {
         warn!("bootstrap: tokio not initialized, cannot auto-start local node");
