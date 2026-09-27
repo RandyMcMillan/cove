@@ -242,6 +242,9 @@ private struct CoveMainPresentedContent: View {
             .presentingSheet($app.sheetState, context: presentationContext)
             .onOpenURL(perform: ScanManager.shared.handleFileOpen)
             .onChange(of: phase, initial: true, onChangePhase)
+            .onReceive(NotificationCenter.default.publisher(for: .openAppSettings)) { _ in
+                app.closeSidebarAndOpenSettings()
+            }
     }
 }
 
