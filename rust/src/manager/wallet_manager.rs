@@ -794,6 +794,19 @@ impl RustWalletManager {
         Ok(())
     }
 
+    /// Broadcast a signed transaction to the currently selected node.
+    ///
+    /// This is the FFI entry point called from Swift/Kotlin. The full path is:
+    /// 1. Swift `WalletViewModel.broadcast()` → this FFI wrapper
+    /// 2. `WalletActor::broadcast_transaction()` (actor message)
+    /// 3. `start_broadcast_transaction()` → spawns async work
+    /// 4. `broadcast_transaction_with_connection()` → waits for node connection
+    /// 5. `broadcast_to_node_with_connection()` → gets `NodeClient`, calls broadcast
+    /// 6. `NodeClient::broadcast_transaction()` → dispatches to Electrum or Esplora
+    /// 7. `ElectrumClient::broadcast_transaction()` or `EsploraClient::broadcast_transaction()`
+    ///
+    /// For local node: `resolve_selected_node()` auto-starts rbitcoin if needed and
+    /// waits up to 5 min for RPC endpoints. `node_client_or_new()` retries 10×.
     #[uniffi::method]
     pub async fn broadcast_transaction(
         &self,

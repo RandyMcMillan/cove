@@ -158,6 +158,15 @@ impl LocalNodeManager {
 /// When the user has selected the local node, this ensures it is running and
 /// returns a `Node` with the dynamically allocated URL. Otherwise returns the
 /// persisted remote node.
+///
+/// Local node lifecycle:
+/// 1. Check if a node is already running on the correct network; stop it if not.
+/// 2. Start the node via `LocalNodeManager::start` (spawns the rbitcoin tokio task).
+/// 3. Wait up to 300 s for `wait_for_ready` — the RPC endpoints only become available
+///    after IBD (initial block download) completes, which can take minutes on first run.
+/// 4. Return a `Node` with the actual `tcp://` (electrum) or `http://` (esplora) URL.
+///
+/// If step 3 times out, the error propagates up to the UI as "Node Connection Failed".
 pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
     let global_config = &Database::global().global_config;
     let network = global_config.selected_network();

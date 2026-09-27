@@ -197,6 +197,14 @@ impl WalletActor {
         });
     }
 
+    /// Begin establishing a connection to the selected node.
+    ///
+    /// For remote nodes: resolves the persisted URL and creates a `NodeClient`.
+    /// For the local node: calls `resolve_selected_node()` which auto-starts rbitcoin
+    /// if needed and waits up to 5 minutes for its RPC endpoints to be ready.
+    ///
+    /// The result is sent back to `handle_node_connection_result` which caches the
+    /// `NodeClient` in the actor for subsequent operations (broadcast, height refresh).
     fn start_node_connection(&mut self, reply: Option<NodeConnectionReply>) {
         let node = selected_node_identity_placeholder();
 
@@ -424,6 +432,12 @@ impl WalletActor {
     }
 }
 
+/// Create a `NodeClient` after verifying the node is reachable.
+///
+/// `check_node_connection_inner` probes the node with a fresh temporary connection
+/// (to avoid concurrent access on the shared electrum TCP client). For local nodes
+/// it retries up to 10 times because the RPC port may not be bound immediately after
+/// the process starts.
 pub(crate) async fn checked_node_client(node: &Node) -> Result<NodeClient, Error> {
     check_node_connection_inner(node).await.map_err(Error::NodeConnectionFailed)?;
 
@@ -464,6 +478,11 @@ async fn fetch_node_block_id(
     NodeRefreshResult { key, result }
 }
 
+/// Return a usable `NodeClient`, creating one if necessary.
+///
+/// Reuses `node_client` when its `connection_identity` matches the current node.
+/// For local nodes, retries creation up to 10× with 500 ms delays because the
+/// rbitcoin RPC listener may not be bound yet even though the process is running.
 async fn node_client_or_new(
     node: &Node,
     node_client: Option<NodeClient>,
@@ -508,6 +527,14 @@ async fn node_client_or_new(
     unreachable!()
 }
 
+/// Probe whether the node is actually reachable.
+///
+/// Creates a fresh temporary `NodeClient` for the probe (not the cached one) because
+/// `rust-electrum-client`'s persistent TCP connection is not safe for concurrent use.
+///
+/// For local nodes: retries up to 10× with 500 ms delays. The most common failure is
+/// `Connection refused (os error 61)` — the rbitcoin process started but hasn't bound
+/// its electrum/esplora port yet.
 async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
     // create a fresh client with its own TCP connection for connection probes
     // because the actor may continue processing messages with its cached client

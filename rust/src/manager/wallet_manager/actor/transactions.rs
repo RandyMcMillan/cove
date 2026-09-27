@@ -626,6 +626,10 @@ impl WalletActor {
         Ok((psbt, fallback_tx))
     }
 
+    /// Actor handler for `broadcast_transaction`.
+    ///
+    /// Validates the ledger is ready, then delegates to `start_broadcast_transaction`
+    /// which spawns the actual broadcast work off the actor's main loop.
     pub async fn broadcast_transaction(
         &mut self,
         transaction: BdkTransaction,
@@ -637,6 +641,11 @@ impl WalletActor {
         Ok(self.start_broadcast_transaction(transaction))
     }
 
+    /// Initiate a broadcast without blocking the actor.
+    ///
+    /// Creates a deferred node connection, then spawns `broadcast_transaction_with_connection`
+    /// in a background task. The result is delivered via a oneshot channel wrapped in
+    /// `Produces::Deferred`.
     fn start_broadcast_transaction(
         &mut self,
         transaction: BdkTransaction,
@@ -1182,6 +1191,14 @@ async fn broadcast_payjoin_terminal_with_client(
     Ok(())
 }
 
+/// Broadcast a transaction after the node connection is established.
+///
+/// 1. Waits for `connection` (from `start_node_connection`) to succeed.
+/// 2. Calls `broadcast_to_node_with_connection` to send the tx.
+/// 3. Calls `apply_broadcast_transaction` to persist it in the wallet database.
+///
+/// `connection` is a `Produces` because `start_node_connection` is deferred;
+/// for local nodes it may take minutes on first sync.
 async fn broadcast_transaction_with_connection(
     addr: WeakAddr<WalletActor>,
     connection: Produces<Result<(), Error>>,
@@ -1239,6 +1256,14 @@ async fn payjoin_tx_known_to_node(addr: WeakAddr<WalletActor>, txid: Txid) -> bo
     matches!(response, Ok(Some(ref found)) if found.compute_txid() == txid)
 }
 
+/// Send the transaction bytes to the connected node.
+///
+/// Steps:
+/// 1. Await the deferred connection (fails with "Connection refused" if the local
+///    node hasn't finished binding its RPC port yet).
+/// 2. Get the cached `NodeClient` from the actor.
+/// 3. Call `NodeClient::broadcast_transaction` → Electrum `blockchain.transaction.broadcast`
+///    or Esplora `POST /tx`.
 async fn broadcast_to_node_with_connection(
     addr: WeakAddr<WalletActor>,
     connection: Produces<Result<(), Error>>,

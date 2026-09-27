@@ -133,6 +133,11 @@ impl EsploraClient {
         self.client.get_tx(&txid).await.map_err(Error::EsploraGetTransaction)
     }
 
+    /// Broadcast a transaction via the Esplora HTTP API.
+    ///
+    /// POSTs the raw transaction bytes to `/tx`. Used for Signet and any node
+    /// configured with `ApiType::Esplora`. The local node exposes Esplora on
+    /// a dynamically allocated HTTP port returned by `wait_for_ready`.
     pub async fn broadcast_transaction(&self, txn: bitcoin::Transaction) -> Result<Txid, Error> {
         self.client.broadcast(&txn).await.map_err(Error::EsploraBroadcast)?;
 

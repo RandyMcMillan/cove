@@ -318,6 +318,11 @@ impl ElectrumClient {
         Ok(!txns.is_empty())
     }
 
+    /// Broadcast a transaction via the Electrum protocol.
+    ///
+    /// Calls `blockchain.transaction.broadcast` on the electrum TCP connection.
+    /// This is the final hop in the broadcast chain when the selected node uses
+    /// `ApiType::Electrum` (mainnet, testnet, and local node for those networks).
     pub async fn broadcast_transaction(&self, txn: Transaction) -> Result<Txid, Error> {
         let client = self.client.clone();
         let tx_id = cove_tokio::unblock::run_blocking(move || {
