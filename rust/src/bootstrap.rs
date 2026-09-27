@@ -147,14 +147,21 @@ pub async fn bootstrap() -> Result<Option<String>, AppInitError> {
         let network = global_config.selected_network();
         let is_local = global_config.selected_node_is_local();
 
+        info!("bootstrap: local node check — network={network}, is_local={is_local}");
+
         if should_auto_start_local_node(network, is_local) {
+            info!("bootstrap: spawning local node auto-start task for {network}");
             cove_tokio::task::spawn(async move {
                 match crate::local_node_manager::LOCAL_NODE_MANAGER.start(network).await {
-                    Ok(()) => info!("local node auto-started on bootstrap"),
-                    Err(e) => warn!("local node auto-start on bootstrap failed: {e}"),
+                    Ok(()) => info!("bootstrap: local node auto-start completed for {network}"),
+                    Err(e) => warn!("bootstrap: local node auto-start failed for {network}: {e}"),
                 }
             });
+        } else {
+            info!("bootstrap: skipping local node auto-start — not selected or unsupported network");
         }
+    } else {
+        warn!("bootstrap: tokio not initialized, cannot auto-start local node");
     }
 
     result

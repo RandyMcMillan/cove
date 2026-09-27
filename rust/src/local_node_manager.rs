@@ -163,31 +163,62 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
     let network = global_config.selected_network();
 
     if !global_config.selected_node_is_local() {
-        return Ok(global_config.selected_node());
+        let node = global_config.selected_node();
+        tracing::info!("resolve_selected_node: returning remote node {} at {}", node.name, node.url);
+        return Ok(node);
     }
 
     let manager = &LOCAL_NODE_MANAGER;
+    tracing::info!("resolve_selected_node: local node selected for {network}");
 
     {
         let guard = manager.node.read().await;
         if let Some(ref node) = *guard {
+            tracing::info!(
+                "resolve_selected_node: existing node state — running={}, network={}",
+                node.is_running(),
+                node.network()
+            );
             if !node.is_running() || node.network() != network {
                 drop(guard);
+                tracing::warn!("resolve_selected_node: stopping stale/wrong-network node");
                 manager.stop().await;
             }
+        } else {
+            tracing::info!("resolve_selected_node: no existing node in manager");
         }
     }
 
     if !manager.is_running().await {
-        manager.start(network).await?;
+        tracing::info!("resolve_selected_node: local node not running, starting for {network}");
+        match manager.start(network).await {
+            Ok(()) => tracing::info!("resolve_selected_node: local node start completed"),
+            Err(e) => {
+                tracing::error!("resolve_selected_node: local node start failed: {e}");
+                return Err(e);
+            }
+        }
+    } else {
+        tracing::info!("resolve_selected_node: local node already running");
     }
 
     // Wait for RPC endpoints to be ready before returning. The node process
     // may have started but electrum/esplora listeners can take a few seconds
     // to bind and accept connections.
+    tracing::info!("resolve_selected_node: waiting up to 30s for RPC endpoints");
     let urls = match manager.wait_for_ready(30).await {
-        Ok(urls) => urls,
-        Err(_) => manager.urls().await.ok_or(LocalNodeError::NotRunning)?,
+        Ok(urls) => {
+            tracing::info!(
+                "resolve_selected_node: RPC endpoints ready — electrum={}, esplora={}",
+                urls.electrum,
+                urls.esplora
+            );
+            urls
+        }
+        Err(e) => {
+            tracing::warn!("resolve_selected_node: wait_for_ready failed: {e}, falling back to cached urls");
+            manager.urls().await.ok_or(LocalNodeError::NotRunning)?
+        }
     };
 
     let (api_type, url) = match network {
@@ -200,6 +231,7 @@ pub async fn resolve_selected_node() -> Result<Node, LocalNodeError> {
         }
     };
 
+    tracing::info!("resolve_selected_node: returning local node with url={url}");
     let node = Node { name: LOCAL_NODE_NAME.to_string(), network, api_type, url };
 
     Ok(node)

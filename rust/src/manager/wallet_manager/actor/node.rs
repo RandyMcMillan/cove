@@ -87,11 +87,21 @@ impl WalletActor {
     #[into_actor_result]
     pub async fn check_node_connection(&mut self) {
         let node = selected_node_identity_placeholder();
+        tracing::info!("wallet_actor: check_node_connection called for {}", node.name);
 
         self.addr.send_fut_with(|addr| async move {
             let result = match resolve_selected_node().await {
-                Ok(resolved) => check_node_connection_inner(&resolved).await,
-                Err(error) => Err(error.to_string()),
+                Ok(resolved) => {
+                    tracing::info!(
+                        "wallet_actor: resolved node — name={}, url={}, api_type={:?}",
+                        resolved.name, resolved.url, resolved.api_type
+                    );
+                    check_node_connection_inner(&resolved).await
+                }
+                Err(error) => {
+                    tracing::error!("wallet_actor: resolve_selected_node failed: {error}");
+                    Err(error.to_string())
+                }
             };
             send!(addr.handle_node_connection_check_result(node, result));
         });
@@ -467,13 +477,30 @@ async fn node_client_or_new(
     let max_attempts = if is_local { 10 } else { 1 };
     let retry_delay = Duration::from_millis(500);
 
+    tracing::info!(
+        "node_client_or_new: creating client for {} (local={is_local}, attempts={max_attempts})",
+        node.url
+    );
+
     for attempt in 1..=max_attempts {
-        let result = NodeClient::new(node).await;
-        if result.is_ok() || attempt == max_attempts {
-            return result
-                .map_err_prefix("failed to create node client", Error::NodeConnectionFailed);
+        match NodeClient::new(node).await {
+            Ok(client) => {
+                tracing::info!("node_client_or_new: client created on attempt {attempt}");
+                return Ok(client);
+            }
+            Err(err) => {
+                tracing::warn!(
+                    "node_client_or_new: attempt {attempt}/{max_attempts} failed for {}: {err}",
+                    node.url
+                );
+                if attempt == max_attempts {
+                    return Err(Error::NodeConnectionFailed(format!(
+                        "failed to create node client after {max_attempts} attempts: {err}"
+                    )));
+                }
+                tokio::time::sleep(retry_delay).await;
+            }
         }
-        tokio::time::sleep(retry_delay).await;
     }
 
     unreachable!()
@@ -495,18 +522,42 @@ async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
 
     for attempt in 1..=max_attempts {
         let result = async {
-            let node_client = NodeClient::new(node)
-                .await
-                .map_err(|_| "unable to create a connection to the node".to_string())?;
-
-            node_client
-                .check_url()
-                .with_timeout(Duration::from_secs(5))
-                .await
-                .map_err(|_| "unable to connect to node, timeout".to_string())?
-                .map_err(|err| err.to_string())?;
-
-            Ok(())
+            match NodeClient::new(node).await {
+                Ok(node_client) => {
+                    tracing::info!(
+                        "check_node_connection_inner: NodeClient created successfully for {} (attempt {attempt})",
+                        node.url
+                    );
+                    match node_client
+                        .check_url()
+                        .with_timeout(Duration::from_secs(5))
+                        .await
+                    {
+                        Ok(Ok(())) => Ok(()),
+                        Ok(Err(err)) => {
+                            tracing::warn!(
+                                "check_node_connection_inner: check_url failed for {} (attempt {attempt}): {err}",
+                                node.url
+                            );
+                            Err(format!("check_url failed: {err}"))
+                        }
+                        Err(_) => {
+                            tracing::warn!(
+                                "check_node_connection_inner: check_url timed out for {} (attempt {attempt})",
+                                node.url
+                            );
+                            Err("unable to connect to node, timeout".to_string())
+                        }
+                    }
+                }
+                Err(err) => {
+                    tracing::warn!(
+                        "check_node_connection_inner: NodeClient::new failed for {} (attempt {attempt}): {err}",
+                        node.url
+                    );
+                    Err(format!("unable to create a connection to the node: {err}"))
+                }
+            }
         }
         .await;
 
@@ -514,6 +565,10 @@ async fn check_node_connection_inner(node: &Node) -> Result<(), String> {
             return result;
         }
 
+        tracing::info!(
+            "check_node_connection_inner: retrying {}/{} for {} in {:?}",
+            attempt, max_attempts, node.url, retry_delay
+        );
         tokio::time::sleep(retry_delay).await;
     }
 
